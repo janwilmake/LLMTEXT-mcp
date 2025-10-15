@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publisher Analytics - llmtext</title>
+    <meta name="description" content="Understand who uses your content. Deep insights into AI consumption patterns." />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://llmtext.com/pricing" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Publisher Analytics - llmtext" />
+    <meta property="og:description"
+        content="Understand who uses your content. Deep insights into AI consumption patterns." />
+    <meta property="og:image" content="https://llmtext.com/og.png" />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content="llmtext.com" />
+    <meta property="twitter:url" content="https://llmtext.com/pricing" />
+    <meta name="twitter:title" content="Publisher Analytics - llmtext" />
+    <meta name="twitter:description"
+        content="Understand who uses your content. Deep insights into AI consumption patterns." />
+    <meta name="twitter:image" content="https://llmtext.com/og.png" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            background: #ffffff;
+            color: #1d1d1f;
+            line-height: 1.4;
+            font-weight: 400;
+            letter-spacing: -0.022em;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .brand-header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            background-color: #4fc1ae;
+            padding: 0px 5px;
+            border-radius: 2px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1d1d1f;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-link {
+            background: #f5f5f7;
+            color: #1d1d1f;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid #d2d2d7;
+        }
+
+        .nav-link:hover {
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 120px 20px 80px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 64px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            color: #1d1d1f;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 28px;
+            font-weight: 400;
+            margin-bottom: 80px;
+            color: #86868b;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 80px;
+        }
+
+        .features-section {
+            margin-bottom: 120px;
+        }
+
+        .feature {
+            margin-bottom: 80px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature:last-child {
+            margin-bottom: 0;
+        }
+
+        .feature-title {
+            font-size: 48px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #1d1d1f;
+            line-height: 1.1;
+        }
+
+        .feature-description {
+            font-size: 24px;
+            color: #86868b;
+            line-height: 1.3;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-section {
+            background: #f5f5f7;
+            border-radius: 24px;
+            padding: 80px 60px;
+            margin: 80px auto 0;
+            max-width: 800px;
+        }
+
+        .cta-title {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1d1d1f;
+        }
+
+        .cta-subtitle {
+            font-size: 21px;
+            color: #86868b;
+            margin-bottom: 40px;
+        }
+
+        .cta-button {
+            background: #1d1d1f;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-size: 19px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            background: #424245;
+            transform: translateY(-2px);
+        }
+
+        .contact-info {
+            margin-top: 24px;
+            font-size: 17px;
+            color: #86868b;
+        }
+
+        .contact-info a {
+            color: #007aff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .header {
+                position: static;
+                justify-content: center;
+                margin-bottom: 40px;
+                padding: 20px;
+            }
+
+            .brand-header {
+                position: static;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .brand-logo {
+                font-size: 32px;
+                padding: 2px 8px;
+            }
+
+            .container {
+                padding: 60px 20px;
+            }
+
+            h1 {
+                font-size: 40px;
+                margin-bottom: 20px;
+            }
+
+            .subtitle {
+                font-size: 22px;
+                margin-bottom: 60px;
+                padding: 0 10px;
+            }
+
+            .features-section {
+                margin-bottom: 80px;
+            }
+
+            .feature {
+                margin-bottom: 60px;
+            }
+
+            .feature-title {
+                font-size: 32px;
+                margin-bottom: 20px;
+            }
+
+            .feature-description {
+                font-size: 19px;
+                padding: 0 10px;
+            }
+
+            .cta-section {
+                padding: 50px 30px;
+                border-radius: 20px;
+            }
+
+            .cta-title {
+                font-size: 28px;
+                margin-bottom: 16px;
+            }
+
+            .cta-subtitle {
+                font-size: 18px;
+                margin-bottom: 32px;
+            }
+
+            .cta-button {
+                padding: 16px 32px;
+                font-size: 17px;
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 40px 16px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 19px;
+            }
+
+            .feature-title {
+                font-size: 28px;
+            }
+
+            .feature-description {
+                font-size: 17px;
+            }
+
+            .cta-section {
+                padding: 40px 24px;
+                border-radius: 16px;
+            }
+
+            .cta-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="brand-header">
+        <a href="/" class="brand-logo">LLMTEXT</a>
+    </div>
+
+    <div class="header">
+        <a href="/" class="nav-link">Home</a>
+    </div>
+
+    <div class="container">
+        <h1>Know Your Audience</h1>
+        <p class="subtitle">Understand who uses your content with AI. Deep insights into consumption patterns.</p>
+
+        <div class="features-section">
+            <div class="feature">
+                <div class="feature-title">Usage Intelligence</div>
+                <div class="feature-description">
+                    Track who accesses your content, when, and how often. See patterns emerge over time.
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">User Profiles</div>
+                <div class="feature-description">
+                    Connect usage data to social profiles. Understand what your content enables.
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">AI Guide Creation</div>
+                <div class="feature-description">
+                    Transform your documentation into intelligent, personalized guides that understand user intent.
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <div class="cta-title">Enterprise Solutions</div>
+            <div class="cta-subtitle">Custom analytics and insights tailored to your needs.</div>
+            <a href="mailto:hello@parallel.ai?subject=Publisher Analytics Inquiry&body=Hi, I'm interested in learning more about publisher analytics for my website."
+                class="cta-button">Contact Us</a>
+            <div class="contact-info">
+                <a href="mailto:hello@parallel.ai">hello@parallel.ai</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

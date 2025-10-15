@@ -1,8 +1,8 @@
 /// <reference types="@cloudflare/workers-types" />
+/// <reference lib="esnext" />
+
 import { DurableObject } from "cloudflare:workers";
 import { withSimplerAuth, UserContext } from "simplerauth-client";
-//@ts-ignore
-import html from "./html.html";
 import { convertRestToMcp } from "rest-mcp";
 //@ts-ignore
 import popular from "./popular.json";
@@ -26,7 +26,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export default {
   fetch: withSimplerAuth(
-    async (request: Request, env: Env, ctx: UserContext): Promise<Response> => {
+    async (request: Request, env: Env, ctx: UserContext) => {
       // Validate required env
       if (!env.HISTORY_DO) {
         return new Response("HISTORY_DO binding not configured", {
@@ -44,9 +44,9 @@ export default {
       const hostname = pathSegments[0];
 
       // Handle root path
+      // Handle root path
       if (path === "/") {
         const historyDO = env.HISTORY_DO.get(env.HISTORY_DO.idFromName(DO_ID));
-        const stats = await historyDO.getPersonalStats(ctx.user?.username);
         const leaderboard = await historyDO.getLeaderboard(undefined, 10);
 
         // Get existing server hostnames from leaderboard
@@ -70,9 +70,36 @@ export default {
 <html lang="en">
 
 <head>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>llmtext.com</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>llmtext - An MCP server for every llms.txt</title>
+<meta name="description" content="Get an MCP server that knows your llms.txt to always retrieve the right context when needed." />
+<meta name="robots" content="index, follow" />
+
+<!-- Facebook Meta Tags -->
+<meta property="og:url" content="https://llmtext.com" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="llmtext - An MCP server for every llms.txt" />
+<meta property="og:description" content="Get an MCP server that knows your llms.txt to always retrieve the right context when needed." />
+<meta property="og:image" content="https://llmtext.com/og.png" />
+<meta property="og:image:alt" content="Get an MCP server that knows your llms.txt to always retrieve the right context when needed."/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+
+<!-- Twitter Meta Tags -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:domain" content="llmtext.com" />
+<meta property="twitter:url" content="https://llmtext.com" />
+<meta name="twitter:title" content="llmtext - An MCP server for every llms.txt" />
+<meta name="twitter:description" content="Get an MCP server that knows your llms.txt to always retrieve the right context when needed." />
+<meta name="twitter:image" content="https://llmtext.com/og.png" />
+
     <style>
         * {
             margin: 0;
@@ -95,6 +122,61 @@ export default {
             right: 20px;
             display: flex;
             gap: 16px;
+            z-index: 10;
+        }
+
+        .brand-header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            background-color: #4fc1ae;
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+            border-radius: 2px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1d1d1f;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            margin-bottom: 2px;
+        }
+
+        .brand-by {
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: #86868b;
+            margin-bottom: 4px;
+            font-weight: 400;
+        }
+
+        .parallel-logo {
+            height: 12px;
+            width: auto;
+            margin-bottom: 2px;
+        }
+
+        .read-more {
+            font-size: 12px;
+            color: #007aff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .read-more:hover {
+            color: #0051d0;
         }
 
         .tool-link {
@@ -115,6 +197,11 @@ export default {
             transform: translateY(-1px);
         }
 
+        .tools-label {
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
         .container {
             max-width: 980px;
             margin: 0 auto;
@@ -122,19 +209,20 @@ export default {
         }
 
         h1 {
-            font-size: 56px;
+            font-size: 48px;
             font-weight: 600;
             letter-spacing: -0.005em;
             text-align: center;
+            margin-top: 24px;
             margin-bottom: 24px;
             color: #1d1d1f;
         }
 
         .subtitle {
-            font-size: 28px;
+            font-size: 21px;
             font-weight: 400;
             text-align: center;
-            margin-bottom: 80px;
+            margin-bottom: 20px;
             color: #86868b;
         }
 
@@ -266,13 +354,52 @@ export default {
             transform: translateY(-1px);
         }
 
+        /* Mobile styles */
         @media (max-width: 768px) {
             .header {
-                position: relative;
-                top: 0;
-                right: 0;
-                justify-content: center;
-                margin-bottom: 40px;
+                position: static;
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 20px;
+                padding: 0;
+            }
+
+            .tools-label {
+                margin-top: 0;
+                margin-bottom: 8px;
+                order: -1;
+            }
+
+            .tool-link {
+                padding: 10px 20px;
+                font-size: 16px;
+                width: 100%;
+                text-align: center;
+                max-width: 280px;
+            }
+
+            .brand-header {
+                position: static;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .brand-logo {
+                font-size: 32px;
+                padding: 2px 8px;
+            }
+
+            .brand-by {
+                font-size: 10px;
+            }
+
+            .parallel-logo {
+                height: 14px;
+            }
+
+            .read-more {
+                font-size: 14px;
             }
 
             .container {
@@ -280,16 +407,23 @@ export default {
             }
 
             h1 {
-                font-size: 40px;
+                font-size: 36px;
+                line-height: 1.1;
+                margin-top: 0px;
+                margin-bottom: 16px;
             }
 
             .subtitle {
-                font-size: 21px;
+                font-size: 18px;
+                margin-bottom: 30px;
+                padding: 0 10px;
             }
 
             .form-section,
             .leaderboard {
-                padding: 24px;
+                padding: 24px 20px;
+                border-radius: 16px;
+                margin-bottom: 40px;
             }
 
             .input-group {
@@ -297,28 +431,110 @@ export default {
                 gap: 16px;
             }
 
+            input[type="url"] {
+                width: 100%;
+                font-size: 16px;
+                padding: 14px 16px;
+            }
+
+            .install-btn {
+                width: 100%;
+                padding: 14px 24px;
+                font-size: 16px;
+            }
+
+            .leaderboard h2 {
+                font-size: 26px;
+                margin-bottom: 24px;
+            }
+
             .mcp-item {
                 flex-direction: column;
                 gap: 16px;
-                align-items: flex-start;
+                align-items: stretch;
+                padding: 16px 0;
             }
 
             .mcp-info {
                 width: 100%;
+                gap: 12px;
+            }
+
+            .mcp-rank {
+                font-size: 20px;
+                min-width: 28px;
+            }
+
+            .mcp-favicon {
+                width: 18px;
+                height: 18px;
+            }
+
+            .mcp-name {
+                font-size: 17px;
+                word-break: break-word;
+            }
+
+            .mcp-stats {
+                font-size: 14px;
+                line-height: 1.3;
+            }
+
+            .mcp-install {
+                width: 100%;
+                text-align: center;
+                padding: 12px 20px;
+                margin-top: 8px;
+                border-radius: 10px;
+            }
+        }
+
+        /* Extra small mobile styles */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 12px;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .form-section,
+            .leaderboard {
+                padding: 20px 16px;
+            }
+
+            .brand-logo {
+                font-size: 28px;
+            }
+
+            .leaderboard h2 {
+                font-size: 24px;
             }
         }
     </style>
 </head>
 
 <body>
+    <div class="brand-header">
+        <a href="/" class="brand-logo">LLMTEXT</a>
+        <span class="brand-by">by <img src="/dark-parallel-text-270.svg" alt="Parallel AI" class="parallel-logo" /></span>
+        <a href="https://parallel.ai/blog" class="read-more" target="_blank">read more &gt;</a>
+    </div>
+
     <div class="header">
+        <span class="tools-label">Tools</span>
         <a href="https://check.llmtext.com" class="tool-link" target="_blank">llms.txt checker</a>
         <a href="https://reader.llmtext.com" class="tool-link" target="_blank">html md reader</a>
     </div>
 
     <div class="container">
-        <h1>llmtext</h1>
-        <p class="subtitle">Install MCP servers from llms.txt</p>
+        <h1>Turn Your Docs into a Dedicated MCP Server</h1>
+        <p class="subtitle">Eliminate token bloat in docs to improve LLM understanding.</p>
 
         <div class="form-section">
             <form id="mcpForm" class="input-group">
@@ -329,7 +545,7 @@ export default {
         </div>
 
         <div class="leaderboard">
-            <h2>Popular LLMs.txt MCP Servers</h2>
+            <h2>Popular llms.txt MCP Servers</h2>
             <div id="mcpList">
                 ${allServers
                   .map((server, index) => {
@@ -348,9 +564,17 @@ export default {
                     } favicon" class="mcp-favicon" onerror="this.style.display='none'">
                         <div class="mcp-details">
                             <div class="mcp-name">${server.hostname}</div>
-                            <div class="mcp-stats">${server.total_requests.toLocaleString()} requests • ${(
-                      server.total_tokens || 0
-                    ).toLocaleString()} tokens</div>
+                            ${
+                              server.total_requests ||
+                              server.total_tokens ||
+                              server.unique_users
+                                ? `<div class="mcp-stats">usage - ${server.total_requests.toLocaleString()} requests • ${(
+                                    server.total_tokens || 0
+                                  ).toLocaleString()} tokens ingested by ${(
+                                    server.unique_users || 0
+                                  ).toLocaleString()} users</div>`
+                                : ""
+                            }
                         </div>
                     </div>
                     <a href="${installUrl}" class="mcp-install" target="_blank">Install</a>
@@ -392,9 +616,8 @@ export default {
           const stats = await historyDO.getPersonalStats(ctx.user?.username);
           const leaderboard = await historyDO.getLeaderboard();
 
-          let content = `MCP URL Fetcher - llms.txt\n`;
+          let content = `llmtext fetcher - llms.txt\n`;
           content += `================================\n\n`;
-          content += `Access Token: ${ctx.accessToken}\n\n`;
           content += `Your Stats:\n`;
           content += `- Total requests: ${stats.totalRequests}\n`;
           content += `- Total tokens: ${stats.totalTokens}\n`;
@@ -807,7 +1030,7 @@ async function handleMcp(
         {
           name: "get",
           title: `Get context for ${llmsTxtData.hostname}`,
-          description: `Fetch content and return them as plain text. This MCP server is configured for ${llmsTxtData.hostname} with the following llms.txt content:\n\n${llmsTxtData.content}`,
+          description: `Fetch content and return them as plain text. Always first retrieve relevant context before doing something that requires new information This MCP server is configured for ${llmsTxtData.hostname} with the following llms.txt content:\n\n${llmsTxtData.content}`,
           inputSchema: {
             type: "object",
             required: ["urls"],
@@ -815,7 +1038,7 @@ async function handleMcp(
               urls: {
                 type: "array",
                 items: { type: "string" },
-                description: "Multiple URLs to fetch content from",
+                description: "Multiple URLs to fetch content from.",
               },
             },
           },
@@ -1265,18 +1488,21 @@ export class HistoryDO extends DurableObject<Env> {
       mcpHosts,
     };
   }
-
   async getLeaderboard(mcpHostname?: string, limit?: number) {
     let userQuery = `
-      SELECT username, COUNT(*) as total_requests, SUM(tokens) as total_tokens
-      FROM history
-    `;
+    SELECT username, COUNT(*) as total_requests, SUM(tokens) as total_tokens
+    FROM history
+  `;
     let serverQuery = `
-      SELECT mcp_hostname as hostname, COUNT(*) as total_requests, SUM(tokens) as total_tokens
-      FROM history
-      GROUP BY mcp_hostname
-      ORDER BY total_requests DESC
-    `;
+    SELECT 
+      mcp_hostname as hostname, 
+      COUNT(*) as total_requests, 
+      SUM(tokens) as total_tokens,
+      COUNT(DISTINCT username) as unique_users
+    FROM history
+    GROUP BY mcp_hostname
+    ORDER BY total_requests DESC
+  `;
     let totalQuery = `SELECT COUNT(*) as total_requests, SUM(tokens) as total_tokens FROM history`;
 
     const params = [];
@@ -1305,7 +1531,6 @@ export class HistoryDO extends DurableObject<Env> {
       totalTokens: totals?.total_tokens || 0,
     };
   }
-
   async getActivityTrends(mcpHostname?: string) {
     const cacheKey = `${HistoryDO.TRENDS_CACHE_KEY}_${mcpHostname || "global"}`;
 
