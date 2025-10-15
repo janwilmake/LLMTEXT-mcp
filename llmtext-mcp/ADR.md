@@ -16,12 +16,8 @@ As a fist rule, keep it under 10k:
 
 Other than that I've found the following common mistakes in llms.txt files:
 
-Other common mistakes for llms.txt:
-
-1. not served at https
-2. slow: ensure it responds within 2 seconds, but preferably, much faster
-3. not served at root. ensure your llms.txt is served at the root of your (sub)domain: yourwebsite.com/llms.txt
-4. erroring out when presenting an accept header of text/plain or text/markdown. e.g. mintlify.ai currently does this
-5. wrong content-type. ensure to respond with either text/plain or text/markdown.
-6. the content is the full docs. the content must contain markdown links to docs, not all docs in one page
-7. links return html. the links must lead to a text/markdown or text/plain acceptable response.
+1. **not served at root**. ensure your llms.txt is served at the root of your (sub)domain: yourwebsite.com/llms.txt
+2. erroring out when presenting an accept header of text/plain or text/markdown. e.g. mintlify.ai currently does this
+3. **wrong content-type**. ensure to respond with either text/plain or text/markdown.
+4. **the content is the full docs**. the content must contain markdown links to docs, not all docs in one page
+5. **links return html**. the links must lead to a text/markdown or text/plain acceptable response.
