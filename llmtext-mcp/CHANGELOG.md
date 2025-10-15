@@ -17,33 +17,10 @@
 - ✅ Make X oauth work for cursor/vscode and others! X OAuth is vital for leaderboard, it's not the same without it!
 - ✅ Add daily active developer statistic for hostname.
 
-# Make it appealing
+## Make it appealing
 
 - ✅ Retrieve MCP servers from one of these: https://llmstxt.site https://github.com/thedaviddias/llms-txt-hub https://directory.llmstxt.cloud into static file
 - ✅ Use this to server-render install links to all of these, add search on top.
 - ✅ Make favicon / icon files
 - ✅ Make og:image using chatgpt
 - ✅ Add good SEO into frontpage
--
-
-# Determine way to do it
-
-- ✅ LLMtext by parallel (-> read blogpost)
-- blog: Why this is better than context7: Blog about reasoning over a table of contents versus vector search
-- highlight the social element more: top 10 users per server + overall top10 leaderboard
-- give people an option to opt-out of the social element before logging in with X
-
-# Web publishers offering
-
-- Understand who ingests your context
-- Premium 'ai guide creation' tool
-
-# Launch
-
-- Open issue in https://github.com/AnswerDotAI/llms-txt
-- Reach out to https://x.com/jeremyphoward
-- On parallel cookbook, remove old stuff, add this one.
-- On parallel docs, link to this (If X oauth is OK)
-- Launch it on MCP directories in a way that context7/gitmcp did it too
-- Use it for https://docs.parallel.ai/llms.txt and make demo
-- X Launch post
