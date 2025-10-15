@@ -517,6 +517,8 @@ export default {
             }
         }
     </style>
+    <link rel="preload" href="/dark-parallel-text-270.svg" as="image">
+
 </head>
 
 <body>
