@@ -1,0 +1,256 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Reader API",
+    "description": "An API that extracts readable content from web pages using Mozilla's Readability library",
+    "version": "1.0.0",
+    "contact": {
+      "url": "https://reader.llmtext.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://reader.llmtext.com",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/html/{url}": {
+      "get": {
+        "summary": "Extract readable content as HTML",
+        "description": "Fetches a webpage and extracts its main content in HTML format",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "path",
+            "required": true,
+            "description": "The URL of the webpage to process (URL-encoded)",
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "example.com/article"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully extracted HTML content",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "description": "Article content in HTML format"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid URL",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Invalid URL"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - No HTML content at the specified URL",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "No HTML"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Error: Failed to parse content"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/md/{url}": {
+      "get": {
+        "summary": "Extract readable content as Markdown",
+        "description": "Fetches a webpage and extracts its main content in Markdown format",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "path",
+            "required": true,
+            "description": "The URL of the webpage to process (URL-encoded)",
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "example.com/article"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully extracted Markdown content",
+            "content": {
+              "text/markdown": {
+                "schema": {
+                  "type": "string",
+                  "description": "Article content in Markdown format"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid URL",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Invalid URL"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - No HTML content at the specified URL",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "No HTML"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Error: Failed to parse content"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/json/{url}": {
+      "get": {
+        "summary": "Extract readable content as JSON",
+        "description": "Fetches a webpage and extracts its main content with full metadata in JSON format",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "path",
+            "required": true,
+            "description": "The URL of the webpage to process (URL-encoded)",
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "example.com/article"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully extracted content with metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["title", "content", "textContent", "length"],
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "description": "Article title"
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Article content in HTML format"
+                    },
+                    "textContent": {
+                      "type": "string",
+                      "description": "Article content in plain text"
+                    },
+                    "length": {
+                      "type": "integer",
+                      "description": "Content length"
+                    },
+                    "excerpt": {
+                      "type": "string",
+                      "description": "Article excerpt"
+                    },
+                    "byline": {
+                      "type": "string",
+                      "description": "Article author or byline"
+                    },
+                    "dir": {
+                      "type": "string",
+                      "description": "Text direction (e.g., 'ltr', 'rtl')"
+                    },
+                    "siteName": {
+                      "type": "string",
+                      "description": "Name of the website"
+                    },
+                    "lang": {
+                      "type": "string",
+                      "description": "Content language code"
+                    },
+                    "publishedTime": {
+                      "type": "string",
+                      "description": "Article publication timestamp"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid URL",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Invalid URL"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - No HTML content at the specified URL",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "No HTML"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Error: Failed to parse content"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

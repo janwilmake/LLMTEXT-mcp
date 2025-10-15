@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "name": "mcp-url-fetcher",
+  "main": "worker.ts",
+  "assets": { "directory": "./" },
+  "compatibility_date": "2025-10-14",
+  "observability": { "logs": { "enabled": true } },
+  "durable_objects": {
+    "bindings": [{ "name": "HISTORY_DO", "class_name": "HistoryDO" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["HistoryDO"] }],
+  "routes": [
+    { "custom_domain": true, "pattern": "llmtext.com" },
+    { "custom_domain": true, "pattern": "www.llmtext.com" }
+  ]
+}

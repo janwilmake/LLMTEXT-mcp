@@ -1,0 +1,13 @@
+{
+  "name": "getassetmanifest",
+  "version": "0.0.5",
+  "main": "mod.js",
+  "files": [
+    "mod.js",
+    "cli.js"
+  ],
+  "bin": "cli.js",
+  "dependencies": {
+    "multipart-formdata-stream-js": "^0.0.18"
+  }
+}

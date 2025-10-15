@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "name": "llmtext-check",
+  "main": "worker.ts",
+  "compatibility_date": "2025-10-14",
+  "observability": { "logs": { "enabled": true } },
+  "routes": [{ "custom_domain": true, "pattern": "check.llmtext.com" }]
+}
