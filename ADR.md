@@ -23,3 +23,41 @@ Other than that I've found the following common mistakes in llms.txt files:
 5. **links return html**. the links must lead to a text/markdown or text/plain acceptable response.
 
 Lots of llms.txt are low quality and the guidelines from the standard are ambiguous.
+
+<!--
+Why we built this
+What we think the value is
+How to use it
++ Any other interesting observations
+-->
+
+# no description from `/extract` api
+
+extract endpont nicely returns title and published date which is truly awesome, but it doesn't get the description, causing me to need to do 2 extra api calls PER PAGE.
+
+# Why separate repo & hostname is best practice?
+
+After considering this for a while, it seems to me that a separate repo is better practice than putting it on the root. Why?
+
+- we don't want only the main domain, we want all subdomains and other locations where important context can be found.
+- it reduces complication because it can be a different host, makign it easier to set up github actions without getting in a weird loop
+- can make OSS which also allows people to explore the markdown on github
+- can more easily deploy MCP server besides it (subdomain)
+- we can just add proper info in rel alternate and redirect from 'accept' header
+
+# What are goals for this project, what are non-goals?
+
+Goals
+
+- Brand awareness Parallel
+- Viral potential
+- Establish Developer Trust
+
+Non goals
+
+- Extra revenue for parallel
+
+How to get this
+
+- Make it an independent project aiming to be taken over by OSS community
+- Make it 'Sponsored/powered/backed by Parallel', not 'by Parallel'

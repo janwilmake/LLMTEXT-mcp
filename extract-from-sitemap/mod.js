@@ -8,6 +8,7 @@
  * @property {boolean} extracted - Whether the content was extracted or directly fetched
  * @property {number} status - HTTP status code or processing status
  * @property {number} tokens - Number of tokens in the content
+ * @property {string} originalUrl - The original URL of the content
  */
 
 /**
@@ -62,6 +63,7 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
           status: result.status,
           tokens: Math.round(result.content.length / 5),
           publishedDate: result.publishedDate || "",
+          originalUrl: urlStr,
           error: result.error,
         };
 
@@ -80,6 +82,7 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
           status: 0,
           tokens: 0,
           publishedDate: "",
+          originalUrl: urlStr,
         };
         if (!forceExtract) {
           urlsNeedingExtract.push(urlStr);
@@ -108,6 +111,7 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
           status: 0,
           tokens: 0,
           publishedDate: "",
+          originalUrl: result.url,
         };
 
         const content = result.full_content || existing.content;
@@ -122,6 +126,7 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
           publishedDate: result.published_date || existing.publishedDate,
           status: existing.status,
           tokens: Math.round(content.length / 5),
+          originalUrl: existing.originalUrl,
         };
       }
 
@@ -137,18 +142,6 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
     }
   }
 
-  // Generate llms.txt
-  const llmsTxt = generateLlmsTxt(origin, files);
-  files["/llms.txt"] = {
-    content: llmsTxt,
-    title: "LLMs.txt",
-    description: "LLM-friendly content listing",
-    extracted: false,
-    publishedDate: "",
-    status: 200,
-    tokens: Math.round(llmsTxt.length / 5),
-  };
-
   // Sort files by path
   const sortedFiles = Object.keys(files)
     .sort()
@@ -162,7 +155,7 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
     (sum, file) => sum + file.tokens,
     0
   );
-  const totalPages = Object.keys(sortedFiles).length - 1; // Exclude llms.txt from page count
+  const totalPages = Object.keys(sortedFiles).length;
   const errors = Object.values(sortedFiles).filter((file) => file.error).length;
   const processingTimeMs = Date.now() - startTime;
 
@@ -525,44 +518,6 @@ function getPathFromUrl(urlStr) {
     // Fallback to a sanitized version of the full URL
     return "/" + urlStr.replace(/[^a-zA-Z0-9]/g, "_");
   }
-}
-
-/**
- * Generate llms.txt content
- * @param {string} origin - Site origin
- * @param {Record<string, any>} files - Files object
- * @returns {string} Generated llms.txt content
- */
-function generateLlmsTxt(origin, files) {
-  // Find homepage for top-level description
-  const homepageFile = files["/index.html.md"] || files[Object.keys(files)[0]];
-  const siteTitle =
-    homepageFile?.title ||
-    new URL(origin.startsWith("http") ? origin : `https://${origin}`).hostname;
-  const siteDescription =
-    homepageFile?.description || `Documentation for ${siteTitle}`;
-
-  let llmsTxt = `# ${siteTitle}\n\n> ${siteDescription}\n\n`;
-
-  // Add documentation section
-  llmsTxt += "## Documentation\n\n";
-
-  // Sort files by path for consistent ordering
-  const sortedFiles = Object.entries(files)
-    .filter(([path]) => path !== "/llms.txt")
-    .sort(([a], [b]) => a.localeCompare(b));
-
-  for (const [path, file] of sortedFiles) {
-    if (file.content || file.title) {
-      const title = file.title || path.replace(".md", "");
-      const description = file.description ? `: ${file.description}` : "";
-      llmsTxt += `- [${title}](${path.replace(".md", "")}) (${
-        file.tokens
-      } tokens)${description}\n`;
-    }
-  }
-
-  return llmsTxt;
 }
 
 /**

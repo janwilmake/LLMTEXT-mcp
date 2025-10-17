@@ -10,17 +10,19 @@ const os = require("os");
 const { extractFromSitemap } = require("./mod.js");
 
 /**
- * @typedef {Object} OriginConfig
- * @property {string} origin - The origin URL to process
- * @property {boolean} forceExtract - Whether to force extraction for this origin
+ * @typedef {Object} SourceConfig
+ * @property {string} title - The title for this source
+ * @property {string} [origin] - The origin URL to process (optional)
+ * @property {string} [outDir] - Output directory for this source's extracted files
+ * @property {boolean} [forceExtract] - Whether to force extraction for this source
+ * @property {boolean} [keepOriginalUrls] - Whether to keep original URL structure and not save files locally
+ * @property {Array<{title: string, description: string, filename: string, url: string}>} [customUrls] - Custom URLs to extract for this source
  */
 
 /**
  * @typedef {Object} Config
- * @property {string} outDir - Output directory for extracted files
- * @property {OriginConfig[]} origins - Array of origin configurations
- * @property {Array<{title: string, description: string, url: string}>} customUrls - Custom URLs to extract
- * @property {boolean} keepOriginalUrls - Whether to keep original URL structure
+ * @property {string} outDir - Top-level output directory for combined llms.txt
+ * @property {SourceConfig[]} sources - Array of source configurations
  */
 
 /**
@@ -217,12 +219,49 @@ async function loadConfig() {
         {
           $schema: "https://extract.llmtext.com/llmtext.schema.json",
           outDir: "./docs",
-          origins: [
-            { origin: "https://docs.parallel.ai", forceExtract: false },
-            { origin: "https://parallel.ai", forceExtract: true },
+          sources: [
+            {
+              title: "Parallel AI Documentation",
+              origin: "https://docs.parallel.ai",
+              forceExtract: false,
+              outDir: "./docs/parallel-docs",
+              keepOriginalUrls: false,
+            },
+            {
+              title: "Parallel AI Website",
+              origin: "https://parallel.ai",
+              forceExtract: true,
+              outDir: "./docs/parallel-main",
+              keepOriginalUrls: false,
+            },
+            {
+              title: "Custom Resources",
+              forceExtract: true,
+              outDir: "./docs/custom",
+              keepOriginalUrls: false,
+              customUrls: [
+                {
+                  title: "Custom Page",
+                  description: "A custom page to extract",
+                  filename: "custom-page",
+                  url: "https://example.com/page",
+                },
+              ],
+            },
+            {
+              title: "External References",
+              keepOriginalUrls: true,
+              forceExtract: false,
+              customUrls: [
+                {
+                  title: "External API Guide",
+                  description: "Third-party API documentation",
+                  filename: "external-api",
+                  url: "https://external.com/api-guide",
+                },
+              ],
+            },
           ],
-          customUrls: [],
-          keepOriginalUrls: false,
         },
         null,
         2
@@ -236,25 +275,68 @@ async function loadConfig() {
 
     // Validate required fields
     if (!config.outDir) throw new Error("outDir is required");
-    if (!Array.isArray(config.origins))
-      throw new Error("origins must be an array");
+    if (!Array.isArray(config.sources))
+      throw new Error("sources must be an array");
 
-    // Validate origin objects
-    for (const [index, originConfig] of config.origins.entries()) {
-      if (typeof originConfig !== "object" || originConfig === null) {
-        throw new Error(`origins[${index}] must be an object`);
+    // Resolve top-level outDir to absolute path
+    const topLevelOutDir = path.resolve(config.outDir);
+
+    // Validate source objects
+    for (const [index, sourceConfig] of config.sources.entries()) {
+      if (typeof sourceConfig !== "object" || sourceConfig === null) {
+        throw new Error(`sources[${index}] must be an object`);
       }
-      if (!originConfig.origin) {
-        throw new Error(`origins[${index}].origin is required`);
+      if (!sourceConfig.title) {
+        throw new Error(`sources[${index}].title is required`);
       }
-      if (typeof originConfig.forceExtract !== "boolean") {
-        throw new Error(`origins[${index}].forceExtract must be a boolean`);
+
+      // Set defaults
+      sourceConfig.forceExtract = sourceConfig.forceExtract ?? false;
+      sourceConfig.keepOriginalUrls = sourceConfig.keepOriginalUrls ?? false;
+      sourceConfig.customUrls = sourceConfig.customUrls || [];
+
+      // Default outDir to top-level outDir if not specified
+      if (!sourceConfig.outDir) {
+        sourceConfig.outDir = config.outDir;
+      }
+
+      // Validate outDir is within top-level outDir (unless keepOriginalUrls is true)
+      if (!sourceConfig.keepOriginalUrls) {
+        const resolvedSourceOutDir = path.resolve(sourceConfig.outDir);
+
+        if (!resolvedSourceOutDir.startsWith(topLevelOutDir)) {
+          throw new Error(
+            `sources[${index}].outDir (${sourceConfig.outDir}) must be within the top-level outDir (${config.outDir})`
+          );
+        }
+      }
+
+      // Either origin or customUrls must be provided
+      if (
+        !sourceConfig.origin &&
+        (!sourceConfig.customUrls || sourceConfig.customUrls.length === 0)
+      ) {
+        throw new Error(
+          `sources[${index}] must have either origin or customUrls`
+        );
+      }
+
+      // Validate customUrls
+      for (const [urlIndex, customUrl] of (
+        sourceConfig.customUrls || []
+      ).entries()) {
+        if (
+          !customUrl.title ||
+          !customUrl.description ||
+          !customUrl.filename ||
+          !customUrl.url
+        ) {
+          throw new Error(
+            `sources[${index}].customUrls[${urlIndex}] must have title, description, filename, and url`
+          );
+        }
       }
     }
-
-    // Set defaults
-    config.customUrls = config.customUrls || [];
-    config.keepOriginalUrls = config.keepOriginalUrls ?? false;
 
     return config;
   } catch (error) {
@@ -389,7 +471,7 @@ function cleanupOldFiles(outDir, currentFiles, previousFiles) {
 
 /**
  * Process custom URLs through extraction API
- * @param {Array<{title: string, description: string, url: string}>} customUrls - Custom URLs to process
+ * @param {Array<{title: string, description: string, filename: string, url: string}>} customUrls - Custom URLs to process
  * @param {string} apiKey - API key for authentication
  * @returns {Promise<Record<string, any>>} Extracted files
  */
@@ -417,8 +499,7 @@ async function processCustomUrls(customUrls, apiKey) {
         const result = await response.json();
         if (result.results && result.results.length > 0) {
           const extracted = result.results[0];
-          const filename =
-            customUrl.title.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase() + ".md";
+          const filename = customUrl.filename + ".md";
 
           files[filename] = {
             content: extracted.full_content || "",
@@ -428,6 +509,7 @@ async function processCustomUrls(customUrls, apiKey) {
             publishedDate: extracted.published_date || "",
             status: 200,
             tokens: Math.round((extracted.full_content || "").length / 5),
+            originalUrl: customUrl.url,
           };
         }
       } else {
@@ -442,6 +524,64 @@ async function processCustomUrls(customUrls, apiKey) {
   }
 
   return files;
+}
+
+/**
+ * Get path prefix for links in llms.txt
+ * @param {string} topLevelOutDir - Top-level output directory
+ * @param {string} sourceOutDir - Source-specific output directory
+ * @returns {string} Path prefix for links
+ */
+function getPathPrefix(topLevelOutDir, sourceOutDir) {
+  const resolvedTopLevel = path.resolve(topLevelOutDir);
+  const resolvedSource = path.resolve(sourceOutDir);
+
+  if (resolvedSource === resolvedTopLevel) {
+    return "";
+  }
+
+  const relativePath = path.relative(resolvedTopLevel, resolvedSource);
+  return relativePath || "";
+}
+
+/**
+ * Generate combined llms.txt from all sources
+ * @param {Array<{title: string, files: Record<string, any>, keepOriginalUrls?: boolean, pathPrefix: string}>} allSources - All processed sources
+ * @returns {string} Combined llms.txt content
+ */
+function generateCombinedLlmsTxt(allSources) {
+  let combinedTxt =
+    "# Documentation Collection\n\n> Combined documentation from multiple sources\n\n";
+
+  for (const source of allSources) {
+    combinedTxt += `## ${source.title}\n\n`;
+
+    // Sort files by path for consistent ordering
+    const sortedFiles = Object.entries(source.files).sort(([a], [b]) =>
+      a.localeCompare(b)
+    );
+
+    for (const [path, file] of sortedFiles) {
+      if (file.content || file.title) {
+        const title = file.title || path.replace(".md", "");
+        const description = file.description ? `: ${file.description}` : "";
+
+        // Generate link based on keepOriginalUrls and pathPrefix
+        let link;
+        if (source.keepOriginalUrls) {
+          link = file.originalUrl;
+        } else {
+          link = source.pathPrefix + (path.startsWith("/") ? path : "/" + path);
+        }
+
+        combinedTxt += `- [${title}](${link}) (${file.tokens} tokens)${description}\n`;
+      }
+    }
+
+    combinedTxt += "\n";
+  }
+
+  return combinedTxt;
 }
 
 /**
@@ -477,114 +617,151 @@ async function main() {
     const config = await loadConfig();
     const apiKey = await getApiKey();
 
-    // Ensure output directory exists
+    // Ensure top-level output directory exists
     fs.mkdirSync(config.outDir, { recursive: true });
 
-    // Load previous manifest
-    const previousManifest = loadManifest(config.outDir);
-    const currentFiles = [];
-
+    const allSources = [];
     let totalTokens = 0;
     let totalPages = 0;
     let totalErrors = 0;
 
-    // Process each origin with its own forceExtract setting
-    for (const originConfig of config.origins) {
+    // Process each source
+    for (const [sourceIndex, sourceConfig] of config.sources.entries()) {
+      const sourceName = `${sourceConfig.title} (source ${sourceIndex + 1})`;
+
       console.log(
-        `\n🌐 Processing origin: ${originConfig.origin} (forceExtract: ${originConfig.forceExtract})`
+        `\n🌐 Processing ${sourceName} (forceExtract: ${sourceConfig.forceExtract}, keepOriginalUrls: ${sourceConfig.keepOriginalUrls})`
       );
 
+      // Ensure source output directory exists (if not keeping original URLs)
+      if (!sourceConfig.keepOriginalUrls) {
+        fs.mkdirSync(sourceConfig.outDir, { recursive: true });
+      }
+
+      // Load previous manifest for this source (only if we have an outDir and not keeping original URLs)
+      const previousManifest = !sourceConfig.keepOriginalUrls
+        ? loadManifest(sourceConfig.outDir)
+        : { files: [], timestamp: new Date().toISOString() };
+      const currentFiles = [];
+      let sourceFiles = {};
+
       try {
-        const result = await extractFromSitemap(
-          originConfig.origin,
-          originConfig.forceExtract,
-          apiKey
-        );
+        // Process origin if provided
+        if (sourceConfig.origin) {
+          const result = await extractFromSitemap(
+            sourceConfig.origin,
+            sourceConfig.forceExtract,
+            apiKey
+          );
 
-        console.log(
-          `✅ Extracted ${result.totalPages} pages with ${result.totalTokens} tokens`
-        );
-        if (result.errors > 0) {
-          console.log(`⚠️  ${result.errors} errors occurred`);
-        }
-
-        // Write files to disk
-        for (const [filePath, file] of Object.entries(result.files)) {
-          let filename = filePath;
-
-          if (!config.keepOriginalUrls) {
-            // Create domain-specific subdirectory
-            const domain = new URL(
-              originConfig.origin.startsWith("http")
-                ? originConfig.origin
-                : `https://${originConfig.origin}`
-            ).hostname;
-            const domainDir = path.join(config.outDir, domain);
-            fs.mkdirSync(domainDir, { recursive: true });
-            filename = path.join(
-              domain,
-              filePath.startsWith("/") ? filePath.slice(1) : filePath
-            );
-          } else {
-            filename = filePath.startsWith("/") ? filePath.slice(1) : filePath;
+          console.log(
+            `✅ Extracted ${result.totalPages} pages with ${result.totalTokens} tokens`
+          );
+          if (result.errors > 0) {
+            console.log(`⚠️  ${result.errors} errors occurred`);
           }
 
-          const fullFilePath = path.join(config.outDir, filename);
-          const fileDir = path.dirname(fullFilePath);
-
-          fs.mkdirSync(fileDir, { recursive: true });
-          fs.writeFileSync(fullFilePath, file.content);
-          currentFiles.push(filename);
-
-          console.log(`📝 Wrote: ${filename} (${file.tokens} tokens)`);
+          sourceFiles = result.files;
+          totalTokens += result.totalTokens;
+          totalPages += result.totalPages;
+          totalErrors += result.errors;
         }
 
-        totalTokens += result.totalTokens;
-        totalPages += result.totalPages;
-        totalErrors += result.errors;
+        // Process custom URLs for this source
+        if (sourceConfig.customUrls && sourceConfig.customUrls.length > 0) {
+          console.log(
+            `📋 Processing ${sourceConfig.customUrls.length} custom URLs for this source...`
+          );
+          const customFiles = await processCustomUrls(
+            sourceConfig.customUrls,
+            apiKey
+          );
+
+          // Merge custom files with sitemap files
+          sourceFiles = { ...sourceFiles, ...customFiles };
+
+          for (const file of Object.values(customFiles)) {
+            totalTokens += file.tokens;
+            totalPages++;
+          }
+        }
+
+        // Write files to source directory (only if not keeping original URLs)
+        if (!sourceConfig.keepOriginalUrls) {
+          for (const [filePath, file] of Object.entries(sourceFiles)) {
+            let filename = filePath.startsWith("/")
+              ? filePath.slice(1)
+              : filePath;
+
+            const fullFilePath = path.join(sourceConfig.outDir, filename);
+            const fileDir = path.dirname(fullFilePath);
+
+            fs.mkdirSync(fileDir, { recursive: true });
+            fs.writeFileSync(fullFilePath, file.content);
+            currentFiles.push(filename);
+
+            console.log(
+              `📝 Wrote: ${path.join(sourceConfig.outDir, filename)} (${
+                file.tokens
+              } tokens)`
+            );
+          }
+
+          // Clean up old files for this source
+          if (previousManifest.files.length > 0) {
+            cleanupOldFiles(
+              sourceConfig.outDir,
+              currentFiles,
+              previousManifest.files
+            );
+          }
+
+          // Save manifest for this source
+          const newManifest = {
+            files: currentFiles,
+            timestamp: new Date().toISOString(),
+          };
+          saveManifest(sourceConfig.outDir, newManifest);
+        } else {
+          console.log(
+            `📋 Keeping original URLs - not saving files locally for ${sourceName}`
+          );
+        }
+
+        // Calculate path prefix for this source
+        const pathPrefix = sourceConfig.keepOriginalUrls
+          ? ""
+          : getPathPrefix(config.outDir, sourceConfig.outDir);
+
+        // Add to all sources for combined llms.txt
+        allSources.push({
+          title: sourceConfig.title,
+          files: sourceFiles,
+          keepOriginalUrls: sourceConfig.keepOriginalUrls,
+          pathPrefix: pathPrefix,
+        });
       } catch (error) {
-        console.error(
-          `❌ Error processing ${originConfig.origin}:`,
-          error.message
-        );
+        console.error(`❌ Error processing ${sourceName}:`, error.message);
         totalErrors++;
       }
     }
 
-    // Process custom URLs
-    if (config.customUrls.length > 0) {
-      console.log(`\n📋 Processing ${config.customUrls.length} custom URLs...`);
-      const customFiles = await processCustomUrls(config.customUrls, apiKey);
-
-      for (const [filename, file] of Object.entries(customFiles)) {
-        const filePath = path.join(config.outDir, filename);
-        fs.writeFileSync(filePath, file.content);
-        currentFiles.push(filename);
-        totalTokens += file.tokens;
-        totalPages++;
-
-        console.log(`📝 Wrote: ${filename} (${file.tokens} tokens)`);
-      }
+    // Generate and write combined llms.txt to top-level outDir
+    if (allSources.length > 0) {
+      const combinedLlmsTxt = generateCombinedLlmsTxt(allSources);
+      const combinedLlmsTxtPath = path.join(config.outDir, "llms.txt");
+      fs.writeFileSync(combinedLlmsTxtPath, combinedLlmsTxt);
+      console.log(`\n📋 Generated combined llms.txt: ${combinedLlmsTxtPath}`);
     }
-
-    // Clean up old files
-    if (previousManifest.files.length > 0) {
-      cleanupOldFiles(config.outDir, currentFiles, previousManifest.files);
-    }
-
-    // Save new manifest
-    const newManifest = {
-      files: currentFiles,
-      timestamp: new Date().toISOString(),
-    };
-    saveManifest(config.outDir, newManifest);
 
     console.log("\n✨ Extraction completed!");
     console.log(`📊 Total: ${totalPages} pages, ${totalTokens} tokens`);
     if (totalErrors > 0) {
       console.log(`⚠️  Errors: ${totalErrors}`);
     }
-    console.log(`📁 Output directory: ${path.resolve(config.outDir)}`);
+    console.log(
+      `📁 Top-level output directory: ${path.resolve(config.outDir)}`
+    );
     console.log("\n💡 Use --clear-credentials to remove stored API key");
   } catch (error) {
     console.error("💥 Fatal error:", error.message);

@@ -89,12 +89,6 @@ class ExtractRequest(BaseModel):
 
 (edited)
 
-saunack
-Today at 12:15 AM
-@anshul can you also paste the response types? Jan does not have access to our main code repo (internal_openapi.json)
-
-anshul
-Today at 12:20 AM
 The output is ExtractResponse
 class ExtractResult(BaseModel):
 """Extract result for a single URL."""

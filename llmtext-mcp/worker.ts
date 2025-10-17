@@ -531,7 +531,7 @@ export default {
     <div class="header">
         <span class="tools-label">Tools</span>
         <a href="https://check.llmtext.com" class="tool-link" target="_blank">llms.txt checker</a>
-        <a href="https://reader.llmtext.com" class="tool-link" target="_blank">html md reader</a>
+        <a href="https://extract.llmtext.com" class="tool-link" target="_blank">generate llms.txt</a>
     </div>
 
     <div class="container">
