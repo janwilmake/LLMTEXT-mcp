@@ -21,3 +21,5 @@ Other than that I've found the following common mistakes in llms.txt files:
 3. **wrong content-type**. ensure to respond with either text/plain or text/markdown.
 4. **the content is the full docs**. the content must contain markdown links to docs, not all docs in one page
 5. **links return html**. the links must lead to a text/markdown or text/plain acceptable response.
+
+Lots of llms.txt are low quality and the guidelines from the standard are ambiguous.

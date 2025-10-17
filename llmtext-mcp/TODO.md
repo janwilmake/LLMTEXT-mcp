@@ -1,7 +1,7 @@
 # Further refinements
 
 - ✅ LLMtext by parallel (-> read blogpost)
-- Link to llms.txt files (ask Tina)
+- Link to `llms.txt` files (ask Tina)
 - ⏳ Move to `parallel-web/llmtext-mcp` with website https://llmtext.com and description `Turn Your Docs into a Dedicated MCP Server`
 - ⏳ For professionally linking it to Parallel, put social login at https://login.llmtext.com with Parallel X Account
 - Highlight the social element more: top 10 users per server + overall top 10 leaderboard
@@ -12,7 +12,7 @@
 
 - Why this is better than context7
 - Reasoning over a table of contents > vector search?
-- Every website needs an llms.txt, not just docs
+- Every website needs an llms.txt, not just docs sites!
 - Parallel.ai llms.txt combines main website + docs + socials
 
 # Launch

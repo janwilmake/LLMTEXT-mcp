@@ -1,0 +1,229 @@
+openapi: 3.0.3
+info:
+  title: Sitemap to LLM Text API
+  description: |
+    Convert website sitemaps into LLM-friendly text format. This API discovers sitemaps,
+    extracts content from all pages, and generates structured markdown files along with
+    an llms.txt index file.
+
+    The service attempts to fetch markdown directly from URLs first, then falls back
+    to using the Parallel Extract API for HTML content extraction when needed.
+  version: 1.0.0
+  contact:
+    url: https://extract.llmtext.com
+servers:
+  - url: https://extract.llmtext.com
+    description: Production server
+
+paths:
+  /extract:
+    get:
+      summary: Convert sitemap to LLM text format
+      description: |
+        Processes a website's sitemap and converts all pages into LLM-friendly markdown format.
+
+        The service will:
+        1. Discover the sitemap for the given hostname
+        2. Parse all URLs from the sitemap (including sitemap indexes)
+        3. Attempt to fetch markdown content directly from each URL
+        4. Fall back to HTML extraction using Parallel Extract API for missing content
+        5. Generate structured markdown files and an llms.txt index
+
+        Authentication is required via Bearer token for Parallel Extract API access.
+      parameters:
+        - name: hostname
+          in: query
+          required: true
+          description: The hostname or full URL of the website to process
+          schema:
+            type: string
+            example: "docs.example.com"
+          examples:
+            hostname_only:
+              summary: Hostname only
+              value: "docs.example.com"
+            full_url:
+              summary: Full URL
+              value: "https://docs.example.com"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully processed sitemap
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseData"
+              examples:
+                success:
+                  summary: Successful processing
+                  value:
+                    files:
+                      "/index.html.md":
+                        content: "# Welcome\n\nThis is the homepage content..."
+                        title: "Welcome to Example Docs"
+                        description: "Documentation homepage"
+                        extracted: false
+                        status: 200
+                        tokens: 120
+                      "/api/reference.md":
+                        content: "# API Reference\n\nAPI documentation..."
+                        title: "API Reference"
+                        description: "Complete API documentation"
+                        extracted: true
+                        status: 200
+                        tokens: 450
+                      "/llms.txt":
+                        content: "# Example Docs\n\n> Documentation homepage\n\n## Documentation\n\n- [Welcome to Example Docs](/index.html) (120 tokens): Documentation homepage\n- [API Reference](/api/reference) (450 tokens): Complete API documentation\n"
+                        title: "LLMs.txt"
+                        description: "LLM-friendly content listing"
+                        extracted: false
+                        status: 200
+                        tokens: 95
+                    totalTokens: 665
+                    totalPages: 2
+                    errors: 0
+                    processingTimeMs: 1250
+                    extractApiCallCount: 1
+                    fetchCount: 4
+        "400":
+          description: Bad request - missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                missing_hostname:
+                  summary: Missing hostname parameter
+                  value:
+                    error: "Missing 'hostname' query parameter"
+        "401":
+          description: Unauthorized - missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                missing_auth:
+                  summary: Missing authorization
+                  value:
+                    error: "Authorization header not configured"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                sitemap_not_found:
+                  summary: Sitemap discovery failed
+                  value:
+                    error: "Could not find sitemap for example.com"
+                extract_api_error:
+                  summary: Extract API failure
+                  value:
+                    error: "Extract API failed: 429 Too Many Requests"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        API key for Parallel Extract API. Required for fallback content extraction
+        when direct markdown fetching fails.
+
+  schemas:
+    ResponseData:
+      type: object
+      required:
+        - files
+        - totalTokens
+        - totalPages
+        - errors
+        - processingTimeMs
+        - extractApiCallCount
+        - fetchCount
+      properties:
+        files:
+          type: object
+          description: All extracted files indexed by their path
+          additionalProperties:
+            $ref: "#/components/schemas/FileResult"
+        totalTokens:
+          type: integer
+          description: Total estimated tokens across all files (content length / 5)
+          example: 15420
+        totalPages:
+          type: integer
+          description: Number of pages processed (excludes llms.txt)
+          example: 25
+        errors:
+          type: integer
+          description: Number of files that had processing errors
+          example: 2
+        processingTimeMs:
+          type: integer
+          description: Total processing time in milliseconds
+          example: 3450
+        extractApiCallCount:
+          type: integer
+          description: Number of calls made to Parallel Extract API
+          example: 1
+        fetchCount:
+          type: integer
+          description: Total number of HTTP requests made during processing
+          example: 52
+
+    FileResult:
+      type: object
+      required:
+        - content
+        - title
+        - description
+        - extracted
+        - status
+        - tokens
+      properties:
+        content:
+          type: string
+          description: The extracted markdown content
+          example: "# API Reference\n\nThis document describes the API endpoints..."
+        title:
+          type: string
+          description: Page title extracted from HTML <title> tag
+          example: "API Reference - Example Docs"
+        description:
+          type: string
+          description: Page description from og:description or meta description
+          example: "Complete documentation for the Example API"
+        extracted:
+          type: boolean
+          description: Whether content was extracted via Parallel Extract API (true) or fetched directly (false)
+          example: true
+        status:
+          type: integer
+          description: HTTP status code from the page fetch
+          example: 200
+        tokens:
+          type: integer
+          description: Estimated token count (content length / 5)
+          example: 340
+        error:
+          type: string
+          description: Error message if processing failed
+          example: "Failed to fetch page: 404 Not Found"
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: "Missing 'hostname' query parameter"
+
+tags:
+  - name: Extraction
+    description: Sitemap processing and content extraction operations

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract LLM Text - Parallel.ai</title>
+    <meta name="description" content="Convert website sitemaps into LLM-friendly text format with one click.">
+    <link rel="icon" href="https://assets.p0web.com/dark-parallel-symbol-270.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'off-white': '#fcfcfa',
+                        'index-black': '#1d1b16',
+                        'neural': '#d8d0bf',
+                        'signal': '#fb631b'
+                    },
+                    fontFamily: {
+                        'mono': ['FT System Mono', 'monospace'],
+                        'sans': ['Gerstner Programm', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @font-face {
+            font-family: 'FT System Mono';
+            src: url('https://assets.p0web.com/FTSystemMono-Regular.woff2') format('woff2'),
+                url('https://assets.p0web.com/FTSystemMono-Regular.woff') format('woff');
+            font-weight: 400;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'FT System Mono';
+            src: url('https://assets.p0web.com/FTSystemMono-Medium.woff2') format('woff2'),
+                url('https://assets.p0web.com/FTSystemMono-Medium.woff') format('woff');
+            font-weight: 500;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Gerstner Programm';
+            src: url('https://assets.p0web.com/Gerstner-ProgrammRegular.woff2') format('woff2'),
+                url('https://assets.p0web.com/Gerstner-ProgrammRegular.woff') format('woff');
+            font-weight: 400;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Gerstner Programm';
+            src: url('https://assets.p0web.com/Gerstner-ProgrammMedium.woff2') format('woff2'),
+                url('https://assets.p0web.com/Gerstner-ProgrammMedium.woff') format('woff');
+            font-weight: 500;
+            font-display: swap;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin {
+            animation: spin 5s linear infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-off-white text-index-black font-mono min-h-screen">
+    <div id="app">
+        <!-- Marketing/Login View -->
+        <div id="marketing-view" class="min-h-screen">
+            <header class="border-b border-neural">
+                <div class="max-w-6xl mx-auto px-4 sm:px-8 py-8">
+                    <img src="https://assets.p0web.com/dark-parallel-logo-270.svg" alt="Parallel.ai"
+                        class="w-32 h-auto">
+                </div>
+            </header>
+
+            <main class="py-16 sm:py-24">
+                <div class="max-w-6xl mx-auto px-4 sm:px-8 text-center">
+                    <div class="max-w-4xl mx-auto">
+                        <h1 class="font-sans text-4xl sm:text-6xl font-medium mb-6 leading-tight">
+                            Extract LLM Text
+                        </h1>
+                        <p class="text-xl sm:text-2xl mb-16 opacity-80 max-w-2xl mx-auto leading-relaxed">
+                            Convert any website into LLM-friendly markdown format.<br>
+                            Perfect for training data, documentation processing, and content analysis.
+                        </p>
+
+                        <div class="grid md:grid-cols-3 gap-8 mb-16">
+                            <div class="text-center p-8">
+                                <div class="text-4xl mb-4">🗺️</div>
+                                <h3 class="font-sans text-xl mb-2">Sitemap Discovery</h3>
+                                <p class="opacity-70 text-base">Automatically finds and processes entire websites</p>
+                            </div>
+                            <div class="text-center p-8">
+                                <div class="text-4xl mb-4">📝</div>
+                                <h3 class="font-sans text-xl mb-2">Clean Markdown</h3>
+                                <p class="opacity-70 text-base">Extracts content as structured, readable markdown</p>
+                            </div>
+                            <div class="text-center p-8">
+                                <div class="text-4xl mb-4">🤖</div>
+                                <h3 class="font-sans text-xl mb-2">LLM Ready</h3>
+                                <p class="opacity-70 text-base">Generates llms.txt index with token counts</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-12">
+                            <button id="login-btn"
+                                class="bg-index-black text-off-white px-6 py-3 rounded font-medium text-base hover:bg-opacity-90 transition-colors">
+                                Get Started with Parallel
+                            </button>
+                            <p class="mt-4 text-sm opacity-60">Sign in with your Parallel account to begin extracting
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Extraction Form View -->
+        <div id="extraction-view" class="min-h-screen hidden">
+            <header class="border-b border-neural">
+                <div
+                    class="max-w-6xl mx-auto px-4 sm:px-8 py-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                    <img src="https://assets.p0web.com/dark-parallel-logo-270.svg" alt="Parallel.ai"
+                        class="w-32 h-auto">
+                    <div class="flex items-center gap-4">
+                        <span id="user-greeting" class="text-sm">Welcome back</span>
+                        <button id="logout-btn"
+                            class="border border-neural px-4 py-2 rounded text-sm hover:bg-neural transition-colors">
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="py-16">
+                <div class="max-w-4xl mx-auto px-4 sm:px-8">
+                    <div class="mb-8">
+                        <h2 class="font-sans text-3xl sm:text-4xl font-medium mb-4">Extract Website Content</h2>
+                        <p class="text-lg opacity-80">Enter a hostname or URL to convert the entire website into
+                            LLM-friendly format.</p>
+                    </div>
+
+                    <form id="extraction-form" class="mb-8">
+                        <div class="mb-6">
+                            <label for="hostname" class="block mb-2 font-medium">Website URL or Hostname</label>
+                            <input type="text" id="hostname" name="hostname"
+                                placeholder="docs.example.com or https://docs.example.com"
+                                class="w-full px-4 py-3 border border-neural rounded bg-off-white focus:outline-none focus:border-signal text-base"
+                                required>
+                        </div>
+
+                        <button type="submit"
+                            class="bg-index-black text-off-white px-6 py-3 rounded font-medium text-base hover:bg-opacity-90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            id="extract-btn">
+                            <span id="btn-text">Extract Content</span>
+                        </button>
+                        <img id="btn-loading" src="https://assets.p0web.com/dark-parallel-symbol-270.svg"
+                            class="w-5 h-5 animate-spin hidden" alt="Loading">
+                    </form>
+
+                    <!-- Progress Section -->
+                    <div id="extraction-progress" class="border border-neural rounded p-6 mb-8 hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-sans text-xl">Processing Website</h3>
+                            <span id="progress-text" class="text-sm opacity-70">Discovering sitemap...</span>
+                        </div>
+                        <div class="w-full bg-neural rounded-sm h-2 overflow-hidden">
+                            <div id="progress-fill" class="h-full bg-signal transition-all duration-300 ease-out"
+                                style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="extraction-results" class="border border-neural rounded p-6 mb-8 hidden">
+                        <div class="mb-6">
+                            <h3 class="font-sans text-2xl mb-2">Extraction Complete</h3>
+                            <div class="flex flex-col sm:flex-row gap-4 text-sm">
+                                <span><strong class="text-signal" id="total-pages">0</strong> pages</span>
+                                <span><strong class="text-signal" id="total-tokens">0</strong> tokens</span>
+                                <span><strong class="text-signal" id="processing-time">0</strong>ms</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                            <button id="download-btn"
+                                class="bg-index-black text-off-white px-6 py-3 rounded font-medium text-base hover:bg-opacity-90 transition-colors">
+                                Download ZIP Archive
+                            </button>
+                            <button id="view-llms-btn"
+                                class="bg-neural text-index-black px-6 py-3 rounded font-medium text-base hover:bg-opacity-80 transition-colors">
+                                View llms.txt
+                            </button>
+                        </div>
+
+                        <div class="border-t border-neural pt-4">
+                            <div id="file-list" class="space-y-3">
+                                <!-- Files will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Section -->
+                    <div id="extraction-error" class="border border-red-300 rounded p-6 mb-8 bg-red-50 hidden">
+                        <h3 class="font-sans text-xl text-red-600 mb-2">Extraction Failed</h3>
+                        <p id="error-message" class="mb-4 opacity-80">An error occurred during extraction.</p>
+                        <button onclick="resetForm()"
+                            class="border border-neural px-4 py-2 rounded text-sm hover:bg-neural transition-colors">
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // OAuth Configuration
+        const OAUTH_CONFIG = {
+            clientId: window.location.hostname,
+            redirectUri: window.location.origin + window.location.pathname,
+            authorizationEndpoint: 'https://platform.parallel.ai/getKeys/authorize',
+            tokenEndpoint: 'https://platform.parallel.ai/getKeys/token',
+            scope: 'key:read'
+        };
+
+        // Application State
+        let currentApiKey = null;
+        let extractionData = null;
+
+        // DOM Elements
+        const marketingView = document.getElementById('marketing-view');
+        const extractionView = document.getElementById('extraction-view');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const extractionForm = document.getElementById('extraction-form');
+        const extractBtn = document.getElementById('extract-btn');
+        const progressSection = document.getElementById('extraction-progress');
+        const resultsSection = document.getElementById('extraction-results');
+        const errorSection = document.getElementById('extraction-error');
+
+        // Initialize app
+        function init() {
+            // Check if we're returning from OAuth
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+
+            if (code && state) {
+                handleOAuthCallback(code, state);
+                return;
+            }
+
+            // Check if we have a stored API key
+            const storedKey = localStorage.getItem('parallel_api_key');
+            if (storedKey) {
+                setApiKey(storedKey);
+                showExtractionView();
+            } else {
+                showMarketingView();
+            }
+
+            // Set up event listeners
+            loginBtn.addEventListener('click', startOAuthFlow);
+            logoutBtn.addEventListener('click', logout);
+            extractionForm.addEventListener('submit', handleExtraction);
+        }
+
+        // OAuth Flow
+        function generatePKCE() {
+            const codeVerifier = btoa(crypto.getRandomValues(new Uint8Array(32))).replace(
+                /[+/=]/g,
+                (m) => ({ "+": "-", "/": "_", "=": "" }[m])
+            );
+
+            return crypto.subtle
+                .digest("SHA-256", new TextEncoder().encode(codeVerifier))
+                .then((hash) => ({
+                    codeVerifier,
+                    codeChallenge: btoa(String.fromCharCode(...new Uint8Array(hash))).replace(
+                        /[+/=]/g,
+                        (m) => ({ "+": "-", "/": "_", "=": "" }[m])
+                    ),
+                }));
+        }
+
+        async function startOAuthFlow() {
+            const { codeVerifier, codeChallenge } = await generatePKCE();
+            const state = crypto.randomUUID();
+
+            localStorage.setItem('oauth_code_verifier', codeVerifier);
+            localStorage.setItem('oauth_state', state);
+
+            const authUrl = new URL(OAUTH_CONFIG.authorizationEndpoint);
+            authUrl.searchParams.set('client_id', OAUTH_CONFIG.clientId);
+            authUrl.searchParams.set('redirect_uri', OAUTH_CONFIG.redirectUri);
+            authUrl.searchParams.set('response_type', 'code');
+            authUrl.searchParams.set('scope', OAUTH_CONFIG.scope);
+            authUrl.searchParams.set('code_challenge', codeChallenge);
+            authUrl.searchParams.set('code_challenge_method', 'S256');
+            authUrl.searchParams.set('state', state);
+
+            window.location.href = authUrl.toString();
+        }
+
+        async function handleOAuthCallback(code, state) {
+            const storedState = localStorage.getItem('oauth_state');
+            if (state !== storedState) {
+                console.error('OAuth state mismatch');
+                showMarketingView();
+                return;
+            }
+
+            const codeVerifier = localStorage.getItem('oauth_code_verifier');
+            if (!codeVerifier) {
+                console.error('Missing code verifier');
+                showMarketingView();
+                return;
+            }
+
+            try {
+                const response = await fetch(OAUTH_CONFIG.tokenEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        grant_type: 'authorization_code',
+                        code: code,
+                        client_id: OAUTH_CONFIG.clientId,
+                        redirect_uri: OAUTH_CONFIG.redirectUri,
+                        code_verifier: codeVerifier,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token exchange failed');
+                }
+
+                const { access_token } = await response.json();
+                setApiKey(access_token);
+
+                // Clean up OAuth state
+                localStorage.removeItem('oauth_code_verifier');
+                localStorage.removeItem('oauth_state');
+
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                showExtractionView();
+            } catch (error) {
+                console.error('OAuth callback error:', error);
+                showMarketingView();
+            }
+        }
+
+        function setApiKey(apiKey) {
+            currentApiKey = apiKey;
+            localStorage.setItem('parallel_api_key', apiKey);
+        }
+
+        function logout() {
+            currentApiKey = null;
+            localStorage.removeItem('parallel_api_key');
+            showMarketingView();
+            resetForm();
+        }
+
+        // View Management
+        function showMarketingView() {
+            marketingView.classList.remove('hidden');
+            extractionView.classList.add('hidden');
+        }
+
+        function showExtractionView() {
+            marketingView.classList.add('hidden');
+            extractionView.classList.remove('hidden');
+        }
+
+        // Extraction Logic
+        async function handleExtraction(e) {
+            e.preventDefault();
+
+            const hostname = document.getElementById('hostname').value.trim();
+            if (!hostname) return;
+
+            setLoadingState(true);
+            showProgress();
+
+            try {
+                const response = await fetch(`/extract?hostname=${encodeURIComponent(hostname)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${currentApiKey}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                extractionData = await response.json();
+                showResults(extractionData);
+
+            } catch (error) {
+                console.error('Extraction error:', error);
+                showError(error.message);
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function setLoadingState(loading) {
+            const extractBtn = document.getElementById('extract-btn');
+            const btnLoading = document.getElementById('btn-loading');
+
+            if (loading) {
+                extractBtn.classList.add('hidden');
+                btnLoading.classList.remove('hidden');
+            } else {
+                extractBtn.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+            }
+        }
+
+        function showProgress() {
+            progressSection.classList.remove('hidden');
+            resultsSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+
+            // Animate progress bar
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+
+                progressFill.style.width = `${progress}%`;
+
+                if (progress < 30) {
+                    progressText.textContent = 'Discovering sitemap...';
+                } else if (progress < 60) {
+                    progressText.textContent = 'Processing pages...';
+                } else {
+                    progressText.textContent = 'Generating markdown...';
+                }
+            }, 300);
+
+            // Store interval to clear it later
+            window.progressInterval = interval;
+        }
+
+        function showResults(data) {
+            if (window.progressInterval) {
+                clearInterval(window.progressInterval);
+            }
+
+            const progressFill = document.getElementById('progress-fill');
+            progressFill.style.width = '100%';
+
+            setTimeout(() => {
+                progressSection.classList.add('hidden');
+                resultsSection.classList.remove('hidden');
+
+                // Update stats
+                document.getElementById('total-pages').textContent = data.totalPages;
+                document.getElementById('total-tokens').textContent = data.totalTokens.toLocaleString();
+                document.getElementById('processing-time').textContent = data.processingTimeMs;
+
+                // Populate file list
+                populateFileList(data.files);
+
+                // Set up download handlers
+                setupDownloadHandlers();
+            }, 800);
+        }
+
+        function populateFileList(files) {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+
+            Object.entries(files).forEach(([path, fileData]) => {
+                if (path === '/llms.txt') return; // Skip llms.txt in main list
+
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex justify-between items-start p-4 hover:bg-neural hover:bg-opacity-30 rounded cursor-pointer transition-colors';
+                fileItem.innerHTML = `
+                    <div>
+                        <h4 class="font-medium mb-1">${fileData.title || path}</h4>
+                        <p class="text-sm opacity-60">${fileData.description || 'No description'}</p>
+                    </div>
+                    <div class="text-right text-sm opacity-70 ml-4">
+                        <div class="text-signal font-medium">${fileData.tokens} tokens</div>
+                        <div>${fileData.extracted ? 'Extracted' : 'Direct'}</div>
+                    </div>
+                `;
+
+                fileItem.addEventListener('click', () => viewFile(path, fileData));
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function setupDownloadHandlers() {
+            document.getElementById('download-btn').addEventListener('click', downloadAllFilesAsZip);
+            document.getElementById('view-llms-btn').addEventListener('click', viewLlmsTxt);
+        }
+
+        function showError(message) {
+            if (window.progressInterval) {
+                clearInterval(window.progressInterval);
+            }
+
+            progressSection.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            errorSection.classList.remove('hidden');
+
+            document.getElementById('error-message').textContent = message;
+        }
+
+        function resetForm() {
+            document.getElementById('hostname').value = '';
+            progressSection.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+            extractionData = null;
+        }
+
+        // File Viewing Function
+        function viewFile(path, fileData) {
+            const filename = path.startsWith('/') ? path.substring(1) : path;
+            const title = fileData.title || filename;
+
+            const newWindow = window.open('', '_blank');
+            if (newWindow) {
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                        <head>
+                            <title>${title}</title>
+                            <style>
+                                body { 
+                                    font-family: monospace; 
+                                    padding: 2rem; 
+                                    background: #fcfcfa; 
+                                    color: #1d1b16;
+                                    line-height: 1.6;
+                                    max-width: 1200px;
+                                    margin: 0 auto;
+                                }
+                                pre { 
+                                    white-space: pre-wrap; 
+                                    word-wrap: break-word;
+                                }
+                                h1 {
+                                    color: #fb631b;
+                                    border-bottom: 2px solid #d8d0bf;
+                                    padding-bottom: 0.5rem;
+                                    margin-bottom: 1rem;
+                                }
+                                .meta {
+                                    background: #d8d0bf;
+                                    padding: 1rem;
+                                    border-radius: 4px;
+                                    margin-bottom: 2rem;
+                                    font-size: 0.9em;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <h1>${title}</h1>
+                            <div class="meta">
+                                <strong>Path:</strong> ${path}<br>
+                                <strong>Tokens:</strong> ${fileData.tokens}<br>
+                                <strong>Type:</strong> ${fileData.extracted ? 'Extracted' : 'Direct'}<br>
+                                ${fileData.description ? `<strong>Description:</strong> ${fileData.description}` : ''}
+                            </div>
+                            <pre>${fileData.content}</pre>
+                        </body>
+                    </html>
+                `);
+                newWindow.document.close();
+            }
+        }
+
+        // ZIP Download Function
+        async function downloadAllFilesAsZip() {
+            if (!extractionData || !window.JSZip) {
+                console.error('JSZip not loaded or no extraction data');
+                return;
+            }
+
+            try {
+                const zip = new JSZip();
+
+                // Add all files to the zip
+                Object.entries(extractionData.files).forEach(([path, fileData]) => {
+                    // Remove leading slash and ensure proper path
+                    const filename = path.startsWith('/') ? path.substring(1) : path;
+                    const finalFilename = filename || 'content.md';
+
+                    zip.file(finalFilename, fileData.content);
+                });
+
+                // Generate zip file
+                const content = await zip.generateAsync({ type: 'blob' });
+
+                // Create download link
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+
+                // Generate filename from hostname
+                const hostname = document.getElementById('hostname').value.trim();
+                const sanitizedHostname = hostname.replace(/[^a-z0-9.-]/gi, '_');
+                a.download = `${sanitizedHostname}_extracted_content.zip`;
+
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (error) {
+                console.error('Error creating ZIP file:', error);
+                alert('Error creating ZIP file. Please try again.');
+            }
+        }
+
+        function viewLlmsTxt() {
+            if (!extractionData || !extractionData.files['/llms.txt']) return;
+
+            const llmsTxtData = extractionData.files['/llms.txt'];
+            viewFile('/llms.txt', llmsTxtData);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

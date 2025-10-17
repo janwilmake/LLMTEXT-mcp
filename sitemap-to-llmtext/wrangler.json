@@ -1,0 +1,9 @@
+{
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "name": "sitemap-to-llmtext",
+  "main": "worker.ts",
+  "compatibility_date": "2025-07-14",
+  "observability": { "logs": { "enabled": true } },
+  "assets": { "directory": "./" },
+  "routes": [{ "custom_domain": true, "pattern": "extract.llmtext.com" }]
+}
