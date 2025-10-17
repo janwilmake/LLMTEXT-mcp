@@ -1,3 +1,29 @@
+# What are goals for this project, what is the value, what are non-goals?
+
+**Why we built this**
+
+- Brand awareness Parallel
+- Viral potential
+- Establish Developer Trust
+- Facilitate the creation of an independent project aiming to be taken over by OSS community
+
+**What we think the value is: A free tool that is "public good infrastructure" for the internet for AIs**
+
+- **For web-publishers**: to make their content more accessible to AI agents
+- **For end-users**: to easily talk with an AI version of every website
+- **For developers (and their agents)**: to more easily build new products with context of websites, alleviating barrier of scraping
+
+**Non goals**
+
+- Extra revenue for parallel
+
+**How to get this**
+
+- Make it 'Sponsored/powered/backed by Parallel', not 'by Parallel'
+- Owned by Jan, sponsored by Parallel credits, backed by Parallel team
+
+# Learnings
+
 # Why X OAuth
 
 - Track daily active developers and active developers over time for the web publisher
@@ -24,13 +50,6 @@ Other than that I've found the following common mistakes in llms.txt files:
 
 Lots of llms.txt are low quality and the guidelines from the standard are ambiguous.
 
-<!--
-Why we built this
-What we think the value is
-How to use it
-+ Any other interesting observations
--->
-
 # no description from `/extract` api
 
 extract endpont nicely returns title and published date which is truly awesome, but it doesn't get the description, causing me to need to do 2 extra api calls PER PAGE.
@@ -44,20 +63,3 @@ After considering this for a while, it seems to me that a separate repo is bette
 - can make OSS which also allows people to explore the markdown on github
 - can more easily deploy MCP server besides it (subdomain)
 - we can just add proper info in rel alternate and redirect from 'accept' header
-
-# What are goals for this project, what are non-goals?
-
-Goals
-
-- Brand awareness Parallel
-- Viral potential
-- Establish Developer Trust
-
-Non goals
-
-- Extra revenue for parallel
-
-How to get this
-
-- Make it an independent project aiming to be taken over by OSS community
-- Make it 'Sponsored/powered/backed by Parallel', not 'by Parallel'
