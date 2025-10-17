@@ -53,7 +53,7 @@ Make a prompt that gets a summary of each SDK, make a PR for this in each SDK.
 # Further refinements
 
 - ✅ LLMtext by parallel (-> read blogpost)
-- Link to `llms.txt` files (ask Tina)
+- Link to `llms.txt` files
 - ⏳ For professionally linking it to LLMTEXT, put social login at https://login.llmtext.com with LLMTEXT X Account
 - Highlight the social element more: top 10 users per server + overall top 10 leaderboard
 - Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required)
