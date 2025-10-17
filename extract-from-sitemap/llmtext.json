@@ -1,0 +1,7 @@
+{
+  "outDir": "./docs",
+  "origins": ["https://docs.parallel.ai", "https://parallel.ai"],
+  "customUrls": [],
+  "keepOriginalUrls": false,
+  "forceExtract": false
+}

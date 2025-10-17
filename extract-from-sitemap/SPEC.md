@@ -45,6 +45,21 @@
 }
 ```
 
+# Create `extractFromSitemap(origin,forceExtract)` functionality
+
+- Look at meta rel alternate for text markdown variant, use that if available - `<link rel="alternate" type="text/markdown" href="docs.md" title="Docs" />`
+- Should return links sorted by path
+- Maybe: remove duplicate parts from title and/or description somehow
+
+# CLI `extract-from-sitemap`
+
+- `npx extract-from-sitemap`
+- Configure `llmtext.json`. Required. Should allow setting `{ outDir:string, origins:string[],customUrls:{title:string,description:string,url:string}[], keepOriginalUrls:boolean, forceExtract: boolean }`
+- keepOriginal means we don't copy over the remote urls into our fs
+- forceExtract means we don't look for md variant but use extract endpoint directly
+- Should use Parallel OAuth if no `.env` is found or no env is passed.
+- Writes files to outdir, removes old files that weren't overwritten using old manifest `llmtext-manifest.json`, write manifest
+
 ## Sources
 
 - https://llmstxt.org/index.md

@@ -26,14 +26,6 @@
             letter-spacing: -0.022em;
         }
 
-        .header {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 16px;
-            z-index: 10;
-        }
 
         .brand-header {
             position: absolute;
@@ -355,14 +347,6 @@
 
         /* Mobile styles */
         @media (max-width: 768px) {
-            .header {
-                position: static;
-                flex-direction: column;
-                align-items: center;
-                gap: 12px;
-                margin-bottom: 20px;
-                padding: 0;
-            }
 
             .tools-label {
                 margin-top: 0;
@@ -503,11 +487,6 @@
             <a href="https://parallel.ai/blog" class="read-more" target="_blank">read more &gt;</a>
         </div>
 
-        <div class="header">
-            <span class="tools-label">Tools</span>
-            <a href="https://check.llmtext.com" class="tool-link" target="_blank">llms.txt checker</a>
-            <a href="https://reader.llmtext.com" class="tool-link" target="_blank">html md reader</a>
-        </div>
 
         <!-- User info when authenticated -->
         <div id="user-info" class="user-info hidden">
@@ -563,7 +542,7 @@
                             placeholder="docs.example.com or https://docs.example.com" required>
                         <button type="submit" class="extract-btn" id="extract-btn">
                             <span id="btn-text">Extract Content</span>
-                            <img id="btn-loading" src="/dark-parallel-text-270.svg" class="hidden animate-spin"
+                            <img id="btn-loading" src="/dark-parallel-symbol-270.svg" class="hidden animate-spin"
                                 style="width: 20px; height: 20px;" alt="Loading">
                         </button>
                     </div>
