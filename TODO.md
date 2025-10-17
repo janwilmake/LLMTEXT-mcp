@@ -1,21 +1,9 @@
-# Discuss
-
-- What do you think LLMTEXT does or SHOULD DO?
-- Different Content Pieces
-  - Generate `llms.txt` from your website => OSS library
-  - LLMTEXT MCP
-- Must be open source immediately LISENCE MIT
-- X OAuth: Parallel Account?
-- If sitemap wasn't found, generate one? https://docs.firecrawl.dev/features/map
-- Get other things like branding colors, logos, screesnhot? https://assets.p0web.com
-
 # TODO
 
 ## llms.txt generation guide
 
 - ✅ Improve schema and cli further
 - ✅ Create sitemap of everything together in the CLI
-- Create a nice guide for making your website agent-friendly
 
 ## Use `extract-from-sitemap` for parallel.ai
 
@@ -57,3 +45,33 @@ Make a prompt that gets a summary of each SDK, make a PR for this in each SDK.
 - Allow for >500 urls (use DO and reset fetch counter during extraction using alarm)
 - Host the result on `subdoman_domain_tld.markdownvariant.com` and bring MCP hosting together
 - Determine other authored content, maybe include this as well?
+
+# sitemap creation library
+
+- If sitemap wasn't found, generate one? https://docs.firecrawl.dev/features/map
+
+# Further refinements
+
+- ✅ LLMtext by parallel (-> read blogpost)
+- Link to `llms.txt` files (ask Tina)
+- ⏳ For professionally linking it to LLMTEXT, put social login at https://login.llmtext.com with LLMTEXT X Account
+- Highlight the social element more: top 10 users per server + overall top 10 leaderboard
+- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required)
+- Make it OSS and easy to host yourself. Invite contributions.
+
+# Blog
+
+- Why this is better than context7
+- Reasoning over a table of contents > vector search?
+- Every website needs an llms.txt, not just docs sites!
+- Parallel.ai llms.txt combines main website + docs + socials
+
+# Launch
+
+- Open issue in https://github.com/AnswerDotAI/llms-txt
+- Reach out to https://x.com/jeremyphoward
+- On parallel cookbook, remove old stuff, add this one.
+- On parallel docs, link to this (If X OAuth is OK)
+- Launch it on MCP directories in a way that context7/gitmcp did it too
+- Use it for https://docs.parallel.ai/llms.txt and make demo
+- X Launch post
