@@ -1,7 +1,10 @@
 {
+  "$schema": "https://extract.llmtext.com/llmtext.schema.json",
   "outDir": "./docs",
-  "origins": ["https://docs.parallel.ai", "https://parallel.ai"],
+  "origins": [
+    { "origin": "https://docs.parallel.ai", "forceExtract": false },
+    { "origin": "https://parallel.ai", "forceExtract": true }
+  ],
   "customUrls": [],
-  "keepOriginalUrls": false,
-  "forceExtract": false
+  "keepOriginalUrls": false
 }

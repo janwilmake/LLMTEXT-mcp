@@ -60,6 +60,14 @@
 - Should use Parallel OAuth if no `.env` is found or no env is passed.
 - Writes files to outdir, removes old files that weren't overwritten using old manifest `llmtext-manifest.json`, write manifest
 
+## CLI UPDATE
+
+Please update the CLI such that:
+
+- it opens the browser automatically when needed to oauth
+- it adds the api key to keychain after oauth using https://bun.com/docs/api/secrets.md and reuses from there if available
+- it closes the server after the api key has been retrieved, such that the process will end, in the end.
+
 ## Sources
 
 - https://llmstxt.org/index.md

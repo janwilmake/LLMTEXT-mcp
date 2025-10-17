@@ -1,16 +1,15 @@
 {
   "name": "extract-from-sitemap",
-  "bin": "cli.ts",
-  "version": "0.0.1",
+  "bin": "cli.js",
+  "version": "0.0.5",
   "main": "mod.js",
   "description": "A module and CLI that allows extracting all pages from a sitemap into markdown and a llms.txt, using Parallel.ai APIs.",
   "files": [
     "mod.js",
-    "cli.ts"
+    "cli.js"
   ],
   "license": "MIT",
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20251011.0",
-    "@types/bun": "1.3.0"
+    "@cloudflare/workers-types": "4.20251011.0"
   }
 }

@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/janwilmake/extract-from-sitemap/main/llmtext.schema.json",
+  "title": "LLMText Configuration",
+  "description": "Configuration schema for extract-from-sitemap CLI tool",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "outDir": {
+      "type": "string",
+      "description": "Output directory for extracted files",
+      "minLength": 1,
+      "examples": ["./docs", "./output", "/path/to/output"]
+    },
+    "origins": {
+      "type": "array",
+      "description": "Array of origin configurations to process",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string",
+            "description": "The origin URL to process (must be a valid URL)",
+            "format": "uri",
+            "pattern": "^https?://",
+            "examples": [
+              "https://docs.example.com",
+              "https://api.example.com",
+              "https://blog.example.com"
+            ]
+          },
+          "forceExtract": {
+            "type": "boolean",
+            "description": "Whether to force extraction even if files already exist for this origin",
+            "default": false
+          }
+        },
+        "required": ["origin", "forceExtract"],
+        "additionalProperties": false
+      }
+    },
+    "customUrls": {
+      "type": "array",
+      "description": "Array of custom URLs to extract (not from sitemaps)",
+      "default": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title for the extracted content (used for filename)",
+            "minLength": 1,
+            "maxLength": 100,
+            "examples": ["API Documentation", "Getting Started Guide"]
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the content being extracted",
+            "maxLength": 500,
+            "examples": ["Complete API reference for developers"]
+          },
+          "url": {
+            "type": "string",
+            "description": "URL to extract content from",
+            "format": "uri",
+            "pattern": "^https?://",
+            "examples": [
+              "https://example.com/specific-page",
+              "https://blog.example.com/important-post"
+            ]
+          }
+        },
+        "required": ["title", "description", "url"],
+        "additionalProperties": false
+      }
+    },
+    "keepOriginalUrls": {
+      "type": "boolean",
+      "description": "Whether to keep original URL structure in output files (true) or organize by domain (false)",
+      "default": false
+    }
+  },
+  "required": ["outDir", "origins"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "outDir": "./docs",
+      "origins": [
+        { "origin": "https://docs.parallel.ai", "forceExtract": false },
+        { "origin": "https://parallel.ai", "forceExtract": true }
+      ],
+      "customUrls": [
+        {
+          "title": "Getting Started",
+          "description": "Introduction and setup guide",
+          "url": "https://example.com/getting-started"
+        }
+      ],
+      "keepOriginalUrls": false
+    },
+    {
+      "outDir": "./extracted-content",
+      "origins": [
+        { "origin": "https://docs.example.com", "forceExtract": false }
+      ],
+      "customUrls": [],
+      "keepOriginalUrls": true
+    }
+  ]
+}
