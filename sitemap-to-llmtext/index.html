@@ -10,56 +10,333 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'off-white': '#fcfcfa',
-                        'index-black': '#1d1b16',
-                        'neural': '#d8d0bf',
-                        'signal': '#fb631b'
-                    },
-                    fontFamily: {
-                        'mono': ['FT System Mono', 'monospace'],
-                        'sans': ['Gerstner Programm', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        @font-face {
-            font-family: 'FT System Mono';
-            src: url('https://assets.p0web.com/FTSystemMono-Regular.woff2') format('woff2'),
-                url('https://assets.p0web.com/FTSystemMono-Regular.woff') format('woff');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            background: #fafafa;
+            color: #1d1d1f;
+            line-height: 1.47059;
             font-weight: 400;
-            font-display: swap;
+            letter-spacing: -0.022em;
         }
 
-        @font-face {
-            font-family: 'FT System Mono';
-            src: url('https://assets.p0web.com/FTSystemMono-Medium.woff2') format('woff2'),
-                url('https://assets.p0web.com/FTSystemMono-Medium.woff') format('woff');
-            font-weight: 500;
-            font-display: swap;
+        .header {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 16px;
+            z-index: 10;
         }
 
-        @font-face {
-            font-family: 'Gerstner Programm';
-            src: url('https://assets.p0web.com/Gerstner-ProgrammRegular.woff2') format('woff2'),
-                url('https://assets.p0web.com/Gerstner-ProgrammRegular.woff') format('woff');
+        .brand-header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            background-color: #4fc1ae;
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+            border-radius: 2px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1d1d1f;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            margin-bottom: 2px;
+        }
+
+        .brand-by {
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: #86868b;
+            margin-bottom: 4px;
             font-weight: 400;
-            font-display: swap;
         }
 
-        @font-face {
-            font-family: 'Gerstner Programm';
-            src: url('https://assets.p0web.com/Gerstner-ProgrammMedium.woff2') format('woff2'),
-                url('https://assets.p0web.com/Gerstner-ProgrammMedium.woff') format('woff');
+        .parallel-logo {
+            height: 12px;
+            width: auto;
+            margin-bottom: 2px;
+        }
+
+        .read-more {
+            font-size: 12px;
+            color: #007aff;
+            text-decoration: none;
             font-weight: 500;
-            font-display: swap;
+            transition: color 0.2s ease;
+        }
+
+        .read-more:hover {
+            color: #0051d0;
+        }
+
+        .tool-link {
+            background: white;
+            color: #007aff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 590;
+            transition: all 0.2s ease;
+            border: 1px solid #d2d2d7;
+        }
+
+        .tool-link:hover {
+            background: #007aff;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .tools-label {
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 600;
+            letter-spacing: -0.005em;
+            text-align: center;
+            margin-top: 24px;
+            margin-bottom: 24px;
+            color: #1d1d1f;
+        }
+
+        .subtitle {
+            font-size: 21px;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #86868b;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 18px;
+            padding: 48px;
+            margin-bottom: 80px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            font-size: 17px;
+            padding: 16px 20px;
+            border: 2px solid #d2d2d7;
+            border-radius: 12px;
+            background: #f5f5f7;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007aff;
+            background: white;
+        }
+
+        .extract-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 590;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .extract-btn:hover {
+            background: #0051d0;
+            transform: translateY(-1px);
+        }
+
+        .extract-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 18px;
+            padding: 48px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+        }
+
+        .results-section h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f5f5f7;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #007aff;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-name {
+            font-size: 19px;
+            font-weight: 590;
+            color: #1d1d1f;
+            margin-bottom: 2px;
+        }
+
+        .file-stats {
+            font-size: 15px;
+            color: #86868b;
+        }
+
+        .download-btn {
+            background: #34c759;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 590;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            background: #30d158;
+            transform: translateY(-1px);
+        }
+
+        .error-section {
+            background: #fff2f2;
+            border: 1px solid #fecaca;
+            border-radius: 18px;
+            padding: 48px;
+            margin-bottom: 40px;
+        }
+
+        .error-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #dc2626;
+            margin-bottom: 16px;
+        }
+
+        .error-message {
+            color: #7f1d1d;
+            margin-bottom: 24px;
+        }
+
+        .auth-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .auth-btn {
+            background: #1d1d1f;
+            color: white;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 590;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .auth-btn:hover {
+            background: rgba(29, 29, 31, 0.9);
+        }
+
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .logout-btn {
+            background: white;
+            color: #1d1d1f;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 590;
+            transition: all 0.2s ease;
+            border: 1px solid #d2d2d7;
+        }
+
+        .logout-btn:hover {
+            background: #f5f5f7;
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         @keyframes spin {
@@ -75,157 +352,263 @@
         .animate-spin {
             animation: spin 5s linear infinite;
         }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .header {
+                position: static;
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 20px;
+                padding: 0;
+            }
+
+            .tools-label {
+                margin-top: 0;
+                margin-bottom: 8px;
+                order: -1;
+            }
+
+            .tool-link {
+                padding: 10px 20px;
+                font-size: 16px;
+                width: 100%;
+                text-align: center;
+                max-width: 280px;
+            }
+
+            .brand-header {
+                position: static;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .brand-logo {
+                font-size: 32px;
+                padding: 2px 8px;
+            }
+
+            .brand-by {
+                font-size: 10px;
+            }
+
+            .parallel-logo {
+                height: 14px;
+            }
+
+            .read-more {
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 40px 16px;
+            }
+
+            h1 {
+                font-size: 36px;
+                line-height: 1.1;
+                margin-top: 0px;
+                margin-bottom: 16px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+                margin-bottom: 30px;
+                padding: 0 10px;
+            }
+
+            .form-section,
+            .results-section {
+                padding: 24px 20px;
+                border-radius: 16px;
+                margin-bottom: 40px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                font-size: 16px;
+                padding: 14px 16px;
+            }
+
+            .extract-btn {
+                width: 100%;
+                padding: 14px 24px;
+                font-size: 16px;
+            }
+
+            .file-item {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+                padding: 16px 0;
+            }
+
+            .file-info {
+                width: 100%;
+            }
+
+            .download-btn {
+                width: 100%;
+                text-align: center;
+                padding: 12px 20px;
+                margin-top: 8px;
+                border-radius: 10px;
+            }
+
+            .user-info {
+                position: static;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 12px;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .form-section,
+            .results-section {
+                padding: 20px 16px;
+            }
+
+            .brand-logo {
+                font-size: 28px;
+            }
+        }
     </style>
 </head>
 
-<body class="bg-off-white text-index-black font-mono min-h-screen">
+<body>
     <div id="app">
+        <!-- Header with same design as llmtext -->
+        <div class="brand-header">
+            <a href="/" class="brand-logo">LLMTEXT</a>
+            <span class="brand-by">by <img src="/dark-parallel-text-270.svg" alt="Parallel AI"
+                    class="parallel-logo" /></span>
+            <a href="https://parallel.ai/blog" class="read-more" target="_blank">read more &gt;</a>
+        </div>
+
+        <div class="header">
+            <span class="tools-label">Tools</span>
+            <a href="https://check.llmtext.com" class="tool-link" target="_blank">llms.txt checker</a>
+            <a href="https://reader.llmtext.com" class="tool-link" target="_blank">html md reader</a>
+        </div>
+
+        <!-- User info when authenticated -->
+        <div id="user-info" class="user-info hidden">
+            <span id="user-greeting" class="text-sm">Welcome back</span>
+            <button id="logout-btn" class="logout-btn">Sign Out</button>
+        </div>
+
         <!-- Marketing/Login View -->
-        <div id="marketing-view" class="min-h-screen">
-            <header class="border-b border-neural">
-                <div class="max-w-6xl mx-auto px-4 sm:px-8 py-8">
-                    <img src="https://assets.p0web.com/dark-parallel-logo-270.svg" alt="Parallel.ai"
-                        class="w-32 h-auto">
-                </div>
-            </header>
+        <div id="marketing-view" class="container">
+            <h1>Extract Website Content as Markdown</h1>
+            <p class="subtitle">Convert any website into LLM-friendly markdown format.<br>
+                Perfect for training data, documentation processing, and content analysis.</p>
 
-            <main class="py-16 sm:py-24">
-                <div class="max-w-6xl mx-auto px-4 sm:px-8 text-center">
-                    <div class="max-w-4xl mx-auto">
-                        <h1 class="font-sans text-4xl sm:text-6xl font-medium mb-6 leading-tight">
-                            Extract LLM Text
-                        </h1>
-                        <p class="text-xl sm:text-2xl mb-16 opacity-80 max-w-2xl mx-auto leading-relaxed">
-                            Convert any website into LLM-friendly markdown format.<br>
-                            Perfect for training data, documentation processing, and content analysis.
+            <div class="form-section">
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 32px; margin-bottom: 40px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🗺️</div>
+                        <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">Sitemap Discovery</h3>
+                        <p style="color: #86868b; font-size: 16px;">Automatically finds and processes entire websites
                         </p>
-
-                        <div class="grid md:grid-cols-3 gap-8 mb-16">
-                            <div class="text-center p-8">
-                                <div class="text-4xl mb-4">🗺️</div>
-                                <h3 class="font-sans text-xl mb-2">Sitemap Discovery</h3>
-                                <p class="opacity-70 text-base">Automatically finds and processes entire websites</p>
-                            </div>
-                            <div class="text-center p-8">
-                                <div class="text-4xl mb-4">📝</div>
-                                <h3 class="font-sans text-xl mb-2">Clean Markdown</h3>
-                                <p class="opacity-70 text-base">Extracts content as structured, readable markdown</p>
-                            </div>
-                            <div class="text-center p-8">
-                                <div class="text-4xl mb-4">🤖</div>
-                                <h3 class="font-sans text-xl mb-2">LLM Ready</h3>
-                                <p class="opacity-70 text-base">Generates llms.txt index with token counts</p>
-                            </div>
-                        </div>
-
-                        <div class="mt-12">
-                            <button id="login-btn"
-                                class="bg-index-black text-off-white px-6 py-3 rounded font-medium text-base hover:bg-opacity-90 transition-colors">
-                                Get Started with Parallel
-                            </button>
-                            <p class="mt-4 text-sm opacity-60">Sign in with your Parallel account to begin extracting
-                            </p>
-                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📝</div>
+                        <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">Clean Markdown</h3>
+                        <p style="color: #86868b; font-size: 16px;">Extracts content as structured, readable markdown
+                        </p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🤖</div>
+                        <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">LLM Ready</h3>
+                        <p style="color: #86868b; font-size: 16px;">Generates llms.txt index with token counts</p>
                     </div>
                 </div>
-            </main>
+
+                <div class="auth-section">
+                    <button id="login-btn" class="auth-btn">Get Started with Parallel</button>
+                    <p style="margin-top: 16px; font-size: 14px; color: #86868b;">Sign in with your Parallel account to
+                        begin extracting</p>
+                </div>
+            </div>
         </div>
 
         <!-- Extraction Form View -->
-        <div id="extraction-view" class="min-h-screen hidden">
-            <header class="border-b border-neural">
-                <div
-                    class="max-w-6xl mx-auto px-4 sm:px-8 py-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                    <img src="https://assets.p0web.com/dark-parallel-logo-270.svg" alt="Parallel.ai"
-                        class="w-32 h-auto">
-                    <div class="flex items-center gap-4">
-                        <span id="user-greeting" class="text-sm">Welcome back</span>
-                        <button id="logout-btn"
-                            class="border border-neural px-4 py-2 rounded text-sm hover:bg-neural transition-colors">
-                            Sign Out
-                        </button>
-                    </div>
-                </div>
-            </header>
+        <div id="extraction-view" class="container hidden">
+            <h1>Extract Website Content</h1>
+            <p class="subtitle">Enter a hostname or URL to convert the entire website into LLM-friendly format.</p>
 
-            <main class="py-16">
-                <div class="max-w-4xl mx-auto px-4 sm:px-8">
-                    <div class="mb-8">
-                        <h2 class="font-sans text-3xl sm:text-4xl font-medium mb-4">Extract Website Content</h2>
-                        <p class="text-lg opacity-80">Enter a hostname or URL to convert the entire website into
-                            LLM-friendly format.</p>
-                    </div>
-
-                    <form id="extraction-form" class="mb-8">
-                        <div class="mb-6">
-                            <label for="hostname" class="block mb-2 font-medium">Website URL or Hostname</label>
-                            <input type="text" id="hostname" name="hostname"
-                                placeholder="docs.example.com or https://docs.example.com"
-                                class="w-full px-4 py-3 border border-neural rounded bg-off-white focus:outline-none focus:border-signal text-base"
-                                required>
-                        </div>
-
-                        <button type="submit"
-                            class="bg-index-black text-off-white px-6 py-3 rounded font-medium text-base hover:bg-opacity-90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            id="extract-btn">
+            <div class="form-section">
+                <form id="extraction-form">
+                    <div class="input-group">
+                        <input type="text" id="hostname" name="hostname"
+                            placeholder="docs.example.com or https://docs.example.com" required>
+                        <button type="submit" class="extract-btn" id="extract-btn">
                             <span id="btn-text">Extract Content</span>
+                            <img id="btn-loading" src="/dark-parallel-text-270.svg" class="hidden animate-spin"
+                                style="width: 20px; height: 20px;" alt="Loading">
                         </button>
-                        <img id="btn-loading" src="https://assets.p0web.com/dark-parallel-symbol-270.svg"
-                            class="w-5 h-5 animate-spin hidden" alt="Loading">
-                    </form>
-
-                    <!-- Progress Section -->
-                    <div id="extraction-progress" class="border border-neural rounded p-6 mb-8 hidden">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-sans text-xl">Processing Website</h3>
-                            <span id="progress-text" class="text-sm opacity-70">Discovering sitemap...</span>
-                        </div>
-                        <div class="w-full bg-neural rounded-sm h-2 overflow-hidden">
-                            <div id="progress-fill" class="h-full bg-signal transition-all duration-300 ease-out"
-                                style="width: 0%"></div>
-                        </div>
                     </div>
+                </form>
+            </div>
 
-                    <!-- Results Section -->
-                    <div id="extraction-results" class="border border-neural rounded p-6 mb-8 hidden">
-                        <div class="mb-6">
-                            <h3 class="font-sans text-2xl mb-2">Extraction Complete</h3>
-                            <div class="flex flex-col sm:flex-row gap-4 text-sm">
-                                <span><strong class="text-signal" id="total-pages">0</strong> pages</span>
-                                <span><strong class="text-signal" id="total-tokens">0</strong> tokens</span>
-                                <span><strong class="text-signal" id="processing-time">0</strong>ms</span>
-                            </div>
-                        </div>
+            <!-- Progress Section -->
+            <div id="extraction-progress" class="results-section hidden">
+                <h2>Processing Website</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <span id="progress-text" style="font-size: 16px; color: #86868b;">Discovering sitemap...</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
 
-                        <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                            <button id="download-btn"
-                                class="bg-index-black text-off-white px-6 py-3 rounded font-medium text-base hover:bg-opacity-90 transition-colors">
-                                Download ZIP Archive
-                            </button>
-                            <button id="view-llms-btn"
-                                class="bg-neural text-index-black px-6 py-3 rounded font-medium text-base hover:bg-opacity-80 transition-colors">
-                                View llms.txt
-                            </button>
-                        </div>
+            <!-- Results Section -->
+            <div id="extraction-results" class="results-section hidden">
+                <h2>Extraction Complete</h2>
+                <div
+                    style="display: flex; flex-wrap: wrap; gap: 24px; font-size: 16px; margin-bottom: 32px; justify-content: center;">
+                    <span><strong style="color: #007aff;" id="total-pages">0</strong> pages</span>
+                    <span><strong style="color: #007aff;" id="total-tokens">0</strong> tokens</span>
+                    <span><strong style="color: #007aff;" id="processing-time">0</strong>ms</span>
+                </div>
 
-                        <div class="border-t border-neural pt-4">
-                            <div id="file-list" class="space-y-3">
-                                <!-- Files will be populated here -->
-                            </div>
-                        </div>
-                    </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 32px; justify-content: center;">
+                    <button id="download-btn" class="download-btn">Download ZIP Archive</button>
+                    <button id="view-llms-btn" class="download-btn" style="background: #86868b;">View llms.txt</button>
+                </div>
 
-                    <!-- Error Section -->
-                    <div id="extraction-error" class="border border-red-300 rounded p-6 mb-8 bg-red-50 hidden">
-                        <h3 class="font-sans text-xl text-red-600 mb-2">Extraction Failed</h3>
-                        <p id="error-message" class="mb-4 opacity-80">An error occurred during extraction.</p>
-                        <button onclick="resetForm()"
-                            class="border border-neural px-4 py-2 rounded text-sm hover:bg-neural transition-colors">
-                            Try Again
-                        </button>
+                <div style="border-top: 1px solid #f5f5f7; padding-top: 32px;">
+                    <div id="file-list">
+                        <!-- Files will be populated here -->
                     </div>
                 </div>
-            </main>
+            </div>
+
+            <!-- Error Section -->
+            <div id="extraction-error" class="error-section hidden">
+                <h3 class="error-title">Extraction Failed</h3>
+                <p id="error-message" class="error-message">An error occurred during extraction.</p>
+                <button onclick="resetForm()" class="tool-link">Try Again</button>
+            </div>
         </div>
     </div>
 
@@ -246,6 +629,7 @@
         // DOM Elements
         const marketingView = document.getElementById('marketing-view');
         const extractionView = document.getElementById('extraction-view');
+        const userInfo = document.getElementById('user-info');
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const extractionForm = document.getElementById('extraction-form');
@@ -383,11 +767,13 @@
         function showMarketingView() {
             marketingView.classList.remove('hidden');
             extractionView.classList.add('hidden');
+            userInfo.classList.add('hidden');
         }
 
         function showExtractionView() {
             marketingView.classList.add('hidden');
             extractionView.classList.remove('hidden');
+            userInfo.classList.remove('hidden');
         }
 
         // Extraction Logic
@@ -425,15 +811,18 @@
         }
 
         function setLoadingState(loading) {
-            const extractBtn = document.getElementById('extract-btn');
+            const btnText = document.getElementById('btn-text');
             const btnLoading = document.getElementById('btn-loading');
+            const extractBtn = document.getElementById('extract-btn');
 
             if (loading) {
-                extractBtn.classList.add('hidden');
+                btnText.classList.add('hidden');
                 btnLoading.classList.remove('hidden');
+                extractBtn.disabled = true;
             } else {
-                extractBtn.classList.remove('hidden');
+                btnText.classList.remove('hidden');
                 btnLoading.classList.add('hidden');
+                extractBtn.disabled = false;
             }
         }
 
@@ -499,19 +888,27 @@
                 if (path === '/llms.txt') return; // Skip llms.txt in main list
 
                 const fileItem = document.createElement('div');
-                fileItem.className = 'flex justify-between items-start p-4 hover:bg-neural hover:bg-opacity-30 rounded cursor-pointer transition-colors';
+                fileItem.className = 'file-item';
                 fileItem.innerHTML = `
-                    <div>
-                        <h4 class="font-medium mb-1">${fileData.title || path}</h4>
-                        <p class="text-sm opacity-60">${fileData.description || 'No description'}</p>
+                    <div class="file-info">
+                        <div class="file-name">${fileData.title || path}</div>
+                        <div class="file-stats">${fileData.description || 'No description'}</div>
                     </div>
-                    <div class="text-right text-sm opacity-70 ml-4">
-                        <div class="text-signal font-medium">${fileData.tokens} tokens</div>
+                    <div style="text-align: right; font-size: 14px; color: #86868b; margin-left: 16px;">
+                        <div style="color: #007aff; font-weight: 600; font-size: 16px;">${fileData.tokens} tokens</div>
                         <div>${fileData.extracted ? 'Extracted' : 'Direct'}</div>
                     </div>
                 `;
 
                 fileItem.addEventListener('click', () => viewFile(path, fileData));
+                fileItem.style.cursor = 'pointer';
+                fileItem.addEventListener('mouseenter', () => {
+                    fileItem.style.backgroundColor = '#f5f5f7';
+                });
+                fileItem.addEventListener('mouseleave', () => {
+                    fileItem.style.backgroundColor = 'transparent';
+                });
+
                 fileList.appendChild(fileItem);
             });
         }
@@ -555,10 +952,10 @@
                             <title>${title}</title>
                             <style>
                                 body { 
-                                    font-family: monospace; 
+                                    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
                                     padding: 2rem; 
-                                    background: #fcfcfa; 
-                                    color: #1d1b16;
+                                    background: #fafafa; 
+                                    color: #1d1d1f;
                                     line-height: 1.6;
                                     max-width: 1200px;
                                     margin: 0 auto;
@@ -566,19 +963,29 @@
                                 pre { 
                                     white-space: pre-wrap; 
                                     word-wrap: break-word;
+                                    background: white;
+                                    padding: 2rem;
+                                    border-radius: 12px;
+                                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
                                 }
                                 h1 {
-                                    color: #fb631b;
-                                    border-bottom: 2px solid #d8d0bf;
+                                    color: #007aff;
+                                    border-bottom: 2px solid #f5f5f7;
                                     padding-bottom: 0.5rem;
                                     margin-bottom: 1rem;
+                                    font-size: 32px;
+                                    font-weight: 600;
                                 }
                                 .meta {
-                                    background: #d8d0bf;
-                                    padding: 1rem;
-                                    border-radius: 4px;
+                                    background: white;
+                                    padding: 1.5rem;
+                                    border-radius: 12px;
                                     margin-bottom: 2rem;
                                     font-size: 0.9em;
+                                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                                }
+                                .meta strong {
+                                    color: #007aff;
                                 }
                             </style>
                         </head>
