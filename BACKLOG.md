@@ -1,3 +1,25 @@
+# More
+
+## PR: Improve human/machine toggling interface
+
+- Button on `/ai/{path}` page that opens `{path}.md`
+- Bug: parallel.ai clicking "ai" doesn't go to `/ai`. Weird loop in development too
+
+## Improve parallel.ai/llms.txt
+
+- Optional: use Sanity; Sanity uses [portable text](https://github.com/sanity-io/block-content-to-markdown) to retrieve the content. there is [a library](https://github.com/sanity-io/block-content-to-markdown) to turn this datastructure into markdown.
+
+# Idea - LLMTEXT MCP => Hosted version of the library?
+
+- Optimize for speed (more parallelism, add description to extract endpoint)
+- Allow for >500 urls (use DO and reset fetch counter during extraction using alarm)
+- Host the result on `subdoman_domain_tld.markdownvariant.com` and bring MCP hosting together
+- Determine other authored content, maybe include this as well?
+
+# Sitemap creation library
+
+- If sitemap wasn't found, generate one? https://docs.firecrawl.dev/features/map
+
 # Newer MCP features
 
 <!-- No direct benefit but cool to have later -->

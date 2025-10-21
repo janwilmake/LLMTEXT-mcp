@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "name": "llmtext-www",
+  "assets": { "directory": "./" },
+  "compatibility_date": "2025-10-14",
+  "observability": { "logs": { "enabled": true } },
+  "routes": [
+    { "custom_domain": true, "pattern": "www.llmtext.com" },
+    { "custom_domain": true, "pattern": "llmtext.com" }
+  ]
+}

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLMTEXT.com - Tools for the llms.txt standard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #fcfcfa;
+            color: #1d1b16;
+            line-height: 1.6;
+        }
+
+        .header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e0;
+            gap: 0.5rem;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .logo-box {
+            background: #1d1b16;
+            padding: 0.35rem 0.5rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.1rem;
+            border-radius: 2px;
+        }
+
+        .logo-main {
+            font-size: 1rem;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            color: white;
+        }
+
+        .logo-com {
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            color: white;
+        }
+
+        .powered-by {
+            font-size: 0.55rem;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .parallel-logo {
+            height: 10px;
+            margin-top: 1px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            padding: 0.35rem 0.6rem;
+            border: 1.5px solid #ccc;
+            background: transparent;
+            color: #1d1b16;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav-btn.cyan {
+            border-color: #1ABFFB;
+        }
+
+        .nav-btn.orange {
+            border-color: #FF7700;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0ed;
+        }
+
+        .github-icon {
+            width: 28px;
+            height: 28px;
+            border: 1.5px solid #1d1b16;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            color: #1d1b16;
+            text-decoration: none;
+        }
+
+        .github-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        h1 u {
+            text-decoration-color: #FF7700;
+            text-decoration-thickness: 2px;
+        }
+
+        .tabs-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.15rem;
+            margin-bottom: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 0.6rem 0.8rem;
+            background: white;
+            border: 2px solid #1d1b16;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1d1b16;
+            transition: all 0.2s;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .tab:hover:not(.active) {
+            background: #f0f0ed;
+        }
+
+        .tab.active {
+            background: #1ABFFB;
+            color: white;
+            border-color: #1d1b16;
+            z-index: 2;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-panel {
+            background: white;
+            border: 2px solid #1d1b16;
+            border-radius: 0 8px 8px 8px;
+            padding: 1.5rem 1rem;
+            margin-top: -2px;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #1d1b16;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        input[type="text"]::placeholder {
+            color: #999;
+        }
+
+        .btn-primary {
+            padding: 0.875rem 2rem;
+            background: #1d1b16;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: #2d2b26;
+        }
+
+        .stats {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #999;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table-container {
+            overflow-x: visible;
+            -webkit-overflow-scrolling: touch;
+        }
+
+
+        .table-scroll {
+            overflow-x: visible;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem 0.5rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #e5e5e0;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        td {
+            padding: 1rem 0.5rem;
+            border-bottom: 1px solid #e5e5e0;
+            font-size: 0.8rem;
+        }
+
+        /* Make columns responsive on mobile */
+        @media (max-width: 640px) {
+
+            th,
+            td {
+                font-size: 0.7rem;
+                padding: 0.5rem 0.25rem;
+            }
+
+            /* Hide less important columns on mobile if needed */
+            th:nth-child(3),
+            td:nth-child(3),
+            th:nth-child(4),
+            td:nth-child(4) {
+                display: none;
+            }
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .btn-add {
+            padding: 0.4rem 0.75rem;
+            background: transparent;
+            border: 1px solid #1d1b16;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            text-decoration: none;
+            color: #1d1b16;
+            display: inline-block;
+        }
+
+        .btn-add:hover {
+            background: #f0f0ed;
+        }
+
+        .source-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .favicon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .placeholder {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #999;
+        }
+
+        .placeholder h2 {
+            color: #1d1b16;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .header {
+                padding: 1.5rem 2rem;
+            }
+
+            .logo-main {
+                font-size: 1.25rem;
+            }
+
+            .logo-com {
+                font-size: 0.85rem;
+            }
+
+            .parallel-logo {
+                height: 13px;
+            }
+
+            .nav-btn {
+                padding: 0.4rem 0.9rem;
+                font-size: 0.75rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tab {
+                padding: 0.75rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            .tab-panel {
+                padding: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .input-group {
+                flex-direction: row;
+                gap: 1rem;
+            }
+
+            input[type="text"] {
+                font-size: 0.95rem;
+            }
+
+            h3 {
+                font-size: 1rem;
+            }
+
+            td {
+                font-size: 0.875rem;
+            }
+
+            .btn-add {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                padding: 3rem 2rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                margin-bottom: 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-box">
+                <span class="logo-main">LLMTEXT</span>
+                <span class="logo-com">.com</span>
+            </div>
+            <div class="powered-by">
+                <span>powered by</span>
+                <img src="https://assets.p0web.com/dark-parallel-text-270.svg" alt="parallel" class="parallel-logo">
+            </div>
+        </div>
+        <div class="nav">
+            <a href="https://llmstxt.org" class="nav-btn cyan">LLMS.TXT</a>
+            <a href="https://parallel.ai/blog" class="nav-btn orange">LEARN MORE</a>
+            <a href="https://github.com/janwilmake/llmtext-mcp" class="github-icon">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Tools for the <u>llms.txt</u> standard</h1>
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab" onclick="switchTab(0)">01 CREATE</button>
+                <button class="tab" onclick="switchTab(1)">02 CHECK</button>
+                <button class="tab active" onclick="switchTab(2)">03 LLMS.TXT → MCP</button>
+            </div>
+
+            <div class="tab-content" id="tab0">
+                <div class="tab-panel">
+                    <h2>Create LLMS.TXT from sitemap</h2>
+                    <p style="margin-bottom: 1.5rem; color: #666;">Generate an llms.txt file from your website's sitemap
+                        to help LLMs understand your documentation.</p>
+                    <a href="https://github.com/janwilmake/llmtext-mcp/tree/main/extract-from-sitemap"
+                        class="btn-primary"
+                        style="text-decoration: none; display: inline-block; text-align: center;">View on GitHub</a>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab1">
+                <div class="tab-panel">
+                    <div class="placeholder">
+                        <h2>Check LLMS.TXT</h2>
+                        <p>Validation tool for llms.txt files coming soon...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content active" id="tab2">
+                <div class="tab-panel">
+                    <h2>Turn any <strong>llms.txt</strong> URL into a dedicated MCP server</h2>
+
+                    <div class="input-group">
+                        <input type="text" id="llmtext-url" placeholder="https://example.com/llms.txt">
+                        <button class="btn-primary" onclick="handleFindCreate()">FIND / CREATE</button>
+                    </div>
+
+                    <div id="stats" class="stats">2,112 MCP SERVERS CREATED</div>
+
+                    <h3>Popular LLMS.Text MCP Servers</h3>
+
+                    <div class="table-container">
+                        <div class="table-scroll">
+                            <table id="servers-table">
+                                <thead>
+                                    <tr>
+                                        <th>RANK</th>
+                                        <th>SOURCE</th>
+                                        <th>TOKENS</th>
+                                        <th>VOLUME</th>
+                                        <th>USERS</th>
+                                        <th>USE IT</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="servers-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.data = {
+            servers: [
+                {
+                    rank: 1,
+                    domain: "docs.parallel.ai",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 2,
+                    domain: "modelcontextprotocol.io",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 3,
+                    domain: "bun.sh",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 4,
+                    domain: "developers.cloudflare.com",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 5,
+                    domain: "docs.x.com",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 6,
+                    domain: "mux.com",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 7,
+                    domain: "supabase.com",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 8,
+                    domain: "docs.replit.com",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 9,
+                    domain: "svelte.dev",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                },
+                {
+                    rank: 10,
+                    domain: "rainbowkit.com",
+                    tokens: "4,550",
+                    volume: "525K",
+                    users: "19,200"
+                }
+            ]
+        };
+
+        function getFaviconUrl(domain) {
+            return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+        }
+
+        function getMcpName(domain) {
+            return domain.replace(/\./g, '-');
+        }
+
+        function extractHostname(url) {
+            try {
+                const urlObj = new URL(url);
+                return urlObj.hostname;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function handleFindCreate() {
+            const input = document.getElementById('llmtext-url');
+            const url = input.value.trim();
+
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+
+            const hostname = extractHostname(url);
+            if (!hostname) {
+                alert('Please enter a valid URL');
+                return;
+            }
+
+            const mcpName = getMcpName(hostname);
+            const mcpUrl = `https://installthismcp.com/${mcpName}?url=https://mcp.llmtext.com/${hostname}/mcp`;
+            window.open(mcpUrl, '_blank');
+        }
+
+        function renderServers() {
+            const tbody = document.getElementById('servers-tbody');
+            const stats = document.getElementById('stats');
+            stats.innerText = `${window.data.servers.length} MCP SERVERS CREATED`;
+            tbody.innerHTML = '';
+
+            window.data.servers.forEach(server => {
+                const tr = document.createElement('tr');
+                const mcpName = getMcpName(server.domain);
+                const mcpUrl = `https://installthismcp.com/${mcpName}?url=https://mcp.llmtext.com/${server.domain}/mcp`;
+
+                tr.innerHTML = `
+                    <td>${server.rank}</td>
+                    <td>
+                        <div class="source-name">
+                            <img src="${getFaviconUrl(server.domain)}" alt="" class="favicon">
+                            ${server.domain}
+                        </div>
+                    </td>
+                    <td>${server.tokens}</td>
+                    <td>${server.volume}</td>
+                    <td>${server.users}</td>
+                    <td><a href="${mcpUrl}" class="btn-add" target="_blank" rel="noopener">+ ADD MCP</a></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function switchTab(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            contents.forEach((content, i) => {
+                if (i === index) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        renderServers();
+    </script>
+</body>
+
+</html>
