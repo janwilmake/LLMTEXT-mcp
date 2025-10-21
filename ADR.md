@@ -4,12 +4,11 @@
   - Generate `llms.txt` from your website => OSS library
   - Create a nice guide for making your website agent-friendly
   - LLMTEXT MCP
-- Must be open source immediately LISENCE MIT
 - X OAuth: Parallel Account?
 
 # What are goals for this project, what is the value, what are non-goals?
 
-<!-- https://www.notion.so/LLM-TXT-Launch-28f58ffbf0e180e79990d259d222cca2 -->
+https://www.notion.so/LLM-TXT-Launch-28f58ffbf0e180e79990d259d222cca2
 
 **Why we built this**
 

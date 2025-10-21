@@ -1,27 +1,27 @@
 # TODO
 
-## llms.txt generation guide
+## Parallel PR
 
-- ✅ Improve schema and cli further
-- ✅ Create sitemap of everything together in the CLI
+- ✅ intercept `accept:text/markdown` requests
+- ✅ Route accept: `text/markdown` requests should rewrite to llm.parallel.ai
+- ✅ `.md` suffix should be catched as well if `rewriteTo` is available
+- ✅ `llms.txt, llms-full.txt, /mcp` should rewrite to llm.parallel.ai (if available)
+- ✅ Put all .md files into https://github.com/janwilmake/parallel-llmtext using build script.
+- ✅ Every path on parallel.ai has `.md` available (ensure they are all in sitemap, no 404s are in sitemap, and we re-generate from that new sitemap)
+- ✅ Add `<link rel="alternate" type="text/markdown" href="{path}.md" title="Docs" />` into metadata for each html page!
 
-## Use `extract-from-sitemap` for parallel.ai
+## PR: Improve human/machine toggling interface
 
-- ✅ This should be a script in `package.json` that simply puts it all in a repo
-- ✅ Since it's quite fast, can be added to precommit or predeploy
-- Route accept: `text/markdown` requests should redirect to `.md` pages using next.js config
-- Add `<link rel="alternate" type="text/markdown" href="docs.md" title="Docs" />` into metadata for each html page!
+- Button on `/ai/{path}` page that opens `{path}.md`
+- Bug: parallel.ai clicking "ai" doesn't go to `/ai`. Weird loop in development too
+
+## Improve parallel.ai/llms.txt
+
 - Optional: use Sanity; Sanity uses [portable text](https://github.com/sanity-io/block-content-to-markdown) to retrieve the content. there is [a library](https://github.com/sanity-io/block-content-to-markdown) to turn this datastructure into markdown.
-
-EOD: Have a PR for adding all these static files into `public` and the above changes!
 
 ## `developer-mcp.parallel.ai`
 
 Rather than the X OAuthed MCP... Host a bare version of the MCP here, maybe?
-
-## Bug report parallel.ai `/ai`
-
-Bug reported from Tina: there also seems to be a bug where on the website clicking into machine mode isnt making it go into url/ai eg parallel.ai/ai, when its supposed to. strangely parallel.ai/ai works as a standalone page though.
 
 # Sources
 
@@ -37,7 +37,7 @@ Make a prompt that gets a summary of each SDK, make a PR for this in each SDK.
 - https://github.com/parallel-web/parallel-sdk-python
 - https://github.com/parallel-web/parallel-sdk-typescript
 
-# Idea - LLMTEXT MCP ==> Hosted version of the library?
+# Idea - LLMTEXT MCP => Hosted version of the library?
 
 (Useful for easiest adoption)
 
@@ -46,7 +46,7 @@ Make a prompt that gets a summary of each SDK, make a PR for this in each SDK.
 - Host the result on `subdoman_domain_tld.markdownvariant.com` and bring MCP hosting together
 - Determine other authored content, maybe include this as well?
 
-# sitemap creation library
+# Sitemap creation library
 
 - If sitemap wasn't found, generate one? https://docs.firecrawl.dev/features/map
 
@@ -69,7 +69,7 @@ Make a prompt that gets a summary of each SDK, make a PR for this in each SDK.
 # Launch
 
 - Open issue in https://github.com/AnswerDotAI/llms-txt
-- Reach out to https://x.com/jeremyphoward
+- Reach out to https://x.com/jeremyphoward (somehow)
 - On parallel cookbook, remove old stuff, add this one.
 - On parallel docs, link to this (If X OAuth is OK)
 - Launch it on MCP directories in a way that context7/gitmcp did it too

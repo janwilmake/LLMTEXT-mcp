@@ -24,3 +24,13 @@
 - ✅ Make favicon / icon files
 - ✅ Make og:image using chatgpt
 - ✅ Add good SEO into frontpage
+
+## llms.txt generation guide
+
+- ✅ Improve schema and cli further
+- ✅ Create sitemap of everything together in the CLI
+
+## Use `extract-from-sitemap` for parallel.ai
+
+- ✅ This should be a script in `package.json` that simply puts it all in a repo
+- ✅ Since it's quite fast, can be added to precommit or predeploy

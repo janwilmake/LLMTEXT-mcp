@@ -554,7 +554,7 @@ export default {
                     const installUrl = `https://installthismcp.com/${encodeURIComponent(
                       server.hostname + " llms.txt"
                     )}?url=${encodeURIComponent(
-                      "https://llmtext.com/" + server.hostname + "/mcp"
+                      "https://mcp.llmtext.com/" + server.hostname + "/mcp"
                     )}`;
                     const faviconUrl = `https://www.google.com/s2/favicons?domain=${server.hostname}&sz=32`;
 
@@ -594,7 +594,7 @@ export default {
 
             try {
                 const hostname = new URL(url).hostname;
-                const installUrl = \`https://installthismcp.com/\${encodeURIComponent(hostname + ' llms.txt')}?url=\${encodeURIComponent('https://llmtext.com/' + hostname + '/mcp')}\`;
+                const installUrl = \`https://installthismcp.com/\${encodeURIComponent(hostname + ' llms.txt')}?url=\${encodeURIComponent('https://mcp.llmtext.com/' + hostname + '/mcp')}\`;
                 window.open(installUrl, '_blank');
             } catch (error) {
                 alert('Please enter a valid URL');
