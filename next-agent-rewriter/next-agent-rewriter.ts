@@ -36,6 +36,18 @@ interface AgentRewriterConfig {
 }
 
 /**
+Helper function to rewrite to an origin (can be empty for your own origin) that contains static markdown files.
+*/
+export const rewriteToStatic = (origin: string = "") => {
+  return (pathname: string) => {
+    const lastSegment = pathname.slice(pathname.lastIndexOf("/") + 1);
+    const hasExtension = lastSegment.includes(".");
+    const ext = hasExtension ? "" : ".md";
+    const path = pathname.endsWith("/") ? "/index" : pathname;
+    return `${origin}${path}${ext}`;
+  };
+};
+/**
  * Middleware function that rewrites URLs based on Accept headers.
  * Supports rewriting to external domains via rewriteTo function.
  *

@@ -39,6 +39,8 @@ Later:
 
 Create very good README.md that uses https://github.com/janwilmake/parallel-llmtext as example and explains everything you need to do to serve a good `llms.txt` in step-by-step plan.
 
+Ensure it creates `index.md` files properly in every folder.
+
 ## Draft Blogpost/learnings
 
 - Why this a fair alternative to context7

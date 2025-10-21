@@ -5,18 +5,15 @@ Usage:
 2. In `middleware.ts`
 
 ```ts
-import { agentRewriter } from "./next-agent-rewriter";
+import { agentRewriter, rewriteToStatic } from "./next-agent-rewriter";
 
 export function middleware(request: NextRequest) {
   const rewriteResponse = agentRewriter(request, {
     // Set to true if you want the default to be HTML (when accept header is not specified)
     defaultHtml: false,
-
-    rewriteTo: (pathname) => {
-      const lastSegment = pathname.slice(pathname.lastIndexOf("/") + 1);
-      const hasExtension = lastSegment.includes(".");
-      return `https://llm.parallel.ai${pathname}${hasExtension ? "" : ".md"}`;
-    },
+    // Handler to respond a url to rewrite to when agent-friendly response is preferred
+    rewriteTo: rewriteToStatic("https://llm.parallel.ai"),
+,
   });
   if (rewriteResponse) {
     return rewriteResponse;
