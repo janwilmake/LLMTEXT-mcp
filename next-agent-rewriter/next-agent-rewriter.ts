@@ -43,7 +43,7 @@ export const rewriteToStatic = (origin: string = "") => {
     const lastSegment = pathname.slice(pathname.lastIndexOf("/") + 1);
     const hasExtension = lastSegment.includes(".");
     const ext = hasExtension ? "" : ".md";
-    const path = pathname.endsWith("/") ? "/index" : pathname;
+    const path = pathname.endsWith("/") ? `${pathname}index` : pathname;
     return `${origin}${path}${ext}`;
   };
 };
@@ -215,6 +215,9 @@ function shouldServeMarkdown(acceptHeader: string, pathname: string): boolean {
   }
 
   if (highestMarkdown.quality === highestHtml.quality) {
+    if (highestMarkdown.quality === 0) {
+      return false;
+    }
     return highestMarkdown.index < highestHtml.index;
   }
 

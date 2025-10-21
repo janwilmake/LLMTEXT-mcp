@@ -56,6 +56,11 @@
             "description": "Whether to keep original URL structure and not save files locally",
             "default": false
           },
+          "titleRemovePattern": {
+            "type": "string",
+            "format": "regex",
+            "description": "Optional regex to remove a part of the title"
+          },
           "customUrls": {
             "type": "array",
             "description": "Array of custom URLs to extract for this source (not from sitemaps)",

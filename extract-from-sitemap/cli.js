@@ -17,8 +17,8 @@ const { extractFromSitemap } = require("./mod.js");
  * @property {boolean} [forceExtract] - Whether to force extraction for this source
  * @property {boolean} [keepOriginalUrls] - Whether to keep original URL structure and not save files locally
  * @property {Array<{title: string, description: string, filename: string, url: string}>} [customUrls] - Custom URLs to extract for this source
+ * @property {string} [titleRemovePattern] - Regex pattern to remove from titles (case-insensitive)
  */
-
 /**
  * @typedef {Object} Config
  * @property {string} outDir - Top-level output directory for combined llms.txt
@@ -651,7 +651,8 @@ async function main() {
           const result = await extractFromSitemap(
             sourceConfig.origin,
             sourceConfig.forceExtract,
-            apiKey
+            apiKey,
+            sourceConfig.titleRemovePattern
           );
 
           console.log(

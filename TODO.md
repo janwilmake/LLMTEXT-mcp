@@ -30,16 +30,18 @@ Later:
 - ✅ Document check API and add llmstxt-check-tool.
 - ✅ Checktool bug: 404 for https://docs.zapier.com/llms.txt and even for https://modelcontextprotocol.io/llms.txt even though they exist.
 
-## MCP
+## Finalize llms.txt generation
+
+Create very good `extract-from-sitemap/README.md` that uses https://github.com/janwilmake/parallel-llmtext as example and explains everything you need to do to serve a good `llms.txt` in step-by-step plan.
+
+Ensure `extract-from-sitemap` creates `index.md` files properly in every folder.
+
+Setup auto-update of https://github.com/janwilmake/parallel-llmtext using a secret; Set to update and redeploy hourly while optimizing for cost. Important to have this as well, or our llms.txt will get outdated.
+
+## Finalize MCP
 
 - Ensure relative links are also correctly fetched from the right hostname. Ensure hostname is part of description clearly.
 - Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`
-
-## Finish `extract-from-sitemap`
-
-Create very good README.md that uses https://github.com/janwilmake/parallel-llmtext as example and explains everything you need to do to serve a good `llms.txt` in step-by-step plan.
-
-Ensure it creates `index.md` files properly in every folder.
 
 ## Draft Blogpost/learnings
 
@@ -47,10 +49,6 @@ Ensure it creates `index.md` files properly in every folder.
 - Reasoning over a table of contents > vector search?
 - Every website needs an llms.txt, not just docs sites!
 - Parallel.ai llms.txt combines main website + docs + socials
-
-## Auto-update
-
-Setup auto-update of https://github.com/janwilmake/parallel-llmtext using a secret; Set to update hourly while optimizing for cost. Important to have this as well!
 
 # Launch
 

@@ -27,9 +27,15 @@
  * @param {string} origin - The origin URL to extract from
  * @param {boolean} forceExtract - Whether to force using extract API instead of markdown variants
  * @param {string} apiKey - Parallel API key
+ * @param {string} [titleRemovePattern] - Optional regex pattern to remove from titles
  * @returns {Promise<ResponseData>}
  */
-export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
+export async function extractFromSitemap(
+  origin,
+  forceExtract = false,
+  apiKey,
+  titleRemovePattern
+) {
   const startTime = Date.now();
   let fetchCount = 0;
   let extractApiCallCount = 0;
@@ -57,7 +63,7 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
         const path = getPathFromUrl(urlStr) + ".md";
         files[path] = {
           content: result.content,
-          title: cleanTitle(result.title, origin),
+          title: cleanTitle(result.title, titleRemovePattern),
           description: cleanDescription(result.description, result.title),
           extracted: false,
           status: result.status,
@@ -117,7 +123,7 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
         const content = result.full_content || existing.content;
         files[path] = {
           content,
-          title: cleanTitle(result.title || existing.title, origin),
+          title: cleanTitle(result.title || existing.title, titleRemovePattern),
           description: cleanDescription(
             existing.description,
             result.title || existing.title
@@ -171,32 +177,25 @@ export async function extractFromSitemap(origin, forceExtract = false, apiKey) {
 }
 
 /**
- * Clean title by removing site name duplicates
+ * Clean title by removing custom pattern if provided
  * @param {string} title - Original title
- * @param {string} origin - Site origin
+ * @param {string} [removePattern] - Optional regex pattern to remove from title
  * @returns {string} Cleaned title
  */
-function cleanTitle(title, origin) {
+function cleanTitle(title, removePattern) {
   if (!title) return "";
 
-  // Extract domain name from origin
-  const domain = new URL(origin).hostname.replace(/^www\./, "");
-  const siteName = domain.split(".")[0];
-
-  // Remove common site name patterns from end of title
-  const patterns = [
-    new RegExp(`\\s*[-|•]\\s*${siteName}\\s*$`, "i"),
-    new RegExp(`\\s*[-|•]\\s*${domain}\\s*$`, "i"),
-    /\s*[-|•]\s*Home\s*$/i,
-    /\s*[-|•]\s*Documentation\s*$/i,
-  ];
-
-  let cleaned = title;
-  for (const pattern of patterns) {
-    cleaned = cleaned.replace(pattern, "");
+  if (removePattern) {
+    try {
+      const regex = new RegExp(removePattern, "gi");
+      return title.replace(regex, "").trim();
+    } catch (error) {
+      console.warn(`Invalid titleRemovePattern: ${error.message}`);
+      return title.trim();
+    }
   }
 
-  return cleaned.trim();
+  return title.trim();
 }
 
 /**
@@ -505,12 +504,12 @@ function getPathFromUrl(urlStr) {
 
     // Handle root path
     if (path === "/" || path === "") {
-      return "/index.html";
+      return "/index";
     }
 
     // Handle paths ending with /
     if (path.endsWith("/")) {
-      path += "index.html";
+      path += "index";
     }
 
     return path;
