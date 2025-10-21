@@ -83,17 +83,11 @@ export function agentRewriter(
   const acceptHeader = request.headers.get("accept");
 
   // No Accept header - use default behavior
-  if (!acceptHeader) {
-    return defaultHtml
-      ? null
-      : rewriteToDestination(request, pathname, rewriteTo);
-  }
-
-  // */* - use default behavior
-  if (acceptHeader === "*/*") {
-    return defaultHtml
-      ? null
-      : rewriteToDestination(request, pathname, rewriteTo);
+  if (!acceptHeader || acceptHeader === "*/*") {
+    if (defaultHtml) {
+      return null;
+    }
+    return rewriteToDestination(request, pathname, rewriteTo);
   }
 
   // Check if markdown/plain should be served based on proper Accept header parsing
@@ -116,10 +110,18 @@ function rewriteToDestination(
   if (rewriteTo) {
     const customDestination = rewriteTo(pathname);
     if (customDestination) {
+      const isAbsolute =
+        customDestination.startsWith("http://") ||
+        customDestination.startsWith("https://") ||
+        customDestination.startsWith("//");
       // Support both absolute URLs and relative paths
-      const destination = customDestination.startsWith("http")
+      const destination = isAbsolute
         ? customDestination
-        : `${request.nextUrl.origin}${customDestination}`;
+        : `${request.nextUrl.origin}${
+            customDestination.startsWith("/")
+              ? customDestination
+              : "/" + customDestination
+          }`;
 
       return NextResponse.rewrite(destination);
     }

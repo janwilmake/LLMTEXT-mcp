@@ -27,7 +27,8 @@ Later:
 - ✅ Ensure mcp.parallel.ai serves data as JSON at `index.json`, including top 10 users leaderboard
 - ✅ link from hostname to raw `llms.txt`
 - ✅ Fetch that and overwrite `window.data` in the HTML using node-script pre-deploy
-- Document check API and add llmstxt-check-tool.
+- ✅ Document check API and add llmstxt-check-tool.
+- ✅ Checktool bug: 404 for https://docs.zapier.com/llms.txt and even for https://modelcontextprotocol.io/llms.txt even though they exist.
 
 ## MCP
 

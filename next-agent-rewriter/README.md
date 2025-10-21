@@ -12,11 +12,11 @@ export function middleware(request: NextRequest) {
     // Set to true if you want the default to be HTML (when accept header is not specified)
     defaultHtml: false,
 
-    rewriteTo: (pathname) =>
-      // rewrite to another location: wherever the md-version is found
-      `https://llm.mydomain.com${pathname}${
-        pathname.includes(".") ? "" : ".md"
-      }`,
+    rewriteTo: (pathname) => {
+      const lastSegment = pathname.slice(pathname.lastIndexOf("/") + 1);
+      const hasExtension = lastSegment.includes(".");
+      return `https://llm.parallel.ai${pathname}${hasExtension ? "" : ".md"}`;
+    },
   });
   if (rewriteResponse) {
     return rewriteResponse;
