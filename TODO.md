@@ -32,11 +32,13 @@ Later:
 
 ## Finalize llms.txt generation
 
-Create very good `extract-from-sitemap/README.md` that uses https://github.com/janwilmake/parallel-llmtext as example and explains everything you need to do to serve a good `llms.txt` in step-by-step plan.
-
-Ensure `extract-from-sitemap` creates `index.md` files properly in every folder.
-
-Setup auto-update of https://github.com/janwilmake/parallel-llmtext using a secret; Set to update and redeploy hourly while optimizing for cost. Important to have this as well, or our llms.txt will get outdated.
+- ✅ Add regex for each method to replace the title
+- ✅ Ensure `extract-from-sitemap` creates `index.md` files properly in every folder.
+- `llms.txt`: Group links by path like they do in https://github.com/apify/actor-llmstxt-generator/pull/16
+- Remove newlines in descriptions to be according to spec
+- Check spec and see what else is non-compliant.
+- Create very good `extract-from-sitemap/README.md`
+- Setup auto-update of https://github.com/janwilmake/parallel-llmtext using parallel secret and cloudflare deployment secret; Set to update and redeploy hourly while optimizing for cost. Important to have this as well, or our llms.txt will get outdated.
 
 ## Finalize MCP
 
