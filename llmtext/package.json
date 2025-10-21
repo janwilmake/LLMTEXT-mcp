@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "predeploy": "node predeploy.js",
+    "deploy": "wrangler deploy"
+  }
+}

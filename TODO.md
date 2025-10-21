@@ -24,15 +24,15 @@ Later:
 ## Website
 
 - ✅ Adhere to figma design
-- Ensure mcp.parallel.ai serves data as JSON at `stats.json`, including top 10 users leaderboard. count pages of the llms.txt, not tokens
-- link from hostname to raw `llms.txt`
-- Fetch that and overwrite `window.data` in the HTML using node-script pre-deploy
-- Document check api and add llmstxt-check-tool.
+- ✅ Ensure mcp.parallel.ai serves data as JSON at `index.json`, including top 10 users leaderboard
+- ✅ link from hostname to raw `llms.txt`
+- ✅ Fetch that and overwrite `window.data` in the HTML using node-script pre-deploy
+- Document check API and add llmstxt-check-tool.
 
 ## MCP
 
 - Ensure relative links are also correctly fetched from the right hostname. Ensure hostname is part of description clearly.
-- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required)
+- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`
 
 ## Finish `extract-from-sitemap`
 
@@ -47,7 +47,7 @@ Create very good README.md that uses https://github.com/janwilmake/parallel-llmt
 
 ## Auto-update
 
-Setup auto-update of https://github.com/janwilmake/parallel-llmtext using a secret; Set to update hourly while optimizing for cost.
+Setup auto-update of https://github.com/janwilmake/parallel-llmtext using a secret; Set to update hourly while optimizing for cost. Important to have this as well!
 
 # Launch
 
