@@ -45,6 +45,10 @@ Later:
 - Ensure relative links are also correctly fetched from the right hostname. Ensure hostname is part of description clearly.
 - Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`
 
+## Make MCP available in p0docs
+
+It's probably fine to silently put it there already, not to wait too long.
+
 ## Draft Blogpost/learnings
 
 - Why this a fair alternative to context7
