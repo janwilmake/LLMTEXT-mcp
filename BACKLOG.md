@@ -1,5 +1,24 @@
 # More
 
+## Improve recurring llms.txt generation
+
+- `llms.txt`: For each source, group links by path like they do in https://github.com/apify/actor-llmstxt-generator/pull/16
+- Fix it so it works for recursive sitemaps: https://developers.cloudflare.com/sitemap.xml
+- Remove newlines in descriptions to be according to spec.
+- Ensure not to hit `/extract` urls count limitation or other errors. log them.
+- Check spec and see what else is non-compliant.
+- Setup auto-update of https://github.com/janwilmake/parallel-llmtext using parallel secret and cloudflare deployment secret; Set to update and redeploy hourly while optimizing for cost. Important to have this as well, or our llms.txt will get outdated.
+- Setup auto-prompt for https://github.com/parallel-web/parallel-sdk-typescript and https://github.com/parallel-web/parallel-sdk-python (and get prs merged for this)
+
+Question: what's the easiest way for people to set up doing prompts and other apis from private enterprise repos in a reliable way?
+
+- try github way first
+- then make it easier using contextarea if possible
+
+## Benchmark
+
+Can I somehow benchmark running the MCP within Claude Sonnet 4.5 programmatically, then also running Context7, and compare total tokens ingested for a correct answer? It would need to be complicated queries that require getting several docs pages for this to work well.
+
 ## New APIs for extracting context from multiple pages
 
 1. somehow use objective and other capabilities of `/extract`

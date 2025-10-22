@@ -30,50 +30,18 @@ Later:
 - ✅ Document check API and add llmstxt-check-tool.
 - ✅ Checktool bug: 404 for https://docs.zapier.com/llms.txt and even for https://modelcontextprotocol.io/llms.txt even though they exist.
 
-## Improve recurring llms.txt generation
-
-- ✅ Add regex for each method to replace the title
-- ✅ Ensure `extract-from-sitemap` creates `index.md` files properly in every folder.
-- ✅ Improve [readme](https://github.com/janwilmake/llmtext-mcp)
-- `llms.txt`: For each source, group links by path like they do in https://github.com/apify/actor-llmstxt-generator/pull/16
-- Fix it so it works for recursive sitemaps: https://developers.cloudflare.com/sitemap.xml
-- Remove newlines in descriptions to be according to spec.
-- Ensure not to hit `/extract` urls count limitation or other errors. log them.
-- Check spec and see what else is non-compliant.
-- Setup auto-update of https://github.com/janwilmake/parallel-llmtext using parallel secret and cloudflare deployment secret; Set to update and redeploy hourly while optimizing for cost. Important to have this as well, or our llms.txt will get outdated.
-- Setup auto-prompt for https://github.com/parallel-web/parallel-sdk-typescript and https://github.com/parallel-web/parallel-sdk-python (and get prs merged for this)
-
-Question: what's the easiest way for people to set up doing prompts and other apis from private enterprise repos in a reliable way?
-
-- try github way first
-- then make it easier using contextarea if possible
-
-## Website
+## Finalize MCP + listings
 
 - Use the check-api on all servers and ensure that the ones that have HTML only in their contents get filtered out. These aren't valid.
-
-## Finalize MCP
-
+- When entering a new llms.txt URL to create an MCP, perform the check first, and only redirect to installation page when it's confirmed that it is actually good
 - Ensure relative links are also correctly fetched from the right hostname. Ensure hostname is part of description clearly.
 - Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`
-
-## Clarity
-
 - Make MCP available in p0docs + demo on how this works for Travers
 - Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website, combined (it's missing!)
+- Talk to Lukas/Khushi on how to launch this!
+- Consider improving the MCP with the extract API.
 
-## Benchmark
-
-Can I somehow benchmark running the MCP within Claude Sonnet 4.5 programmatically, then also running Context7, and compare total tokens ingested for a correct answer? It would need to be complicated queries that require getting several docs pages for this to work well.
-
-## Draft Blogpost/learnings
-
-- Why this a fair alternative to context7
-- Reasoning over a table of contents > vector search?
-- Every website needs an llms.txt, not just docs sites!
-- Parallel.ai llms.txt combines main website + docs + socials
-
-# Launch
+## Launch
 
 - Open issue in https://github.com/AnswerDotAI/llms-txt
 - Reach out to https://x.com/jeremyphoward (somehow)
@@ -83,3 +51,10 @@ Can I somehow benchmark running the MCP within Claude Sonnet 4.5 programmaticall
 - Launch it on MCP directories in a way that context7/gitmcp did it too
 - Use it for https://docs.parallel.ai/llms.txt and make demo
 - X Launch post
+
+## Draft Blogpost/learnings
+
+- Why this a fair alternative to context7
+- Reasoning over a table of contents > vector search?
+- Every website needs an llms.txt, not just docs sites!
+- Parallel.ai llms.txt combines main website + docs + socials

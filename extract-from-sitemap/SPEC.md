@@ -20,6 +20,8 @@
   - Top-level description: homepage title + description
   - Per-item prefix: `({tokens} tokens)` before description
 - Top-level keys: `totalTokens`, `totalPages`, `errors`, `processingTimeMs`, `extractApiCallCount`, `fetchCount`
+- regex for each method to replace the title
+- Ensure `extract-from-sitemap` creates `index.md` files properly in every folder.
 
 ## Response Structure
 
