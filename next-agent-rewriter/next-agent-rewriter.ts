@@ -8,7 +8,6 @@ interface MediaType {
 }
 
 interface AgentRewriterConfig {
-  defaultHtml?: boolean;
   /**
    * Custom function to determine rewrite destination.
    * If returns a string, rewrites to that URL (can be external domain).
@@ -47,6 +46,7 @@ export const rewriteToStatic = (origin: string = "") => {
     return `${origin}${path}${ext}`;
   };
 };
+
 /**
  * Middleware function that rewrites URLs based on Accept headers.
  * Supports rewriting to external domains via rewriteTo function.
@@ -64,7 +64,7 @@ export function agentRewriter(
   request: NextRequest,
   config: AgentRewriterConfig = {}
 ): NextResponse | null {
-  const { defaultHtml = false, rewriteTo } = config;
+  const { rewriteTo } = config;
   const pathname = request.nextUrl.pathname;
 
   // Special paths that should always be rewritten when rewriteTo is available
@@ -93,13 +93,10 @@ export function agentRewriter(
   }
 
   const acceptHeader = request.headers.get("accept");
-
+  console.log({ acceptHeader });
   // No Accept header - use default behavior
   if (!acceptHeader || acceptHeader === "*/*") {
-    if (defaultHtml) {
-      return null;
-    }
-    return rewriteToDestination(request, pathname, rewriteTo);
+    return null;
   }
 
   // Check if markdown/plain should be served based on proper Accept header parsing
