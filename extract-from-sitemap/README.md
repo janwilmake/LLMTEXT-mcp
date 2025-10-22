@@ -13,5 +13,6 @@ This library is in active development. Known limitations:
 
 - Does not work for nested sitemaps
 - Does not work on sitemaps that are too large
+- Example to make it recurring is still missing
 
 I am working on addressing these issues.
