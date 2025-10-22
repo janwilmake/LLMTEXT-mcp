@@ -30,19 +30,25 @@ Later:
 - ✅ Document check API and add llmstxt-check-tool.
 - ✅ Checktool bug: 404 for https://docs.zapier.com/llms.txt and even for https://modelcontextprotocol.io/llms.txt even though they exist.
 
-## Finalize MCP + listings
+## Finalize MCP listings and flow
 
-- Use the check-api on all servers and ensure that the ones that have HTML only in their contents get filtered out. These aren't valid.
-- When entering a new llms.txt URL to create an MCP, perform the check first, and only redirect to installation page when it's confirmed that it is actually good
-- Ensure relative links are also correctly fetched from the right hostname. Ensure hostname is part of description clearly.
+- ✅ The check API should use parse-llms-txt and actually give you deeper information about 50 random links in your `llms.txt`
+- ✅ When entering a new llms.txt URL to create an MCP, perform the check first, and only allow going to installation page when it's confirmed that it is actually good
+- ✅ Improve check api testing on bun: https://bun.com/llms.txt. somehow it can't always find the md. Fix this!
+- ✅ Use the check-api on all servers and ensure that the ones that have HTML only in their contents get filtered out. These aren't valid. Still keep them in the dataset as invalid servers, leading to check them.
+- ✅ Show invalid servers at the bottom and replace "Add" button with "Check". Especially nice to showcase the famous companies with invalid llms.txt server.
+
+## Improve MCP
+
+- ✅ Ensure relative links are also correctly fetched from the right hostname. Ensure hostname is part of description clearly.
 - Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`
-- Make MCP available in p0docs + demo on how this works for Travers
-- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website, combined (it's missing!)
-- Talk to Lukas/Khushi on how to launch this!
-- Consider improving the MCP with the extract API.
+- Consider improving the MCP with the extract API. The 'strategy' could be something you set up during the auth process as well, effectively changing the tools.
 
 ## Launch
 
+- Make MCP available in p0docs + demo on how this works for Travers
+- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website, combined (it's missing!)
+- Talk to Lukas/Khushi on how to launch this!
 - Open issue in https://github.com/AnswerDotAI/llms-txt
 - Reach out to https://x.com/jeremyphoward (somehow)
 - Get on llms.txt directories for parallel.ai/llms.txt: [llmstxt.site](https://llmstxt.site/) and [directory.llmstxt.cloud](https://directory.llmstxt.cloud/)

@@ -457,8 +457,10 @@ const handleLlmsTxt = async () => {
     let content = "# llms.txt\n\n";
 
     // Add summary
-    const totalServers = data.servers.length;
-    const activeServers = data.servers.filter(
+    const activeServersList = data.servers.filter((x) => !!x.valid);
+
+    const totalServers = activeServersList.length;
+    const activeServers = activeServersList.filter(
       (s: any) => s.total_requests > 0
     ).length;
     const totalUsers = data.users.length;
@@ -477,8 +479,8 @@ const handleLlmsTxt = async () => {
     content += `> Total Requests: ${totalRequests}\n`;
     content += `> Total Tokens Ingested: ${totalTokens.toLocaleString()}\n\n`;
 
+    content += `## llms.txt MCP Servers\n\n`;
     // Add active servers (those with requests > 0)
-    const activeServersList = data.servers;
 
     if (activeServersList.length > 0) {
       for (const server of activeServersList) {

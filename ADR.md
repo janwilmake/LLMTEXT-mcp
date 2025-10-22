@@ -60,7 +60,7 @@ Other than that I've found the following common mistakes in llms.txt files:
 
 Lots of llms.txt are low quality and the guidelines from the standard are ambiguous.
 
-# no description from `/extract` api
+# No description from `/extract` api
 
 extract endpont nicely returns title and published date which is truly awesome, but it doesn't get the description, causing me to need to do 2 extra api calls PER PAGE.
 

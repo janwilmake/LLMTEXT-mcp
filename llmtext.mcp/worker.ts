@@ -7,7 +7,7 @@ import { convertRestToMcp } from "rest-mcp";
 //@ts-ignore
 import popular from "./popular.json";
 
-const DO_ID = "history-v2";
+const DO_ID = "history-v3";
 export interface Env {
   HISTORY_DO: DurableObjectNamespace<HistoryDO>;
   PORT?: string;
@@ -559,86 +559,97 @@ async function handleMcp(
         let isError = false;
 
         if (name === "get") {
-          const singleUrl = args?.url;
           const multipleUrls = args?.urls;
 
-          if (!singleUrl && !multipleUrls) {
-            result = "Error: Either 'url' or 'urls' parameter is required";
+          if (!multipleUrls) {
+            result = "Error: Either 'urls' parameter is required";
             isError = true;
           } else {
             try {
               // Determine which URLs to fetch
               let urlsToFetch: string[] = [];
 
-              if (singleUrl) {
-                new URL(singleUrl); // Validate URL
-                urlsToFetch = [singleUrl];
-              } else if (multipleUrls && Array.isArray(multipleUrls)) {
-                // Validate all URLs
+              if (multipleUrls && Array.isArray(multipleUrls)) {
+                // Validate and normalize all URLs
+                const origin = `https://${hostname}`;
+
                 for (const url of multipleUrls) {
                   if (typeof url !== "string") {
                     throw new Error(`Invalid URL type: ${typeof url}`);
                   }
-                  new URL(url); // Validate URL
+
+                  let normalizedUrl = url.trim();
+
+                  // Handle relative paths
+                  if (normalizedUrl.startsWith("/")) {
+                    // Absolute path: /path
+                    normalizedUrl = `${origin}${normalizedUrl}`;
+                  } else if (normalizedUrl.startsWith("./")) {
+                    // Relative path: ./path
+                    normalizedUrl = `${origin}/${normalizedUrl.slice(2)}`;
+                  } else if (
+                    !normalizedUrl.startsWith("http://") &&
+                    !normalizedUrl.startsWith("https://")
+                  ) {
+                    // Relative path without prefix: path
+                    normalizedUrl = `${origin}/${normalizedUrl}`;
+                  }
+
+                  // Validate the final URL
+                  new URL(normalizedUrl);
+                  urlsToFetch.push(normalizedUrl);
                 }
-                urlsToFetch = multipleUrls;
               } else {
                 throw new Error("Invalid URL format");
               }
 
-              // Limit number of URLs to prevent abuse
-              if (urlsToFetch.length > 10) {
-                result = "Error: Maximum 10 URLs allowed per request";
-                isError = true;
-              } else {
-                const fetchResults = await fetchMultipleUrls(urlsToFetch);
+              const fetchResults = await fetchMultipleUrls(urlsToFetch);
 
-                // Store each URL in history
-                for (const fetchResult of fetchResults.results) {
-                  if (fetchResult.success) {
-                    try {
-                      const urlHostname = new URL(fetchResult.url).hostname;
-                      const isLlmsTxt = fetchResult.url.endsWith("/llms.txt");
+              // Store each URL in history
+              for (const fetchResult of fetchResults.results) {
+                if (fetchResult.success) {
+                  try {
+                    const urlHostname = new URL(fetchResult.url).hostname;
+                    const isLlmsTxt = fetchResult.url.endsWith("/llms.txt");
 
-                      await historyDO.addHistory({
-                        username: ctx.user!.username,
-                        hostname: urlHostname,
-                        mcp_hostname: hostname, // Track which MCP was used
-                        is_llms_txt: isLlmsTxt,
-                        content_type: fetchResult.contentType,
-                        url: fetchResult.url,
-                        tokens: fetchResult.tokens,
-                        response_time: fetchResult.responseTime,
-                      });
-                    } catch (historyError) {
-                      // Log but don't fail the request for history errors
-                      console.error("History storage error:", historyError);
-                    }
+                    await historyDO.addHistory({
+                      username: ctx.user!.username,
+                      hostname: urlHostname,
+                      mcp_hostname: hostname, // Track which MCP was used
+                      is_llms_txt: isLlmsTxt,
+                      content_type: fetchResult.contentType,
+                      url: fetchResult.url,
+                      tokens: fetchResult.tokens,
+                      response_time: fetchResult.responseTime,
+                    });
+                  } catch (historyError) {
+                    // Log but don't fail the request for history errors
+                    console.error("History storage error:", historyError);
                   }
                 }
-
-                // Format the response
-                result = fetchResults.summary;
-
-                fetchResults.results.forEach((fetchResult, index) => {
-                  result += `${"=".repeat(50)}\n`;
-                  result += `URL ${index + 1}: ${fetchResult.url}\n`;
-                  result += `Status: ${
-                    fetchResult.success ? "Success" : "Failed"
-                  }\n`;
-                  result += `Content-Type: ${fetchResult.contentType}\n`;
-                  result += `Response Time: ${fetchResult.responseTime}ms\n`;
-                  result += `Tokens: ${fetchResult.tokens}\n`;
-                  if (fetchResult.isHtml) {
-                    result += `⚠️  HTML Content (replaced with warning)\n`;
-                  }
-                  if (fetchResult.error) {
-                    result += `Error: ${fetchResult.error}\n`;
-                  }
-                  result += `${"=".repeat(50)}\n\n`;
-                  result += fetchResult.content + "\n\n";
-                });
               }
+
+              // Format the response
+              result = fetchResults.summary;
+
+              fetchResults.results.forEach((fetchResult, index) => {
+                result += `${"=".repeat(50)}\n`;
+                result += `URL ${index + 1}: ${fetchResult.url}\n`;
+                result += `Status: ${
+                  fetchResult.success ? "Success" : "Failed"
+                }\n`;
+                result += `Content-Type: ${fetchResult.contentType}\n`;
+                result += `Response Time: ${fetchResult.responseTime}ms\n`;
+                result += `Tokens: ${fetchResult.tokens}\n`;
+                if (fetchResult.isHtml) {
+                  result += `⚠️  HTML Content (replaced with warning)\n`;
+                }
+                if (fetchResult.error) {
+                  result += `Error: ${fetchResult.error}\n`;
+                }
+                result += `${"=".repeat(50)}\n\n`;
+                result += fetchResult.content + "\n\n";
+              });
             } catch (urlError) {
               result = `Error: Invalid URL(s) - ${urlError.message}`;
               isError = true;
@@ -981,16 +992,21 @@ export class HistoryDO extends DurableObject<Env> {
 
     // Add popular servers that aren't in the history
     const popularServersToAdd = popular
-      .filter((hostname) => !existingHostnames.has(hostname))
-      .map((hostname) => ({
-        hostname,
+      .filter((item) => !existingHostnames.has(item.hostname))
+      .map((item) => ({
+        valid: item.valid,
+        hostname: item.hostname,
         total_requests: 0,
         total_tokens: 0,
         unique_users: 0,
-      }));
+      }))
+      .sort((a, b) => (b.valid < a.valid ? -1 : 1));
 
     // Combine existing servers with popular ones
-    const allServers = [...servers, ...popularServersToAdd];
+    const allServers = [
+      ...servers.map((item) => ({ ...item, valid: true })),
+      ...popularServersToAdd,
+    ];
 
     return {
       users,

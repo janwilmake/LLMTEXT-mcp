@@ -21,14 +21,10 @@ const { extractFromSitemap } = require("./mod.js");
  */
 /**
  * @typedef {Object} Config
+ * @property {string} description - Description of the documentation collection
+ * @property {string} [details] - Optional additional details about the collection
  * @property {string} outDir - Top-level output directory for combined llms.txt
  * @property {SourceConfig[]} sources - Array of source configurations
- */
-
-/**
- * @typedef {Object} Manifest
- * @property {string[]} files - List of generated files
- * @property {string} timestamp - Timestamp of last generation
  */
 
 const CREDENTIALS_DIR = path.join(os.homedir(), ".llmtext");
@@ -218,6 +214,9 @@ async function loadConfig() {
       JSON.stringify(
         {
           $schema: "https://extract.llmtext.com/llmtext.schema.json",
+          description: "Combined documentation from multiple sources",
+          details:
+            "This collection includes API documentation, guides, and references.",
           outDir: "./docs",
           sources: [
             {
@@ -274,6 +273,7 @@ async function loadConfig() {
     const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
     // Validate required fields
+    if (!config.description) throw new Error("description is required");
     if (!config.outDir) throw new Error("outDir is required");
     if (!Array.isArray(config.sources))
       throw new Error("sources must be an array");
@@ -417,59 +417,6 @@ async function getApiKey() {
 }
 
 /**
- * Load manifest file
- * @param {string} outDir - Output directory
- * @returns {Manifest} The manifest object
- */
-function loadManifest(outDir) {
-  const manifestPath = path.join(outDir, "llmtext-manifest.json");
-
-  if (!fs.existsSync(manifestPath)) {
-    return { files: [], timestamp: new Date().toISOString() };
-  }
-
-  try {
-    return JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-  } catch {
-    return { files: [], timestamp: new Date().toISOString() };
-  }
-}
-
-/**
- * Save manifest file
- * @param {string} outDir - Output directory
- * @param {Manifest} manifest - The manifest to save
- */
-function saveManifest(outDir, manifest) {
-  const manifestPath = path.join(outDir, "llmtext-manifest.json");
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-}
-
-/**
- * Clean up old files that are no longer generated
- * @param {string} outDir - Output directory
- * @param {string[]} currentFiles - Currently generated files
- * @param {string[]} previousFiles - Previously generated files
- */
-function cleanupOldFiles(outDir, currentFiles, previousFiles) {
-  const filesToRemove = previousFiles.filter(
-    (file) => !currentFiles.includes(file)
-  );
-
-  for (const file of filesToRemove) {
-    const filePath = path.join(outDir, file);
-    try {
-      if (fs.existsSync(filePath)) {
-        fs.rmSync(filePath);
-        console.log(`🗑️  Removed old file: ${file}`);
-      }
-    } catch (error) {
-      console.warn(`⚠️  Could not remove ${file}:`, error.message);
-    }
-  }
-}
-
-/**
  * Process custom URLs through extraction API
  * @param {Array<{title: string, description: string, filename: string, url: string}>} customUrls - Custom URLs to process
  * @param {string} apiKey - API key for authentication
@@ -546,12 +493,17 @@ function getPathPrefix(topLevelOutDir, sourceOutDir) {
 
 /**
  * Generate combined llms.txt from all sources
+ * @param {string} description - Top-level description
+ * @param {string} [details] - Optional top-level details
  * @param {Array<{title: string, files: Record<string, any>, keepOriginalUrls?: boolean, pathPrefix: string}>} allSources - All processed sources
  * @returns {string} Combined llms.txt content
  */
-function generateCombinedLlmsTxt(allSources) {
-  let combinedTxt =
-    "# Documentation Collection\n\n> Combined documentation from multiple sources\n\n";
+function generateCombinedLlmsTxt(description, details, allSources) {
+  let combinedTxt = `# Documentation Collection\n\n> ${description}\n\n`;
+
+  if (details) {
+    combinedTxt += `${details}\n\n`;
+  }
 
   for (const source of allSources) {
     combinedTxt += `## ${source.title}\n\n`;
@@ -574,7 +526,10 @@ function generateCombinedLlmsTxt(allSources) {
           link = source.pathPrefix + (path.startsWith("/") ? path : "/" + path);
         }
 
-        combinedTxt += `- [${title}](${link}) (${file.tokens} tokens)${description}\n`;
+        combinedTxt += `- [${title}](${link}): ${description.replaceAll(
+          "\n",
+          " "
+        )}\n`;
       }
     }
 
@@ -638,11 +593,6 @@ async function main() {
         fs.mkdirSync(sourceConfig.outDir, { recursive: true });
       }
 
-      // Load previous manifest for this source (only if we have an outDir and not keeping original URLs)
-      const previousManifest = !sourceConfig.keepOriginalUrls
-        ? loadManifest(sourceConfig.outDir)
-        : { files: [], timestamp: new Date().toISOString() };
-      const currentFiles = [];
       let sourceFiles = {};
 
       try {
@@ -699,7 +649,6 @@ async function main() {
 
             fs.mkdirSync(fileDir, { recursive: true });
             fs.writeFileSync(fullFilePath, file.content);
-            currentFiles.push(filename);
 
             console.log(
               `📝 Wrote: ${path.join(sourceConfig.outDir, filename)} (${
@@ -707,22 +656,6 @@ async function main() {
               } tokens)`
             );
           }
-
-          // Clean up old files for this source
-          if (previousManifest.files.length > 0) {
-            cleanupOldFiles(
-              sourceConfig.outDir,
-              currentFiles,
-              previousManifest.files
-            );
-          }
-
-          // Save manifest for this source
-          const newManifest = {
-            files: currentFiles,
-            timestamp: new Date().toISOString(),
-          };
-          saveManifest(sourceConfig.outDir, newManifest);
         } else {
           console.log(
             `📋 Keeping original URLs - not saving files locally for ${sourceName}`
@@ -749,7 +682,11 @@ async function main() {
 
     // Generate and write combined llms.txt to top-level outDir
     if (allSources.length > 0) {
-      const combinedLlmsTxt = generateCombinedLlmsTxt(allSources);
+      const combinedLlmsTxt = generateCombinedLlmsTxt(
+        config.description,
+        config.details,
+        allSources
+      );
       const combinedLlmsTxtPath = path.join(config.outDir, "llms.txt");
       fs.writeFileSync(combinedLlmsTxtPath, combinedLlmsTxt);
       console.log(`\n📋 Generated combined llms.txt: ${combinedLlmsTxtPath}`);

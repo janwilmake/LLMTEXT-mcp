@@ -105,8 +105,8 @@
         }
 
         .github-icon {
-            width: 28px;
-            height: 28px;
+            width: 35px;
+            height: 35px;
             border: 1.5px solid #1d1b16;
             border-radius: 3px;
             display: flex;
@@ -136,10 +136,20 @@
             padding: 0 1rem;
         }
 
+        a {
+            text-decoration: none;
+            color: black;
+            font-weight: 400;
+        }
+
         h1 u {
             text-decoration-color: #FF7700;
             text-decoration-thickness: 2px;
+
         }
+
+
+
 
         .tabs-container {
             max-width: 900px;
@@ -240,7 +250,7 @@
             white-space: nowrap;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: #2d2b26;
         }
 
@@ -267,7 +277,6 @@
             overflow-x: visible;
             -webkit-overflow-scrolling: touch;
         }
-
 
         .table-scroll {
             overflow-x: visible;
@@ -299,7 +308,6 @@
             font-size: 0.8rem;
         }
 
-        /* Make columns responsive on mobile */
         @media (max-width: 640px) {
 
             th,
@@ -308,7 +316,6 @@
                 padding: 0.5rem 0.25rem;
             }
 
-            /* Hide less important columns on mobile if needed */
             th:nth-child(3),
             td:nth-child(3),
             th:nth-child(4),
@@ -345,6 +352,8 @@
             gap: 0.5rem;
         }
 
+
+
         .source-name a {
             color: #1d1b16;
             text-decoration: none;
@@ -358,17 +367,6 @@
             width: 16px;
             height: 16px;
             flex-shrink: 0;
-        }
-
-        .placeholder {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: #999;
-        }
-
-        .placeholder h2 {
-            color: #1d1b16;
-            margin-bottom: 1rem;
         }
 
         .validation-result {
@@ -428,44 +426,100 @@
             color: #ea580c;
         }
 
-        .metadata {
+        .metadata-section {
             margin-top: 1rem;
             padding-top: 1rem;
             border-top: 1px solid #e5e5e0;
-            font-size: 0.8rem;
-            color: #666;
         }
 
-        .metadata-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 0.75rem;
-            margin-top: 0.75rem;
-        }
-
-        .metadata-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .metadata-label {
+        .metadata-section h5 {
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
             font-weight: 600;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #999;
         }
 
-        .metadata-value {
+        .metadata-table {
+            width: 100%;
             font-size: 0.85rem;
-            color: #1d1b16;
+        }
+
+        .metadata-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e5e5e0;
+        }
+
+        .metadata-table td:first-child {
+            font-weight: 600;
+            color: #666;
+            width: 40%;
+        }
+
+        .metadata-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .install-mcp-btn {
+            margin-top: 1rem;
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            background: #1d1b16;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .install-mcp-btn:hover:not(.disabled) {
+            background: #2d2b26;
+        }
+
+        .install-mcp-btn.disabled {
+            background: #999;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         .loading {
             text-align: center;
             padding: 2rem;
             color: #999;
+        }
+
+        .show-invalid-btn {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .show-invalid-btn button {
+            padding: 0.875rem 2rem;
+            background: transparent;
+            border: 2px solid #1d1b16;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #1d1b16;
+        }
+
+        .show-invalid-btn button:hover {
+            background: #f0f0ed;
+        }
+
+        .invalid-servers-section {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .invalid-servers-section.visible {
+            display: block;
+        }
+
+        .invalid-servers-section h3 {
+            color: #dc2626;
         }
 
         @media (min-width: 640px) {
@@ -556,7 +610,8 @@
             </div>
         </div>
         <div class="nav">
-            <a href="https://llmstxt.org" class="nav-btn cyan" target="_blank">LLMS.TXT</a>
+            <a href="https://github.com/janwilmake/llmtext-mcp/issues/new" class="nav-btn cyan"
+                target="_blank">FEEDBACK</a>
             <a href="https://parallel.ai/blog" class="nav-btn orange" target="_blank">LEARN MORE</a>
             <a href="https://github.com/janwilmake/llmtext-mcp" class="github-icon" target="_blank">
                 <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
@@ -568,7 +623,7 @@
     </div>
 
     <div class="container">
-        <h1>Tools for the <u>llms.txt</u> standard</h1>
+        <h1>Tools for the <a href="https://llmstxt.org" target="_blank"><u>llms.txt</u></a> standard</h1>
 
         <div class="tabs-container">
             <div class="tabs">
@@ -609,7 +664,7 @@
 
                     <div class="input-group">
                         <input type="text" id="llmtext-url" placeholder="https://example.com/llms.txt">
-                        <button class="btn-primary" onclick="handleFindCreate()">FIND / CREATE</button>
+                        <button class="btn-primary" onclick="handleCheckUrl()">CHECK & INSTALL</button>
                     </div>
 
                     <div id="stats" class="stats">Loading...</div>
@@ -634,6 +689,28 @@
                             </table>
                         </div>
                     </div>
+
+                    <div class="show-invalid-btn">
+                        <button onclick="toggleInvalidServers()">Show invalid llms.txt's</button>
+                    </div>
+
+                    <div id="invalid-servers-section" class="invalid-servers-section">
+                        <h3>Invalid submitted llms.txt's</h3>
+                        <div class="table-container">
+                            <div class="table-scroll">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>SOURCE</th>
+                                            <th>CHECK</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invalid-servers-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -641,7 +718,7 @@
 
     <script>
         // Initial dummy data
-        window.data = { "users": [{ "username": "janwilmake", "total_requests": 38, "total_tokens": 918788 }], "servers": [{ "hostname": "docs.parallel.ai", "total_requests": 17, "total_tokens": 47502, "unique_users": 1 }, { "hostname": "modelcontextprotocol.io", "total_requests": 6, "total_tokens": 12040, "unique_users": 1 }, { "hostname": "bun.sh", "total_requests": 4, "total_tokens": 13203, "unique_users": 1 }, { "hostname": "developers.cloudflare.com", "total_requests": 4, "total_tokens": 10497, "unique_users": 1 }, { "hostname": "docs.x.com", "total_requests": 4, "total_tokens": 17306, "unique_users": 1 }, { "hostname": "www.mux.com", "total_requests": 2, "total_tokens": 13975, "unique_users": 1 }, { "hostname": "supabase.com", "total_requests": 1, "total_tokens": 804265, "unique_users": 1 }, { "hostname": "bun.com", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "docs.expo.dev", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "docs.replit.com", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "lobehub.com", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "glama.ai", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "angular.dev", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "vuejs.org", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "astro.build", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "nuxt.com", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "hostname": "svelte.dev", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }], "totalRequests": 38, "totalTokens": 918788 };
+        window.data = {"users":[{"username":"janwilmake","total_requests":37,"total_tokens":112283}],"servers":[{"hostname":"parallel.ai","total_requests":30,"total_tokens":82970,"unique_users":1,"valid":true},{"hostname":"docs.tavus.io","total_requests":3,"total_tokens":5211,"unique_users":1,"valid":true},{"hostname":"llmtext.com","total_requests":3,"total_tokens":21898,"unique_users":1,"valid":true},{"hostname":"bun.com","total_requests":1,"total_tokens":2204,"unique_users":1,"valid":true},{"valid":true,"hostname":"ai.pydantic.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"api-docs.devhub.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"ast-grep.github.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"bun.sh","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"community-charts.github.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"curling.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"dev.writer.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"developer.fabric.inc","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"developer.ongoody.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"developers.cloudflare.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs-en.sinch.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.abs.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.asapp.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.augmentcode.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.avalonfinance.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.ave.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.awesomeapi.com.br","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.axiom.trade","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.base.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.beacon.li","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.beyondwords.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.birds.dog","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.bito.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.bixgrow.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.blocksscan.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.brightdata.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.browsee.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.bsquared.network","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.btcturk.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.bucket.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.bugsplat.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.bunny.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.butlr.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.caldera.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.carbon.network","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.cardknox.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.carto.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.carv.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.catizen.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.centic.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.chaineye.tools","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.chaingpt.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.chatknow.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.chatling.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.chiliz.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.chirpwireless.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.cid.contact","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.citrea.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.cnpj.ws","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.cobrowse.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.codeium.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.coframe.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.coin98.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.commoninja.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.conductor.is","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.consentik.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.contentsquare.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.couchdrop.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.craft.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.cryptoprocessing.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.danielvoelk.de","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.dataimpulse.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.de.fi","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.defisaver.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.dns0.eu","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.dynamic.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.eclipse.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.energyweb.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.entangle.fi","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.eywa.fi","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.fireworks.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.flip.to","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.flowx.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.hub88.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.humanity.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.hybrid.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.hypermode.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.hypertune.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.i3d.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.iagentpro.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.ice.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.icepanel.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.ideogram.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.idriss.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.imagin.studio","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.imagine.art","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.imgarena.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.immortalrising2.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.imprint.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.injective.network","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.inspector.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.instruqt.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.intelligems.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.intract.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.intunedhq.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.ipaper.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.iproyal.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.islandrouter.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.joinmassive.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.journify.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.jsfiddle.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.jumptask.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.junipercreates.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.kaito.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.keeper-wallet.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.kick.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.kintsu.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.krystal.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.kyberswap.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.kyo.finance","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.latch.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.layouthub.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.legendsoflearning.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.livespotting.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.lottielab.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.mangopay.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.mantrachain.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.meshconnect.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.methodfi.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.netlify.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.openpipe.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.oxla.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.perplexity.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.pinecone.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.pingcap.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.primev.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.projectdiscovery.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.reown.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.rungalileo.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.social.plus","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.solidfi.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.tryvital.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.unifygtm.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.upsun.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.usenash.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.useparagon.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.vdo.ninja","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.vechain.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.velo.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.velt.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.ventrata.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.verdn.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.vooi.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.vvs.finance","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.warp.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.waveonsui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.weka.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.whereby.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.whisk.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.whitechain.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.wingbits.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.wonderchat.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.workflow.design","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.xrpscan.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.yala.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.z1labs.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.zealy.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.zenml.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.zep.us","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.zigpoll.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.zipchat.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"docs.zipy.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"faq.karrier.one","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"htmlhint.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"inspira-ui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"instantdb.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"juno.build","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"lib.rsbuild.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"litdb.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"llmstxt.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"loglayer.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"lunacy.docs.icons8.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"lynxjs.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"miarecki.eu","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"modelcontextprotocol.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"monsterui.answer.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"muspimerol.site","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"navi-lang.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"nocruft.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"open.longbridgeapp.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"remult.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"rsbuild.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"rsdoctor.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"rspack.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"sunra.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"tamagui.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"techiral.mintlify.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"testingbot.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"underrun.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"useapi.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"vue-macros.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"vuejs.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"wot-design-uni.cn","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.claudemcp.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.helius.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.mailmodo.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.moremedia.at","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.mux.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.pgflow.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.sherlockdomains.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.twicpics.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"www.unistyl.es","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":true,"hostname":"x-cmd.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"02ai.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"1millionbot.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"48.club","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"4everland.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"7eads.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"a2rev.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"abcproxy.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"abogadoexpres.es","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"abstractapi.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"aceessay.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"acemoneytransfer.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"acrcloud.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"across.to","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"adgatemedia.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"admira.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"adnuntius.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"adpies.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"adsbravo.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"advinservers.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"adxcorp.kr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"aethir.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"aevo.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"aftermath.finance","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"agent.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"agentlayer.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"agileit.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"agno.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ai-interviewer.micro1.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"aicryptocore.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"aidreamscope.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ajaib.gitbook.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"akool.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"alchemywares.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"alexop.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"alphafi.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"alphagate.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"altostrat.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"alva.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"amplemarket.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"analogjs.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"angular.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"annoto.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"answer.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ant.design","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"anytrack.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"anytype.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"apex.exchange","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"apify.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"app.rapidtextai.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"appliancerepairservirep.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"appzung.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"arbiscan.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"arcade.software","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ark-ui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"artzero.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"astro.build","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"aureuserp.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"avalanchehomesystems.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"avohq.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"axiom.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"bartendingschool.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"bepure.ch","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"bergholt.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"bika.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"bits-ui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"blacknet.ninja","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"blog.calendarscripts.info","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"blog.teraren.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"blueshift.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"boehs.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"booqable.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"brucgironashop.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"buildwithfern.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"builtwith.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"bunny.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cal.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cbdtech.fr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"chakra-ui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"chicroom.ca","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cipherstash.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"circleci.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"citizenshipper.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cleaningservice4u.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"clerk.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cloud.needle.tools","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cloudfix.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cncmekalite.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"coefont.cloud","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cog.run","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"comforterp.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"comforthrm.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"comparisonator.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"console.groq.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"contractorgrowthnetwork.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"convertcake.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"convex.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"coolify.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"corpsignals.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"count.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cureangelman.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"cybernoz.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"daisyui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"daitoku0110.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"dat1.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"data-surfer.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"datacamp.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"datadrivenmarketer.me","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"demotime.elio.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"designmodo.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"developer.tryfinch.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"developers.avacloud.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"developers.campsite.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"developers.hubspot.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"digitalhandwerk.rocks","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"digitaliser.getmarked.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"digitalmiddleground.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"digitlnomad.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"directory.llmstxt.cloud","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"dj.110visa.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"doc2lang.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.anthropic.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.argil.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.avaamo.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.availspace.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.axle.insure","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.basehub.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.basescan.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.benzinga.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.birdie.so","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.blockscout.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.bluems.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.boltz.exchange","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.brandfetch.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.bscscan.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.burnt.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.bwarelabs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.caf.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.cdp.coinbase.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.chain.fm","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.chainbase.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.chargeblast.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.circular.bot","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.civic.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.cleartax.in","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.clore.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.clover.space","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.codecrafters.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.cohere.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.comfy.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.coollabs.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.crewai.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.cryptlex.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.cursor.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.dappier.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.datafold.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.deco.cx","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.deno.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.devunus.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.dexpaprika.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.diadata.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.docker.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.dopp.finance","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.duendesoftware.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.embedchain.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.envoyer.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.expo.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.formo.so","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.fractalpay.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.fractionai.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.frigade.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.giselles.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.glood.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.gnosischain.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.goldsky.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.hyperbeam.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.hyperline.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.illuvium.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.infera.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.initia.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.inkeep.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.ionos.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.ionq.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.iotex.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.irev.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.kamino.finance","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.keeper.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.kerberus.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.kiloex.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.lavita.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.layeredge.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.linktr.ee","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.livecaller.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.luxalgo.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.marimo.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.medusajs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.moondream.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.nativescript.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.phare.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.pimlico.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.pinata.cloud","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.platform.sh","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.play.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.pydantic.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.quillsql.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.redpanda.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.replit.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.rushdb.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.salesbricks.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.sardine.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.servicestack.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.skip.build","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.sourceforge.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.sourcegraph.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.supadata.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.synthetix.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.turbodocx.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.turso.tech","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.uniwebview.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.unstructured.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.upstreet.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.vapi.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.vendure.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.venice.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.vertexprotocol.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.videosdk.live","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.videowise.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.wized.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.x.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.x.ink","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.xdcscan.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.zapier.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.zeffy.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docs.zoko.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"docspring.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"doctornow.co.kr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"dotenvx.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"dps.media","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"drayrates.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"dub.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"duckdb.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"e-vignettes.eu","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"edtreatment.info","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"effect.website","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"elevenlabs.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"emailgic.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"embednotionpages.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"enhancemedia.co.uk","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"equipment-python.vercel.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"erdaltoprak.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"etf.capital","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"etiqazur.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"evokeentertainment.com.au","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"fatosmilitares.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"fibery.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"firmly.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"flatfile.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"floren.com.ua","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"flows.sh","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"formengine.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"formwerk.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"fragments-studio.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"freetrade.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"frontmatter.codes","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"future-first-design.vercel.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"games.stardreamcruises.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"getkoala.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"getlago.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"getmaxim.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"getswipe.in","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"glama.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"glucn.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"gr-docs.aporia.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"graphite-note.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"greenappletravel.ae","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"handbook.exemplar.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"herd.garden","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"hericoll.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"heyflow.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"himalayas.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"hola.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"hono.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"id21.com.sg","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"idnocode.fr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ime.sk","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"infisical.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"insights.mtd.info","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"iqboatlifts.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"jam.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"jasminides.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"jazz.tools","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"js.langchain.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"juanluismora.es","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"justlaser.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"knmstudio.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"kol.wunderfauks.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"kravmagaselfdefensebengaluru.in","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"lacreme.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ladendirekt.de","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"langfuse.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"laressourcehumaine.fr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"lawdigitalsolution.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"legittai.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"lettermint.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"liambx.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"liblab.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"libmodulor.c100k.eu","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"likec4.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"liveblocks.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"livecodes.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"llm.rememberizer.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"llm.skydeck.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"llms-txt.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"llmvo.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"lmstudio.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"lobehub.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"loops.so","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"lotsofcsvs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"makojs.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"manofmany.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"marcloudconsulting.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"marcoronco.me","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"marketingdrs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"martijnvanderdoes.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mastory.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mastra.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"matt-rickard.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mcp.umin.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mdutil.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"medscanada.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"millecheck.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"miniapps.farcaster.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mintlify.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mollard.com.au","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mondorobot.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"movehealth.me","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"multisynq.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"muryou-aigazou.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"mystery-o-matic.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"namegulf.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"naturelliving.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"nextevo.one","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"nextevogroup.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"novilabs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"nuxt.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ohmygodz.fr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"onagents.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"once-ui.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"openalternative.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"openrouter.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"openvpn.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"orm.drizzle.team","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"outscal.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"pandyadhruv.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"papergraderpro.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"parcelcube.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"parent.ge","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"paylersigns.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"pikaicons.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"pixonstudio.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"planharmony.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"plumbingspain.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"postfa.st","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"praktycznykod.pl","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"preactjs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"prettier.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"prisma.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"prodigitals.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"progress.rocks","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"proguardpest.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"prsuperstar.co.uk","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"python.langchain.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"quokkalabs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"quotidianomotori.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"qwikrank.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"rainbowkit.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"raincamp.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"randomizepro.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ranjanmayank.in","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"rankscale.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"rcponline.pl","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"render.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"resend.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"respond.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"romanik.nl","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"rubric.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ruletaa.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"samuelstevens.me","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sankeydiagram.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"scrapingproxies.best","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"screenshotone.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sdk.vercel.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sealos.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"seaportlist.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sellm.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"semalt.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"semgrep.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"seolevante.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"serviwebsi.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sgnl.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"shop.sandisk.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"shoppositioner.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sidespace.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sigtech.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"simplepdf.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"singingcarrots.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sitespeak.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"skywork.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"slova.jenda.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"smartcar.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sociality.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"solanawallettracker.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sonofinance.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"spacetimedb.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"sprunkiretake.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"starwind.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"statusfield.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"stephaniekabi.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"stingrayvilla.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"supabase.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"superwall.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"svelte.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"svgviewer.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"syndicats.de","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"tagshop.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"taishoku-anshin-daiko.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"talin.digital","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"telescope.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"tensorzero.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"thehorriblebosses.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"theirstack.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"therapydave.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"tiendaxpels.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"tiptap.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"toriut.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"trackvia.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"transloadit.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"travelmemo.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"travelnep.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"trendeetech.cn","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"trigger.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"trueprofit.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"truyenthongdps.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"turbo.build","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"tz-machinery.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"ufcvelvet.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"upstash.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"upwithdown.bg","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"use-fireproof.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"uxpatterns.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"valdhealth.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"various.at","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"vectorsgroup.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"viem.sh","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"voxelbusters.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"voyante-bordeaux.fr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"we-in-style.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"weather.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"web3.career","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"weblynx.pro","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"webmemo.ch","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"webrecorder.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"wedgwoodinsurance.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"wildinafrica.store","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"wordlift.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"workbookly.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.aankoopvanautos.be","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.activepieces.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.adiacent.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.agentdomain.xyz","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.aipredictstock.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.aiscribbles.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.ako-digital.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.alenmalkoc.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.amema.at","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.apibara.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.appointo.me","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.appsecure.security","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.aptible.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.assurance-voiture-temporaire-provisoire.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.assuranceendirect.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.axial.net","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.azumuta.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.beta3pro.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.better-auth.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.bhosted.nl","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.bitcoin.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.callback.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.captivaterecipes.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.carolmcewan.scot","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.casinobonusesnow.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.cdata.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.chatbase.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.china2move.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.ci.vc","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.clbconsult.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.cm3.com.au","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.cobalthorizons.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.comet.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.concept-designs.com.au","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.contravault.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.cosmicjs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.courier.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.creativehandbook.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.cryptotoolhub.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.darts-nerd.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.databuddy.cc","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.datastax.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.daytona.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.dbe.academy","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.deepseo.it","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.deliverect.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.deployhq.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.digitalstar.lt","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.docetl.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.donobu.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.dubrink.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.eastagile.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.eis-macher.de","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.essio.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.facets.cloud","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.fagaf.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.feedbacksync.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.filmconnection.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.finsago.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.forkforce.com.au","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.gamsystem.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.gaslightingcheck.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.gdm-pixel.fr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.getinbox.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.gilesthomas.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.gradio.app","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.greecevacationsearch.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.gumlet.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.helicone.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.hiretruffle.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.hoteltarobafoz.com.br","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.ikangai.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.inngest.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.insightchoices.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.ketch.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.kinpaku.co.jp","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.kruzty.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.lambdatest.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.langflow.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.latevaweb.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.launchfa.st","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.lightboxre.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.luxidgroup.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.maersk.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.mambomedia.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.manifest.ly","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.mateit.de","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.mealbymeal.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.meilisearch.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.mintense.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.mixo.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.moccu.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.modeser.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.morphic-solutions.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.mubashirhassan.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.nomadhelper.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.nsoftware.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.openfort.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.openphone.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.ovirank.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.papayaqatar.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.parseable.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.pastaclean.tv","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.payrollrabbit.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.performanceplustire.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.petitebox.it","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.pf-pvp.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.pixaura.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.placemania.sk","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.plain.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.poppykidsdental.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.popsmash.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.prompt-kit.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.promptfoo.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.qrco.au","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.qred.se","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.remotion.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.retainful.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.roc-lang.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.runroom.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.sarhaangulati.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.sedigital.es","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.sekhlo.pk","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.seo2llm.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.seokaos.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.simplyweb.com.pl","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.sky-follower-bridge.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.speakeasy.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.stedi.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.stormkit.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.studyfetch.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.sylvaindelaporte.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.taskade.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.tele-assistance-senior.fr","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.television.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.the-bucket-hat.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.thecrawltool.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.thedinnerdetective.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.thenile.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.tidio.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.tinybird.co","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.tooljson.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.trackingplan.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.trailofbits.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.triplit.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.tryprofound.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.tuttosullegalline.it","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.twoshoes.be","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.unkey.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.usemultiplier.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.vald.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.vinfotech.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.visioforge.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.vplayed.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.wandio.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.webhostingpk.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.wheelhousedmg.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.wheyindex.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.xellox.io","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.xomatic.ai","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.yellowlime.nl","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.youseezueri.ch","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"www.zhendongkaiguan.cn","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"wxt.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"xuri.me","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"yamlresume.dev","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"youform.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"zagjs.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"zap-ts.alexandretrotel.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"zaphyr.org","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"zodoristudio.com","total_requests":0,"total_tokens":0,"unique_users":0},{"valid":false,"hostname":"zoomry-ind.com","total_requests":0,"total_tokens":0,"unique_users":0}],"totalRequests":37,"totalTokens":112283};
 
         function getFaviconUrl(domain) {
             return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
@@ -670,7 +747,7 @@
             return num?.toString() || "";
         }
 
-        function handleFindCreate() {
+        function handleCheckUrl() {
             const input = document.getElementById('llmtext-url');
             const url = input.value.trim();
 
@@ -679,15 +756,13 @@
                 return;
             }
 
-            const hostname = extractHostname(url);
-            if (!hostname) {
-                alert('Please enter a valid URL');
-                return;
-            }
+            // Navigate to check tab with URL parameter
+            window.location.href = `?check=${encodeURIComponent(url)}`;
+        }
 
+        function getInstallMcpUrl(hostname) {
             const mcpName = getMcpName(hostname);
-            const mcpUrl = `https://installthismcp.com/${mcpName}?url=https://mcp.llmtext.com/${hostname}/mcp`;
-            window.open(mcpUrl, '_blank');
+            return `https://installthismcp.com/${mcpName}?url=https://mcp.llmtext.com/${hostname}/mcp`;
         }
 
         async function handleCheckValidation() {
@@ -710,7 +785,7 @@
                 const response = await fetch(`https://check.llmtext.com/check?url=${encodeURIComponent(url)}`);
                 const data = await response.json();
 
-                renderValidationResult(data);
+                renderValidationResult(data, url);
             } catch (error) {
                 resultDiv.innerHTML = `
                     <div class="validation-result invalid">
@@ -724,11 +799,15 @@
             }
         }
 
-        function renderValidationResult(data) {
+        function renderValidationResult(data, url) {
             const resultDiv = document.getElementById('validation-result');
             const validClass = data.valid ? 'valid' : 'invalid';
             const icon = data.valid ? '✅' : '❌';
             const title = data.valid ? 'Valid LLMS.TXT' : 'Invalid LLMS.TXT';
+
+            const hostname = extractHostname(url);
+            const installUrl = hostname ? getInstallMcpUrl(hostname) : '#';
+            const installDisabled = !data.valid ? 'disabled' : '';
 
             let html = `
                 <div class="validation-result ${validClass}">
@@ -740,7 +819,7 @@
                 html += '<h5 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem;">Errors:</h5>';
                 html += '<ul class="validation-list errors">';
                 data.errors.forEach(error => {
-                    html += `<li>• ${error}</li>`;
+                    html += `<li>${error}</li>`;
                 });
                 html += '</ul>';
             }
@@ -750,47 +829,41 @@
                 html += '<h5 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem;">Warnings:</h5>';
                 html += '<ul class="validation-list warnings">';
                 data.warnings.forEach(warning => {
-                    html += `<li>• ${warning}</li>`;
+                    html += `<li>${warning}</li>`;
                 });
                 html += '</ul>';
             }
 
             // Show metadata if available
             if (data.metadata) {
-                html += '<div class="metadata">';
-                html += '<div style="font-weight: 600; margin-bottom: 0.5rem;">File Information:</div>';
-                html += '<div class="metadata-grid">';
+                html += '<div class="metadata-section">';
+                html += '<h5>Metadata</h5>';
+                html += '<table class="metadata-table">';
 
-                if (data.metadata.size !== undefined) {
-                    html += `
-                        <div class="metadata-item">
-                            <div class="metadata-label">Size</div>
-                            <div class="metadata-value">${formatNumber(data.metadata.size)} bytes</div>
-                        </div>
-                    `;
+                for (const [key, value] of Object.entries(data.metadata)) {
+                    if (value !== null && value !== undefined) {
+                        const displayValue = typeof value === 'object' ? JSON.stringify(value, null, 2) : value;
+                        html += `
+                            <tr>
+                                <td>${key}</td>
+                                <td>${displayValue}</td>
+                            </tr>
+                        `;
+                    }
                 }
 
-                if (data.metadata.contentType) {
-                    html += `
-                        <div class="metadata-item">
-                            <div class="metadata-label">Content Type</div>
-                            <div class="metadata-value">${data.metadata.contentType}</div>
-                        </div>
-                    `;
-                }
-
-                if (data.metadata.linkCount !== undefined) {
-                    html += `
-                        <div class="metadata-item">
-                            <div class="metadata-label">Total Links</div>
-                            <div class="metadata-value">${data.metadata.linkCount}</div>
-                        </div>
-                    `;
-                }
-
-
-                html += '</div></div>';
+                html += '</table>';
+                html += '</div>';
             }
+
+            // Install MCP button
+            html += `
+                <a href="${installUrl}" 
+                   class="install-mcp-btn ${installDisabled}" 
+                   ${data.valid ? 'target="_blank" rel="noopener"' : ''}>
+                    Install this MCP
+                </a>
+            `;
 
             html += '</div>';
             resultDiv.innerHTML = html;
@@ -798,6 +871,7 @@
 
         function renderServers() {
             const tbody = document.getElementById('servers-tbody');
+            const invalidTbody = document.getElementById('invalid-servers-tbody');
             const stats = document.getElementById('stats');
 
             if (!window.data || !window.data.servers) {
@@ -806,14 +880,16 @@
                 return;
             }
 
-            const totalServers = window.data.servers.length;
-            stats.innerText = `${formatNumber(totalServers)} MCP SERVERS CREATED`;
-            tbody.innerHTML = '';
+            const validServers = window.data.servers.filter(server => server.valid);
+            const invalidServers = window.data.servers.filter(server => !server.valid);
 
-            window.data.servers.forEach((server, index) => {
+            stats.innerText = `${formatNumber(validServers.length)} MCP SERVERS CREATED`;
+
+            // Render valid servers
+            tbody.innerHTML = '';
+            validServers.forEach((server, index) => {
                 const tr = document.createElement('tr');
-                const mcpName = getMcpName(server.hostname);
-                const mcpUrl = `https://installthismcp.com/${mcpName}?url=https://mcp.llmtext.com/${server.hostname}/mcp`;
+                const mcpUrl = getInstallMcpUrl(server.hostname);
                 const llmstxtUrl = `https://${server.hostname}/llms.txt`;
 
                 tr.innerHTML = `
@@ -831,6 +907,37 @@
                 `;
                 tbody.appendChild(tr);
             });
+
+            // Render invalid servers
+            invalidTbody.innerHTML = '';
+            invalidServers.forEach((server) => {
+                const tr = document.createElement('tr');
+                const llmstxtUrl = `https://${server.hostname}/llms.txt`;
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="source-name">
+                            <img src="${getFaviconUrl(server.hostname)}" alt="" class="favicon">
+                            <a href="${llmstxtUrl}" target="_blank" rel="noopener">${server.hostname}</a>
+                        </div>
+                    </td>
+                    <td><a href="?check=https://${server.hostname}/llms.txt" class="btn-add">⚠️ CHECK</a></td>
+                `;
+                invalidTbody.appendChild(tr);
+            });
+        }
+
+        function toggleInvalidServers() {
+            const section = document.getElementById('invalid-servers-section');
+            const button = document.querySelector('.show-invalid-btn button');
+
+            if (section.classList.contains('visible')) {
+                section.classList.remove('visible');
+                button.textContent = "Show invalid llms.txt's";
+            } else {
+                section.classList.add('visible');
+                button.textContent = "Hide invalid llms.txt's";
+            }
         }
 
         function switchTab(index) {
@@ -854,8 +961,28 @@
             });
         }
 
+        // Check for ?check= parameter on load
+        function checkUrlParameter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const checkUrl = urlParams.get('check');
+
+            if (checkUrl) {
+                // Switch to check tab
+                switchTab(1);
+
+                // Set the URL in the input
+                document.getElementById('check-url').value = checkUrl;
+
+                // Trigger validation
+                handleCheckValidation();
+            }
+        }
+
         // Initial render with dummy data
         renderServers();
+
+        // Check URL parameters
+        checkUrlParameter();
 
         // Fetch real data in background
         fetch('https://mcp.llmtext.com/index.json')
