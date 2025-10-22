@@ -46,21 +46,11 @@ Later:
 
 ## Launch
 
-- Make MCP available in p0docs + demo on how this works for Travers
-- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website, combined (it's missing!)
+- On parallel docs, link to this (If X OAuth is OK)
 - Talk to Lukas/Khushi on how to launch this!
 - Open issue in https://github.com/AnswerDotAI/llms-txt
 - Reach out to https://x.com/jeremyphoward (somehow)
 - Get on llms.txt directories for parallel.ai/llms.txt: [llmstxt.site](https://llmstxt.site/) and [directory.llmstxt.cloud](https://directory.llmstxt.cloud/)
-- On parallel cookbook, remove old stuff, add this one.
-- On parallel docs, link to this (If X OAuth is OK)
 - Launch it on MCP directories in a way that context7/gitmcp did it too
 - Use it for https://docs.parallel.ai/llms.txt and make demo
 - X Launch post
-
-## Draft Blogpost/learnings
-
-- Why this a fair alternative to context7
-- Reasoning over a table of contents > vector search?
-- Every website needs an llms.txt, not just docs sites!
-- Parallel.ai llms.txt combines main website + docs + socials

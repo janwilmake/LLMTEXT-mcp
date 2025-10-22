@@ -1,4 +1,38 @@
-# Discuss
+## Why?
+
+- AI is becoming the new user of the web. We expect AI traffic to grow 1000x in the coming decade.
+- web-scraping companies and AI browsers have seen a surge in usage while human use of the web is shrinking
+- this is very inefficient causing higher latency and cost.
+- web publishers could directly make llm-readable content available. we're still very early and very few are doing so.
+- `llms.txt` is a new standard providing navigation of websites in a llm-friendly format, addressing this issue
+- it has been widely adopted for documentation but not adopted yet for most websites. Also not without problems. Tons of llms.txt files have issues.
+
+## Ecosystem of AI context gathering tools
+
+- uithub.com
+- context7
+- gitmcp.io
+
+Why does llmtext-mcp deserve a place? because we're just at the beginning of exploring different ways of context engineering, vector search is not the only way.
+
+Reasoning over a table of contents > vector search?
+
+## What
+
+Today I'm excited to announce launching LLMText, which is Sponsored and supported internally by Parallel.
+
+- **llms.txt MCP**: making llms.txt actually useful by turning any website that has an llms.txt into a dedicated MCP server.
+- **llms.txt checker**: validate your llms.txt to ensure it's valid and follows best practices
+- **llms.txt generator**: A library to
+
+## Background Jan Wilmake
+
+## Blogpost Announcing LLMText
+
+- Make MCP available in p0docs + demo on how this works for Travers
+- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website, combined (it's missing!)
+
+## Discuss
 
 - Different Content Pieces
   - Generate `llms.txt` from your website => OSS library
