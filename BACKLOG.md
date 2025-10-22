@@ -1,5 +1,10 @@
 # More
 
+## New APIs for extracting context from multiple pages
+
+1. somehow use objective and other capabilities of `/extract`
+2. likely need to also create a sitemap cache with a DO per domain, but let's deprioritize this since it's sponsored fully by parallel now with $10/user.
+
 ## PR: Improve human/machine toggling interface
 
 - Button on `/ai/{path}` page that opens `{path}.md`

@@ -8,7 +8,7 @@ export interface Env {
 const PARALLEL_API_BASE = "https://api.parallel.ai";
 const PARALLEL_OAUTH_BASE = "https://platform.parallel.ai";
 const CLIENT_ID = "llmtext.com";
-const REDIRECT_URI = "http://localhost:8787/callback";
+const REDIRECT_URI = "https://llmtext.com/callback";
 const COOKIE_NAME = "parallel_api_key";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
@@ -25,17 +25,23 @@ export default {
       return handleLlmsTxt();
     }
 
+    // Handle OAuth authorization initiation
+    if (path === "/authorize") {
+      const redirectTo = url.searchParams.get("redirect_to") || "/";
+      return redirectToOAuth(redirectTo);
+    }
+
     // Handle OAuth callback
     if (path === "/callback") {
       return handleCallback(request);
     }
 
-    // Get API key from cookie
-    const apiKey = getApiKeyFromCookie(request);
+    // Get API key from cookie or Authorization header
+    const apiKey = getApiKey(request);
 
-    // If no API key, redirect to OAuth
+    // If no API key, return 401 with login page
     if (!apiKey) {
-      return redirectToOAuth(path);
+      return handleUnauthorized(url.origin, path);
     }
 
     // Extract URL from path (remove leading slash)
@@ -119,7 +125,14 @@ function normalizeUrl(url: string): string {
   return url;
 }
 
-function getApiKeyFromCookie(request: Request): string | null {
+function getApiKey(request: Request): string | null {
+  // Check Authorization header first
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.slice(7);
+  }
+
+  // Fall back to cookie
   const cookieHeader = request.headers.get("Cookie");
   if (!cookieHeader) return null;
 
@@ -131,6 +144,170 @@ function getApiKeyFromCookie(request: Request): string | null {
     }
   }
   return null;
+}
+
+function handleUnauthorized(origin: string, path: string): Response {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Required - LLMTEXT.com</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #fcfcfa;
+            color: #1d1b16;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border: 2px solid #1d1b16;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .logo {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-box {
+            background: #1d1b16;
+            padding: 0.5rem 0.75rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.1rem;
+            border-radius: 2px;
+        }
+
+        .logo-main {
+            font-size: 1.25rem;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            color: white;
+        }
+
+        .logo-com {
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            color: white;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1d1b16;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .btn-login {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            background: #1d1b16;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .btn-login:hover {
+            background: #2d2b26;
+        }
+
+        .powered-by {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e5e0;
+            font-size: 0.7rem;
+            color: #999;
+        }
+
+        .powered-by a {
+            color: #1d1b16;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .powered-by a:hover {
+            text-decoration: underline;
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                padding: 2.5rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <div class="logo-box">
+                <span class="logo-main">LLMTEXT</span>
+                <span class="logo-com">.com</span>
+            </div>
+        </div>
+        
+        <h1>Login Required</h1>
+        <p>To convert web pages to clean markdown format, you need to authenticate with your Parallel account.</p>
+        
+        <a href="/authorize?redirect_to=${encodeURIComponent(
+          path
+        )}" class="btn-login">
+            Login with Parallel
+        </a>
+
+        <div class="powered-by">
+            Powered by <a href="https://parallel.ai" target="_blank">Parallel</a>
+        </div>
+    </div>
+</body>
+</html>`;
+
+  return new Response(html, {
+    status: 401,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "WWW-Authenticate": `Bearer realm="main", resource_metadata="${origin}/.well-known/oauth-protected-resource"`,
+    },
+  });
 }
 
 async function redirectToOAuth(originalPath: string): Promise<Response> {
