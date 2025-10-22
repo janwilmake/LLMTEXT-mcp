@@ -16,6 +16,10 @@
         "Technical documentation for developers"
       ]
     },
+    "title": {
+      "type": "string",
+      "description": "Title of your llms.txt document"
+    },
     "details": {
       "type": "string",
       "description": "Optional additional details about the collection (appears after description in llms.txt)",
@@ -134,10 +138,11 @@
       }
     }
   },
-  "required": ["description", "outDir", "sources"],
+  "required": ["description", "title", "outDir", "sources"],
   "additionalProperties": false,
   "examples": [
     {
+      "title": "Parallel Web Systems",
       "description": "Combined documentation from multiple sources",
       "details": "This collection includes API documentation, guides, and references updated daily.",
       "outDir": "./docs",

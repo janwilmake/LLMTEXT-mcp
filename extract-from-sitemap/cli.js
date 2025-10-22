@@ -21,6 +21,7 @@ const { extractFromSitemap } = require("./mod.js");
  */
 /**
  * @typedef {Object} Config
+ * @property {string} title - Title of your document
  * @property {string} description - Description of the documentation collection
  * @property {string} [details] - Optional additional details about the collection
  * @property {string} outDir - Top-level output directory for combined llms.txt
@@ -214,6 +215,7 @@ async function loadConfig() {
       JSON.stringify(
         {
           $schema: "https://extract.llmtext.com/llmtext.schema.json",
+          title: "Parallel Web Systems",
           description: "Combined documentation from multiple sources",
           details:
             "This collection includes API documentation, guides, and references.",
@@ -493,13 +495,14 @@ function getPathPrefix(topLevelOutDir, sourceOutDir) {
 
 /**
  * Generate combined llms.txt from all sources
+ * @param {string} title - Top-level title
  * @param {string} description - Top-level description
  * @param {string} [details] - Optional top-level details
  * @param {Array<{title: string, files: Record<string, any>, keepOriginalUrls?: boolean, pathPrefix: string}>} allSources - All processed sources
  * @returns {string} Combined llms.txt content
  */
-function generateCombinedLlmsTxt(description, details, allSources) {
-  let combinedTxt = `# Documentation Collection\n\n> ${description}\n\n`;
+function generateCombinedLlmsTxt(title, description, details, allSources) {
+  let combinedTxt = `# ${title}\n\n> ${description}\n\n`;
 
   if (details) {
     combinedTxt += `${details}\n\n`;
@@ -516,7 +519,9 @@ function generateCombinedLlmsTxt(description, details, allSources) {
     for (const [path, file] of sortedFiles) {
       if (file.content || file.title) {
         const title = file.title || path.replace(".md", "");
-        const description = file.description ? `: ${file.description}` : "";
+        const description = file.description
+          ? `: ${file.description.replaceAll("\n", " ")}`
+          : "";
 
         // Generate link based on keepOriginalUrls and pathPrefix
         let link;
@@ -526,10 +531,7 @@ function generateCombinedLlmsTxt(description, details, allSources) {
           link = source.pathPrefix + (path.startsWith("/") ? path : "/" + path);
         }
 
-        combinedTxt += `- [${title}](${link}): ${description.replaceAll(
-          "\n",
-          " "
-        )}\n`;
+        combinedTxt += `- [${title}](${link})${description}\n`;
       }
     }
 
@@ -683,6 +685,7 @@ async function main() {
     // Generate and write combined llms.txt to top-level outDir
     if (allSources.length > 0) {
       const combinedLlmsTxt = generateCombinedLlmsTxt(
+        config.title,
         config.description,
         config.details,
         allSources
