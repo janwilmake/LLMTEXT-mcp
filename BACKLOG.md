@@ -1,14 +1,21 @@
 # More
 
+Other Technical Decisions:
+
+1. Whether or not to use additional tool for retrieving llms.txt first to not pollute context too much for people who don't turn off their MCPs. Slightly increases latency but greatly improves ux incase people don't turn these things off.
+2. Fallback using extract so it 'just works' for popular docs that don't implement it correctly. Could make things more complicated too because it adds lot of cost potentially if there's wide use. We don't want to have to take it down later if cost gets too high. Right now people won't get installation link from our site if the llms.txt uses html underneath, and MCP gives a warning if someone still tries it.
+3. I'm curious if we could also try a tool that uses extract with additional objective, returning just excerpts, potentially in a way you don't need to even provide urls as by default it can just add all urls? Obviously this would make it much more expensive because each extract request costs money but it could be made a premium feature or the web publishers could pay for it.
+
 ## Improve recurring llms.txt generation
 
 - `llms.txt`: For each source, group links by path like they do in https://github.com/apify/actor-llmstxt-generator/pull/16
 - Fix it so it works for recursive sitemaps: https://developers.cloudflare.com/sitemap.xml
 - Remove newlines in descriptions to be according to spec.
-- Ensure not to hit `/extract` urls count limitation or other errors. log them.
+- Ensure not to hit `/extract` urls count limitation or other errors. Log them.
 - Check spec and see what else is non-compliant.
 - Setup auto-update of https://github.com/janwilmake/parallel-llmtext using parallel secret and cloudflare deployment secret; Set to update and redeploy hourly while optimizing for cost. Important to have this as well, or our llms.txt will get outdated.
 - Setup auto-prompt for https://github.com/parallel-web/parallel-sdk-typescript and https://github.com/parallel-web/parallel-sdk-python (and get prs merged for this)
+- Also, is there a way to not expose the commit history and just have the latest version be accessible? Making code (like for SDKs) available for perpetuity is fine, but I'm not sure about doing the same for other kinds of content
 
 Question: what's the easiest way for people to set up doing prompts and other apis from private enterprise repos in a reliable way?
 

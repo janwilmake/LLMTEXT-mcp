@@ -10,6 +10,7 @@ Later:
 
 - Hosted version of llms.txt generation, user-budget + cache
 - See [backlog](BACKLOG.md)
+- https://github.com/janwilmake/openapi-mcp-server/issues/35
 
 ## Parallel PR
 
@@ -38,19 +39,27 @@ Later:
 - ✅ Use the check-api on all servers and ensure that the ones that have HTML only in their contents get filtered out. These aren't valid. Still keep them in the dataset as invalid servers, leading to check them.
 - ✅ Show invalid servers at the bottom and replace "Add" button with "Check". Especially nice to showcase the famous companies with invalid llms.txt server.
 
-## Improve MCP
+## TODO
 
-- ✅ Ensure relative links are also correctly fetched from the right hostname. Ensure hostname is part of description clearly.
-- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`
-- Consider improving the MCP with the extract API. The 'strategy' could be something you set up during the auth process as well, effectively changing the tools.
+- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`.
+- https://github.com/shapleyai/parallel-web/pull/125
+- Improve MCP by putting llms.txt url in tool description + the title,description,details of it, not the entire thing.
+- Ensure to add a highlighted boolean prop to the list so popular ones will stand out
+- Make MCP available in p0docs + demo on how this works for Travers
+- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website or groq, combined (it's missing!)
+- The broken llms.txt's should be in a the check tab.
+- If check fails, instruct people to create a better one using the library!
 
 ## Launch
 
 - On parallel docs, link to this (If X OAuth is OK)
-- Talk to Lukas/Khushi on how to launch this!
 - Open issue in https://github.com/AnswerDotAI/llms-txt
 - Reach out to https://x.com/jeremyphoward (somehow)
 - Get on llms.txt directories for parallel.ai/llms.txt: [llmstxt.site](https://llmstxt.site/) and [directory.llmstxt.cloud](https://directory.llmstxt.cloud/)
 - Launch it on MCP directories in a way that context7/gitmcp did it too
 - Use it for https://docs.parallel.ai/llms.txt and make demo
 - X Launch post
+
+## Friday/weekend:
+
+Install ScreenStudio and make demos after making blog skeletons.
