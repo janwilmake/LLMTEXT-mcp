@@ -43,7 +43,7 @@ Later:
 
 - ✅ Ensure to add a highlighted boolean prop to the list so popular ones will stand out. Same for `valid:false`!
 - Flow of dev that looks for a lib should be able to search and below it should say "not found? create mcp"
-- deployment of github repo should become clearer from lib readme
+- Deployment of github repo should become clearer from lib readme
 - FAQ tab
 - servers on same height as "popular llms.txt mcp servers"
 - installthismcp icons are low-quality
