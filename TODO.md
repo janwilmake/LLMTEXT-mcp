@@ -41,14 +41,14 @@ Later:
 
 ## TODO
 
-- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`.
-- https://github.com/shapleyai/parallel-web/pull/125
-- Improve MCP by putting llms.txt url in tool description + the title,description,details of it, not the entire thing.
-- Ensure to add a highlighted boolean prop to the list so popular ones will stand out
-- Make MCP available in p0docs + demo on how this works for Travers
-- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website or groq, combined (it's missing!)
+- Ensure to add a highlighted boolean prop to the list so popular ones will stand out. Same for `valid:false`!
 - The broken llms.txt's should be in a the check tab.
 - If check fails, instruct people to create a better one using the library!
+- Improve MCP by putting `llms.txt` url in tool description + the `{title,description,details}` of it, not the entire thing.
+- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`.
+- Make MCP available in p0docs + demo on how this works for Travers
+- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website or groq, combined (it's missing!)
+- https://github.com/parallel-web/parallel-llmtext public before tuesday, maybe rename to parallel-llm-context or parallel-context
 
 ## Launch
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+/// <reference lib="esnext" />
 
 import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
@@ -7,7 +8,9 @@ interface ValidationResult {
   hostname: string;
   valid: boolean;
   warnings: string[];
+  is404?: boolean;
   errors: string[];
+  highlighted?: boolean;
 }
 
 interface ApiResponse {
@@ -52,6 +55,67 @@ function extractHostname(urlString: string): string {
   }
 }
 
+function extractApexDomain(hostname: string): string {
+  const parts = hostname.split(".");
+
+  // Handle special cases like .co.uk, .com.au, etc.
+  const twoPartTLDs = new Set([
+    "co.uk",
+    "com.au",
+    "co.jp",
+    "co.nz",
+    "co.za",
+    "com.br",
+    "com.cn",
+    "com.mx",
+    "com.ar",
+    "com.tr",
+    "co.in",
+    "co.id",
+  ]);
+
+  if (parts.length >= 3) {
+    const lastTwo = `${parts[parts.length - 2]}.${parts[parts.length - 1]}`;
+    if (twoPartTLDs.has(lastTwo)) {
+      // For two-part TLDs, take the last 3 parts
+      return parts.slice(-3).join(".");
+    }
+  }
+
+  // Default: take the last two parts
+  if (parts.length >= 2) {
+    return parts.slice(-2).join(".");
+  }
+
+  return hostname;
+}
+
+async function loadTrancoList(filePath: string): Promise<Set<string>> {
+  try {
+    console.log("Loading Tranco top-1m list...");
+    const content = await readFile(filePath, "utf-8");
+    const domains = new Set<string>();
+
+    for (const line of content.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+
+      const parts = trimmed.split(",");
+      if (parts.length >= 2) {
+        const domain = parts[1].trim().toLowerCase();
+        domains.add(domain);
+      }
+    }
+
+    console.log(`Loaded ${domains.size} domains from Tranco list`);
+    return domains;
+  } catch (error) {
+    console.error("Error loading Tranco list:", error);
+    console.log("Continuing without highlighting...");
+    return new Set();
+  }
+}
+
 async function validateUrl(url: string): Promise<ValidationResult> {
   const hostname = extractHostname(url);
 
@@ -66,6 +130,7 @@ async function validateUrl(url: string): Promise<ValidationResult> {
     if (!response.ok) {
       return {
         hostname,
+        is404: response.status === 404,
         valid: false,
         warnings: [],
         errors: [`API returned ${response.status}: ${response.statusText}`],
@@ -140,10 +205,30 @@ async function processUrlsInQueue(
   return results;
 }
 
+function highlightPopularDomains(
+  results: ValidationResult[],
+  trancoSet: Set<string>
+): void {
+  let highlightedCount = 0;
+
+  for (const result of results) {
+    const apexDomain = extractApexDomain(result.hostname.toLowerCase());
+    if (trancoSet.has(apexDomain)) {
+      result.highlighted = true;
+      highlightedCount++;
+    }
+  }
+
+  console.log(`\nHighlighted ${highlightedCount} popular domains`);
+}
+
 async function main() {
   try {
+    // Load Tranco list
+    const trancoSet = await loadTrancoList("top-1m.csv");
+
     // Read input file
-    console.log("Reading list.txt...");
+    console.log("\nReading list.txt...");
     const content = await readFile("list.txt", "utf-8");
     const urls = content
       .split("\n")
@@ -161,8 +246,13 @@ async function main() {
     console.log("\nStarting validation (max 6 concurrent requests)...\n");
     const results = await processUrlsInQueue(urls, 6);
 
+    // Highlight popular domains
+    highlightPopularDomains(results, trancoSet);
+
     // Sort results by hostname for consistent output
-    results.sort((a, b) => a.hostname.localeCompare(b.hostname));
+    results
+      .filter((x) => !x.is404)
+      .sort((a, b) => a.hostname.localeCompare(b.hostname));
 
     // Write results
     const outputPath = join("..", "popular.json");
@@ -172,6 +262,7 @@ async function main() {
     // Print summary
     const validCount = results.filter((r) => r.valid).length;
     const invalidCount = results.length - validCount;
+    const highlightedCount = results.filter((r) => r.highlighted).length;
 
     console.log("\n" + "=".repeat(50));
     console.log("VALIDATION COMPLETE");
@@ -185,6 +276,12 @@ async function main() {
     console.log(
       `Invalid: ${invalidCount} (${(
         (invalidCount / results.length) *
+        100
+      ).toFixed(1)}%)`
+    );
+    console.log(
+      `Highlighted (popular): ${highlightedCount} (${(
+        (highlightedCount / results.length) *
         100
       ).toFixed(1)}%)`
     );
@@ -202,6 +299,17 @@ async function main() {
         if (r.warnings.length > 0) {
           console.log(`    Warnings: ${r.warnings.join(", ")}`);
         }
+      });
+    }
+
+    // Show some highlighted examples
+    const highlightedExamples = results
+      .filter((r) => r.highlighted)
+      .slice(0, 5);
+    if (highlightedExamples.length > 0) {
+      console.log("\nExample highlighted (popular) domains:");
+      highlightedExamples.forEach((r) => {
+        console.log(`  ⭐ ${r.hostname}`);
       });
     }
   } catch (error) {
