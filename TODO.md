@@ -41,8 +41,13 @@ Later:
 
 ## TODO
 
-- Ensure to add a highlighted boolean prop to the list so popular ones will stand out. Same for `valid:false`!
-- The broken llms.txt's should be in a the check tab.
+- ✅ Ensure to add a highlighted boolean prop to the list so popular ones will stand out. Same for `valid:false`!
+- Flow of dev that looks for a lib should be able to search and below it should say "not found? create mcp"
+- deployment of github repo should become clearer from lib readme
+- FAQ tab
+- servers on same height as "popular llms.txt mcp servers"
+- installthismcp icons are low-quality
+- The broken `llms.txt`'s should be in a the check tab.
 - If check fails, instruct people to create a better one using the library!
 - Improve MCP by putting `llms.txt` url in tool description + the `{title,description,details}` of it, not the entire thing.
 - Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`.

@@ -10,7 +10,7 @@ interface ValidationResult {
   warnings: string[];
   is404?: boolean;
   errors: string[];
-  highlighted?: boolean;
+  rank?: number;
 }
 
 interface ApiResponse {
@@ -90,11 +90,11 @@ function extractApexDomain(hostname: string): string {
   return hostname;
 }
 
-async function loadTrancoList(filePath: string): Promise<Set<string>> {
+async function loadTrancoList(filePath: string): Promise<Map<string, number>> {
   try {
     console.log("Loading Tranco top-1m list...");
     const content = await readFile(filePath, "utf-8");
-    const domains = new Set<string>();
+    const rankMap = new Map<string, number>();
 
     for (const line of content.split("\n")) {
       const trimmed = line.trim();
@@ -102,17 +102,18 @@ async function loadTrancoList(filePath: string): Promise<Set<string>> {
 
       const parts = trimmed.split(",");
       if (parts.length >= 2) {
+        const rank = parseInt(parts[0].trim(), 10);
         const domain = parts[1].trim().toLowerCase();
-        domains.add(domain);
+        rankMap.set(domain, rank);
       }
     }
 
-    console.log(`Loaded ${domains.size} domains from Tranco list`);
-    return domains;
+    console.log(`Loaded ${rankMap.size} domains from Tranco list`);
+    return rankMap;
   } catch (error) {
     console.error("Error loading Tranco list:", error);
-    console.log("Continuing without highlighting...");
-    return new Set();
+    console.log("Continuing without rank information...");
+    return new Map();
   }
 }
 
@@ -205,27 +206,28 @@ async function processUrlsInQueue(
   return results;
 }
 
-function highlightPopularDomains(
+function assignRanks(
   results: ValidationResult[],
-  trancoSet: Set<string>
+  rankMap: Map<string, number>
 ): void {
-  let highlightedCount = 0;
+  let rankedCount = 0;
 
   for (const result of results) {
     const apexDomain = extractApexDomain(result.hostname.toLowerCase());
-    if (trancoSet.has(apexDomain)) {
-      result.highlighted = true;
-      highlightedCount++;
+    const rank = rankMap.get(apexDomain);
+    if (rank !== undefined) {
+      result.rank = rank;
+      rankedCount++;
     }
   }
 
-  console.log(`\nHighlighted ${highlightedCount} popular domains`);
+  console.log(`\nAssigned ranks to ${rankedCount} domains`);
 }
 
 async function main() {
   try {
     // Load Tranco list
-    const trancoSet = await loadTrancoList("top-1m.csv");
+    const rankMap = await loadTrancoList("top-1m.csv");
 
     // Read input file
     console.log("\nReading list.txt...");
@@ -246,13 +248,22 @@ async function main() {
     console.log("\nStarting validation (max 6 concurrent requests)...\n");
     const results = await processUrlsInQueue(urls, 6);
 
-    // Highlight popular domains
-    highlightPopularDomains(results, trancoSet);
+    // Assign ranks to popular domains
+    assignRanks(results, rankMap);
 
-    // Sort results by hostname for consistent output
+    // Sort results by rank (ranked first, then by hostname)
     results
       .filter((x) => !x.is404)
-      .sort((a, b) => a.hostname.localeCompare(b.hostname));
+      .sort((a, b) => {
+        // Put ranked items first, sorted by rank
+        if (a.rank !== undefined && b.rank !== undefined) {
+          return a.rank - b.rank;
+        }
+        if (a.rank !== undefined) return -1;
+        if (b.rank !== undefined) return 1;
+        // Then sort unranked by hostname
+        return a.hostname.localeCompare(b.hostname);
+      });
 
     // Write results
     const outputPath = join("..", "popular.json");
@@ -262,7 +273,7 @@ async function main() {
     // Print summary
     const validCount = results.filter((r) => r.valid).length;
     const invalidCount = results.length - validCount;
-    const highlightedCount = results.filter((r) => r.highlighted).length;
+    const rankedCount = results.filter((r) => r.rank !== undefined).length;
 
     console.log("\n" + "=".repeat(50));
     console.log("VALIDATION COMPLETE");
@@ -280,8 +291,8 @@ async function main() {
       ).toFixed(1)}%)`
     );
     console.log(
-      `Highlighted (popular): ${highlightedCount} (${(
-        (highlightedCount / results.length) *
+      `Ranked (in Tranco top-1m): ${rankedCount} (${(
+        (rankedCount / results.length) *
         100
       ).toFixed(1)}%)`
     );
@@ -302,14 +313,14 @@ async function main() {
       });
     }
 
-    // Show some highlighted examples
-    const highlightedExamples = results
-      .filter((r) => r.highlighted)
-      .slice(0, 5);
-    if (highlightedExamples.length > 0) {
-      console.log("\nExample highlighted (popular) domains:");
-      highlightedExamples.forEach((r) => {
-        console.log(`  ⭐ ${r.hostname}`);
+    // Show top ranked examples
+    const rankedExamples = results
+      .filter((r) => r.rank !== undefined)
+      .slice(0, 10);
+    if (rankedExamples.length > 0) {
+      console.log("\nTop 10 ranked domains:");
+      rankedExamples.forEach((r) => {
+        console.log(`  #${r.rank} - ${r.hostname}`);
       });
     }
   } catch (error) {
