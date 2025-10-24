@@ -20,4 +20,4 @@
 
 ## Sponsors
 
-[![Logo](llmtext/og-light.png#gh-light-mode-only)![Logo](llmtext/og-dark.png#gh-dark-mode-only)](https://parallel.ai)
+[ ![Logo](llmtext/og-light.png#gh-light-mode-only) ![Logo](llmtext/og-dark.png#gh-dark-mode-only) ](https://parallel.ai)
