@@ -20,5 +20,10 @@
 
 ## Sponsors
 
-![Logo](llmtext/og-light.png#gh-light-mode-only)
-![Logo](llmtext/og-dark.png#gh-dark-mode-only)
+<a href="https://parallel.ai">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="llmtext/og-light.png">
+  <source media="(prefers-color-scheme: light)" srcset="llmtext/og-dark.png">
+  <img alt="Logo" src="llmtext/og-dark.png">
+</picture>
+</a>
