@@ -18,5 +18,4 @@
 
 - [llmtext](llmtext): the website
 
-![Logo](llmtext/og-light.png#gh-light-mode-only)
-![Logo](llmtext/og-dark.png#gh-dark-mode-only)
+[![Logo](llmtext/og-light.png#gh-light-mode-only)![Logo](llmtext/og-dark.png#gh-dark-mode-only)](https://parallel.ai)
