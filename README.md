@@ -6,7 +6,7 @@
 
 2. Create your own llms.txt from your entire website (not just the docs) by using our [extract-from-sitemap](extract-from-sitemap) tool.
 
-## More Tools
+### More Tools
 
 - [llmstxt-generate](llmstxt-generate): Use this in combination with [getassetmanifest](getassetmanifest) if you want to deploy static assets already present in your fs as a `llms.txt`.
 - [llmtext.check](llmtext.check): llms.txt validity checker api
@@ -14,8 +14,10 @@
 - [llmtext.reader](llmtext.reader): converts html into simplified "browser-reader HTML", drastically improving token density
 - [parse-llms-txt](parse-llms-txt) - parse llms.txt according to [the standard](https://llmstxt.org)
 
-## Other
+### Other
 
 - [llmtext](llmtext): the website
+
+## Sponsors
 
 [![Logo](llmtext/og-light.png#gh-light-mode-only)![Logo](llmtext/og-dark.png#gh-dark-mode-only)](https://parallel.ai)
