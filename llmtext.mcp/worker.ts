@@ -1022,6 +1022,7 @@ export class HistoryDO extends DurableObject<Env> {
         valid: item.valid,
         hostname: item.hostname,
         rank: item.rank || Infinity,
+        icon: item.icon,
         total_requests: 0,
         total_tokens: 0,
         unique_users: 0,

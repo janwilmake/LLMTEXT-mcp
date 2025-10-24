@@ -46,36 +46,50 @@ Later:
 - ✅ The broken `llms.txt`'s should be in a the check tab.
 - ✅ If check fails, instruct people to create a better one using the library!
 
-main.ts
+`main.ts`
 
 - ✅ Improve MCP by putting `llms.txt` url in tool description + the `{title,description,details}` of it, not the entire thing.
+- ✅ fix cors problem
 
-llmtext.check
-
-- Minimum 20% of 50 links should be broken
-
-llmtext.login
-
-- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`.
-
-index.html
+`index.html`
 
 - ✅ better subtitle
 - ✅ servers on same height as "popular llms.txt mcp servers"
 - ✅ mobile-friendlier
-- `?check` is annoying if it stays in the url, better to just trigger form submission directly
-- dev that looks for a lib should be able to search (small search input below 'popular llms.txt mcp servers') that does simple fuzzy keyword search that filters the list, and below the list, it should suggest to 'create llms.txt linking to the first tab
-- number the tabs with the number in lay-out for improved readability of the code
+- ✅ `?check` is annoying if it stays in the url, better to just trigger form submission directly
+- ✅ dev that looks for a lib should be able to search (small search input below 'popular llms.txt mcp servers') that does simple fuzzy keyword search that filters the list, and below the list, it should suggest to 'create llms.txt linking to the first tab
+- ✅ number the tabs with the number in lay-out for improved readability of the code
+- ✅ made text inputs a bit less strong
 
-installthismcp
+`llmtext.check`
 
-- it looks a bit spammy/sketchy. I think consistency in the look and feel across open-source projects with our name on it is important.
-- align installthismcp color-schema and add disclaimer 'what is installthismcp?'
+- ✅ Minimum 20% of 50 links should be broken
+
+`filter-urls.ts`
+
+- ✅ use the google favicon api (https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://parallel.ai&size=16) and for llmtext my own, and add `data:image/png;base64,` to the JSON such that they are hardcoded in the html.
+- ✅ use that icon in the img instead of the url. things should load much faster now.
+- ✅ do not fall back to url
+- ensure to render placeholder (hardcoded `/favicon.svg`) if favicon wasnt available
+- have favicons found at `/index.json`
+- fix regex so predeploy doesnt break HTML
+- fix layout shift
+- check click should scroll to top
+
+`installthismcp`:
+
 - icons are low-quality, should be sharper (maybe use different api?)
+- ensure to use https://github.com/modelcontextprotocol/registry/blob/be4182606e8f4f223d1e25d0a7c3037ae278458a/docs/reference/server-json/server.schema.json#L371 at `.well-known/mcp.json` (see https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649) somehow.
+- it looks a bit spammy/sketchy. I think consistency in the look and feel across open-source projects with our name on it is important. remove blue bg
+- align installthismcp color-schema and add disclaimer 'what is installthismcp'?
 
 You're an expert in front-end design and implementation. Refine the screens across this app using the latest standards and trends for high-usability software apps. Your focus should be on intentional design that doesn't distract from the core functions of the app. Use mainly whites and grays for UI elements, with occasional use of color for buttons in highlighted states.
 
-extract-from-sitemap
+`llmtext.login`
+
+- Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`.
+
+`extract-from-sitemap`
 
 - Deployment of github repo should become clearer from lib readme
 

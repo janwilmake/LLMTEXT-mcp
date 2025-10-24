@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 /// <reference lib="esnext" />
+/// <reference types="@types/node" />
 
 import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
@@ -11,6 +12,7 @@ interface ValidationResult {
   is404?: boolean;
   errors: string[];
   rank?: number;
+  icon?: string;
 }
 
 interface ApiResponse {
@@ -90,6 +92,46 @@ function extractApexDomain(hostname: string): string {
   return hostname;
 }
 
+async function fetchFavicon(hostname: string): Promise<string | undefined> {
+  try {
+    // Use custom endpoint for llmtext.com
+    if (hostname === "llmtext.com" || hostname === "www.llmtext.com") {
+      const faviconUrl = "https://llmtext.com/favicon.ico";
+      const response = await fetchWithTimeout(faviconUrl, 10000);
+
+      if (!response.ok) {
+        return undefined;
+      }
+
+      const buffer = await response.arrayBuffer();
+      const base64 = Buffer.from(buffer).toString("base64");
+      return `data:image/x-icon;base64,${base64}`;
+    }
+
+    // Use Google favicon API for other domains
+    const faviconUrl = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${hostname}&size=16`;
+    const response = await fetchWithTimeout(faviconUrl, 10000);
+
+    if (!response.ok) {
+      return undefined;
+    }
+
+    const buffer = await response.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+
+    // Determine content type from response
+    const contentType = response.headers.get("content-type") || "image/png";
+
+    return `data:${contentType};base64,${base64}`;
+  } catch (error) {
+    console.error(
+      `Failed to fetch favicon for ${hostname}:`,
+      error instanceof Error ? error.message : "Unknown error"
+    );
+    return undefined;
+  }
+}
+
 async function loadTrancoList(filePath: string): Promise<Map<string, number>> {
   try {
     console.log("Loading Tranco top-1m list...");
@@ -140,11 +182,15 @@ async function validateUrl(url: string): Promise<ValidationResult> {
 
     const data: ApiResponse = await response.json();
 
+    // Fetch favicon
+    const icon = await fetchFavicon(hostname);
+
     return {
       hostname,
       valid: data.valid,
       warnings: data.warnings || [],
       errors: data.errors || [],
+      icon,
     };
   } catch (error) {
     const errorMessage =
@@ -183,7 +229,7 @@ async function processUrlsInQueue(
           console.log(
             `✓ Progress: ${completed}/${total} - ${result.hostname} - ${
               result.valid ? "VALID" : "INVALID"
-            }`
+            }${result.icon ? " [icon fetched]" : ""}`
           );
         })
         .catch((error) => {
@@ -274,6 +320,7 @@ async function main() {
     const validCount = results.filter((r) => r.valid).length;
     const invalidCount = results.length - validCount;
     const rankedCount = results.filter((r) => r.rank !== undefined).length;
+    const iconCount = results.filter((r) => r.icon !== undefined).length;
 
     console.log("\n" + "=".repeat(50));
     console.log("VALIDATION COMPLETE");
@@ -293,6 +340,12 @@ async function main() {
     console.log(
       `Ranked (in Tranco top-1m): ${rankedCount} (${(
         (rankedCount / results.length) *
+        100
+      ).toFixed(1)}%)`
+    );
+    console.log(
+      `Icons fetched: ${iconCount} (${(
+        (iconCount / results.length) *
         100
       ).toFixed(1)}%)`
     );
@@ -320,7 +373,7 @@ async function main() {
     if (rankedExamples.length > 0) {
       console.log("\nTop 10 ranked domains:");
       rankedExamples.forEach((r) => {
-        console.log(`  #${r.rank} - ${r.hostname}`);
+        console.log(`  #${r.rank} - ${r.hostname}${r.icon ? " [icon]" : ""}`);
       });
     }
   } catch (error) {

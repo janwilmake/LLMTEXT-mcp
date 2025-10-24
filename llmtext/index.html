@@ -155,9 +155,6 @@
             text-decoration-thickness: 2px;
         }
 
-
-
-
         .tabs-container {
             max-width: 900px;
             margin: 0 auto;
@@ -235,13 +232,38 @@
         input[type="text"] {
             width: 100%;
             padding: 0.875rem 1rem;
-            border: 2px solid #1d1b16;
+            border: 2px solid #ccc;
             border-radius: 4px;
             font-size: 0.9rem;
             color: #666;
+            transition: border-color 0.2s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #1d1b16;
         }
 
         input[type="text"]::placeholder {
+            color: #999;
+        }
+
+        .search-input {
+            padding: 0.75rem 1rem;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #1d1b16;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #1d1b16;
+        }
+
+        .search-input::placeholder {
             color: #999;
         }
 
@@ -360,8 +382,6 @@
             align-items: center;
             gap: 0.5rem;
         }
-
-
 
         .source-name a {
             color: #1d1b16;
@@ -542,6 +562,43 @@
         .invalid-domains-section h3 {
             color: #dc2626;
             margin-bottom: 1.5rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .create-suggestion {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border: 2px solid #1ABFFB;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .create-suggestion p {
+            font-size: 0.85rem;
+            color: #0c4a6e;
+            margin-bottom: 1rem;
+        }
+
+        .create-suggestion a {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #1ABFFB;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .create-suggestion a:hover {
+            background: #0da5e0;
         }
 
         .faq-container {
@@ -787,7 +844,8 @@
                 <button class="tab" onclick="switchTab(3)">04 FAQ</button>
             </div>
 
-            <div class="tab-content" id="tab0">
+            <!-- Tab 0: Create -->
+            <div class="tab-content" id="tab-0">
                 <div class="tab-panel">
                     <h2>Create LLMS.TXT from sources</h2>
                     <p style="margin-bottom: 1.5rem; color: #666;">Generate an llms.txt with accompanied markdown
@@ -798,7 +856,8 @@
                 </div>
             </div>
 
-            <div class="tab-content" id="tab1">
+            <!-- Tab 1: Check -->
+            <div class="tab-content" id="tab-1">
                 <div class="tab-panel">
                     <h2>Validate LLMS.TXT files</h2>
                     <p style="margin-bottom: 1.5rem; color: #666;">Check if your llms.txt file follows the official
@@ -831,7 +890,8 @@
                 </div>
             </div>
 
-            <div class="tab-content active" id="tab2">
+            <!-- Tab 2: Install -->
+            <div class="tab-content active" id="tab-2">
                 <div class="tab-panel">
                     <h2>Turn any <strong>llms.txt</strong> URL into a dedicated MCP server
                         that has all the context</h2>
@@ -841,12 +901,15 @@
                         <button class="btn-primary" onclick="handleCheckUrl()">CHECK & INSTALL</button>
                     </div>
 
-
                     <div
                         style="display:flex; flex:1; flex-direction:row; align-items:center; justify-content:space-between;">
                         <h3>Popular llms.txt MCP Servers</h3>
                         <div id="stats" class="stats">Loading...</div>
                     </div>
+
+                    <input type="text" id="search-input" class="search-input" placeholder="Search by domain name..."
+                        oninput="handleSearch()">
+
                     <div class="table-container">
                         <div class="table-scroll">
                             <table id="servers-table">
@@ -864,11 +927,20 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div id="no-results" class="no-results" style="display: none;">
+                            No matching servers found.
+                        </div>
+                    </div>
+
+                    <div id="create-suggestion" class="create-suggestion" style="display: none;">
+                        <p>Can't find what you're looking for? Create your own llms.txt file!</p>
+                        <a href="#" onclick="event.preventDefault(); switchTab(0);">Create LLMS.TXT</a>
                     </div>
                 </div>
             </div>
 
-            <div class="tab-content" id="tab3">
+            <!-- Tab 3: FAQ -->
+            <div class="tab-content" id="tab-3">
                 <div class="tab-panel">
                     <h2>Frequently Asked Questions</h2>
 
@@ -1146,7 +1218,7 @@
                             <details class="faq-item">
                                 <summary>Who else is using llms.txt?</summary>
                                 <div class="faq-answer">
-                                    <p>Check our <strong>03 LLMS.TXT → MCP</strong> tab to see popular sites already
+                                    <p>Check our <strong>03 INSTALL</strong> tab to see popular sites already
                                         using llms.txt. The list includes major documentation platforms, API providers,
                                         and developer tools. You can browse by popularity and tokens ingested.</p>
                                 </div>
@@ -1160,11 +1232,45 @@
 
     <script>
         // Initial dummy data
-        window.data = { "users": [{ "username": "janwilmake", "total_requests": 45, "total_tokens": 145887 }], "servers": [{ "hostname": "parallel.ai", "total_requests": 36, "total_tokens": 107789, "unique_users": 1, "valid": true }, { "hostname": "docs.tavus.io", "total_requests": 3, "total_tokens": 5211, "unique_users": 1, "valid": true }, { "hostname": "llmtext.com", "total_requests": 3, "total_tokens": 21898, "unique_users": 1, "valid": true }, { "hostname": "docs.perplexity.ai", "total_requests": 2, "total_tokens": 8785, "unique_users": 1, "valid": true }, { "hostname": "bun.com", "total_requests": 1, "total_tokens": 2204, "unique_users": 1, "valid": true }, { "valid": true, "hostname": "developers.cloudflare.com", "rank": 5, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.x.com", "rank": 67, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "ast-grep.github.io", "rank": 123, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "community-charts.github.io", "rank": 123, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "docs.sourceforge.net", "rank": 212, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }], "totalRequests": 45, "totalTokens": 145887 };
+        window.data = { "users": [{ "username": "janwilmake", "total_requests": 46, "total_tokens": 158901 }], "servers": [{ "hostname": "parallel.ai", "total_requests": 36, "total_tokens": 107789, "unique_users": 1, "valid": true }, { "hostname": "docs.tavus.io", "total_requests": 3, "total_tokens": 5211, "unique_users": 1, "valid": true }, { "hostname": "llmtext.com", "total_requests": 3, "total_tokens": 21898, "unique_users": 1, "valid": true }, { "hostname": "docs.perplexity.ai", "total_requests": 2, "total_tokens": 8785, "unique_users": 1, "valid": true }, { "hostname": "bun.com", "total_requests": 1, "total_tokens": 2204, "unique_users": 1, "valid": true }, { "hostname": "docs.x.com", "total_requests": 1, "total_tokens": 13014, "unique_users": 1, "valid": true }, { "valid": true, "hostname": "developers.cloudflare.com", "rank": 5, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAARVBMVEVHcEz5hCD5gyDyfyD3giD9sED+sD/5gyD4gyDvjSz1jSn5hSH2mDD9uUP4hCD9tEH8r0D9rj/+vEX8rkD7gR30gR/5hCCKb+RgAAAAFXRSTlMAvN8n+/m0sZQOUuw7gqzRhljI2c1MEf0zAAAAVklEQVQYlZ2OzRKAIAgG0QIh037l/R81bPTQpYN722G/GQCGmZb1405Vo3QTYS2G77W+arQZNy33iZf10VrnQs4MB+EOod7mihdE3IBDhxMRpfHPf3gAf4kEaXHoZzUAAAAASUVORK5CYII=", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "ast-grep.github.io", "rank": 123, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAYFBMVEX///8PPWCirrlQaYFsf5Pw8vUAOV4NPGC4wMn3+Pl0hplUbIRPaIGvucOqtL9hdox/kKE/W3YYQWOUoa/S2N4AM1o2VHEjR2cAJ1Pl6OzJz9ZZcIgqTWy+xs+OnawANlwk1Jl2AAAAgklEQVQYlZ2PSxaEIBAD06INCojTfhgExvvfcvB5A2uXWiQvwBvGSTnrPGarlA1NLJSnj6zbfkx9jE1EPUK+aaEO2+4ATz0wDBAecHYbsHJUHjA6oJ71LjVWU0bQBgfnZ6dSHrkAgeojejIz/ZBYWijXxcIoIsy8NNHdpNbfMK+O4Q83ywXiE1nUywAAAABJRU5ErkJggg==", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "community-charts.github.io", "rank": 123, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.sourceforge.net", "rank": 212, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAKlBMVEVHcEzzfCDzfCDzfCDzfCDzfCDyeyDzfCDzfCDzfCDzfCDzfCDzfCDzfCB7ay8zAAAADXRSTlMANPA9jocE46wCUhl0wdFdCQAAAF5JREFUGJVtjkkSwCAIBEETccn8/7tBsMg6B8tuplCi/yRsH5b85Azwwjb5KGGMCTU6xhWgZURnNACM7obnoTdkKwq5wTS0IzVy06GblIu9w74+2Ez0/Sss97nlzVdO8p8DvvLj0GoAAAAASUVORK5CYII=", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "weather.com", "rank": 224, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAbFBMVEUAM5kAMpkAJpUAKpYAKJYAMJgAIZSisNUAK5YALpfL1ekAGZJ/kMOpt9mbrNRsfrlhdbW1wd2UpM4cQp9zhLwQPJ0IOZ00UqbAyeI/WalKY62tutq1wd/Ez+Z2jcOJmMdRbrUnSqMAAIeNoM4XriNbAAAAoUlEQVQYlZXKyxaCMAxF0SQNLS19QKy8ClT0//9RBy4ce89srwvw/5CIEfAHNphIZJsLVOqHQdzt+rQ5BSnhjvglhAZGmhTB2Fi0CG2Yfb/cF8kC67iOoItz23640ofZxYGBa519NZscOZZHZUC9nB11uiOtOzs1oLc++NNPn255iQS0P40cTqIxZX8JAftYUy0++ZTNKgzAxC1rVqwUWYY3ZcsJW6RgtoQAAAAASUVORK5CYII=", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "developers.hubspot.com", "rank": 246, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAZlBMVEX/SAD/PgD/RQD3////QgD4+PH/OgD47+f+bkr/MwD47OP8qZb9hmr+YDb9f2L3//v/IQD7tqX9kHf6yrz52s7/LQD8oYz+ZDz53tT61cn/Vyb8oIv9eVr/Txf56N/6zsH6xLX7rpvVRPeCAAAAf0lEQVQYlW2O6w7CIAxGKS0FNgfsBlPn1Pd/STeJYIz905yTfm2F+FNA7yYLt6fDQAeZyaEPO/c45Ekhx2kCosGbT4jnqBIHHcoWwUbFxZ8v1UCHS9Saq4jeckJHRVw9WINrFTdserXZwm5r782jPCtXHGe2XI/QM1XImR/+qhdxRASkk3vxuwAAAABJRU5ErkJggg==", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "docs.linktr.ee", "rank": 249, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "docs.docker.com", "rank": 551, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAclBMVEX///86X+czWuaHnPCBl+/DzvgpVOYvWecfT+Xw8v3Ay/fj6PzR1/gAPOSfsPPs8P319/6tu/Ta4fpdfOsAOOMRSeWisvPj5/umtvTL1PlJa+lYeOt2j+6xvvVEZ+i0wvYaTOWTp/JOcOqEmfBtiO2Ln/BLtpckAAAAi0lEQVQYlXWP2xqCIBCE1zgWBwNDQwkz9P1fMcrC+r6avdn5L3Z2AH5rfxDfQCq9mVochTB2A40yJ+3avHUrOGOJffIAtq+z5UNwF9dSHMN4RdJCg6Yb6cdBBy0oVRiWlBDOk9DMqkAAItsVzY+TC6ve4s9oWQDFa6rmL19+nWgWj+ajiSek+9Ma4A7fzgbmT8+PCgAAAABJRU5ErkJggg==", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.kick.com", "rank": 907, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.cdp.coinbase.com", "rank": 1791, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACH0lEQVQ4jaWTzUuUURTGf+d1ZmicSjJFF1G2kUAsoxQpl4GEBg1RUCgtS4JQKKr/oDQQ2vjxB9Qqs0UbCVe2SATDNMih/NqMCwOt3tF533mfFtdRioKoBw73cp9zL+ee8zwASDJJHsC6ryZJw5IykoLtyEgaXvPVvJ3vSTIAk2RmpqyUqoLHwI1veez1DMwtAUDdETh3HPYmEDC0usqd6mr7XnwESaWSxiSpbzQKyzoV0KbIWiVrlWhTVNapoHc0CuUwls0qBWAAYaiBkhJuXusnePaKmLcfkwfKuwosARZBtIGuthM+7SZeKDAYi1mX+b7OJpNMPHyOHgxi8XIIcpDcA6drQcDUPGxuQSIJ+S+otwvupuFrjhYkDeUlVXQoIC1xQarvlmaXtYP3S1LdbcdxUarsUBA4aghJmZG37p9ckhJXpOnPji1ELiRp6pMUvyyRljiv6MWkJCkTA2o+rAAhRgBNx+DEUYgEZq5JkaChBmb6YSsERdihCgBqPP4SVuz4NiS3esBi3WEghojDZAbeLYBnLimS208vQH0PNPTAyVvozUcAFj1gvL0RKg9QoAD5HFx/AnMr7qJnMLvszoJNQFBxkEJ7IwDjtuHrzL4kE49G4P4AxMux4hhP1bqyp+YhtztGHnahe2ksl6Plv4UEQDarVFHKvaNRWNbxeyn3vdyVsqTSn82UVaqq6t/NtGPnNV/Nf7Lzuq+mX+38A7xct/GvlQMkAAAAAElFTkSuQmCC", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "equipment-python.vercel.app", "rank": 2019, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "future-first-design.vercel.app", "rank": 2019, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "docs.sardine.ai", "rank": 2882, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAP1BMVEUtKdc0Mdj///+XlevOzfbm5vrq6vtua+NLSN3h4Pmhn+2opu6bmexIRdxMSd2Ukuvl5PpQTd6joe2Pjeo9OtrhE32aAAAARklEQVQYlWNgoCLg4GSGs1m4GBh4WblZYSKMTKw8vKw8DHxs/DABQXYBoCIGQTZhmACnEDuKACu3CLIWmKFsCGvQraUUAAAOWAH/q1GNrgAAAABJRU5ErkJggg==", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.hybrid.ai", "rank": 2902, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAMAAADarb8dAAAAXVBMVEX////u4/ZgA6xUAKZZAKlPAKS4ntfWxuhcAKrbzOq6otj79/3f0e7BqduKWr+XbsWgfMt6QLdoH7C0mNX18fq0mdVDAJ/LuOHl2/Dw6fbIs9+jgcyBSryDTrt/RbpagEZcAAAAYUlEQVQImZXOSw6AIAwE0AoF6g8V/IJ6/2OqGCLudDadvEUzwFDCFcVFFsp3yB8oAMqq1hSBmrZDjsQiMEI8wSRgtFX985Ts3x1cDDeI8YbJzeEuzpWV9Cuk2QTHF+jdywOJ1QPAx7+ofAAAAABJRU5ErkJggg==", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "hola.org", "rank": 3037, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB8UlEQVQ4jZ2SzUtUURjGf+e9977njkY1cwcqFK2JGCwbIoxC0FVQRGVERW4kRKI2tWnVJqE21bqNCAOBrRvEpD+gWtiiDyi1rOnD3EgxflTG5G3hfDiNs6izOTyc9/m973POgRor7McN+xgNe0nWqgGQmifTnAIO49D5f4CQgwAsczU8h//vAEPbSoVsxfpXapcVG/aSRLjNIF30Y5iJzCNahyiIfifvNDL7cY6m1hEc/7K59XQCwC2h1NsAeoyL2s2sM4n1i2YQrw5fe9jYOAfeIXBjRVsZ4MQSOBbEu47YGcQrmgu7XluldwFPKgF+vKNwmMBo4i8ziEbL2rYDg5WXqNFONAANGMgKN8fzYAOwATde5EhPLZY0NnagOoKNN2NWusbrXVQBDUA8Nq9fIKhfV9AK4jVUAzQQxCPz/isnW5IV+fvatoAomckpunamQLQ0eTmCjU2gAfPLyv1sDjRGMRIakHk7zVzeKerXa0QIhjC69+yeTVwafcjjL99o37Ydg8ujD+/ILf3kzukL4EZAdKj6I6XTPnkZQ7zW38ZlZPwVY5+zhBj2NbdwNNWB4/og3nMidr85smOpAgAQ3h1uwugwoqk1nhHEe0boHjcnGj5VTVCCPHhj+bF4HmO7Ed1dML9EvHssRAfMGfNrdf0fkulw4yeluY4AAAAASUVORK5CYII=", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.anthropic.com", "rank": 3105, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADHUlEQVQ4jWVTX2iVdRh+3vf3+77vfKWbGrPlktyanOGRLrpYZUhnUVAgKaPvmN5kELJAaYscG1303QQts6SgbtaNCuo5FCHELncgCUI0B3PuDMtaooWbuH/n7Jzz+963C1uueu5enouH53mfB/gPSgO5wanBvbtW7uu9e9aV+qNOANAYrAoCQCs83yNiBoBLh6OmBj+IAzYfjx7IpgDAhcE+z9pzo9mspRhSyEWsqwQZACiOReOYn/y8cHt+uTa8LgzSm5ubdwMAEmx3Tv7sKhbdVO/+tida+XJpIPcGAGgUGQaAqYHcC6XKlZHp/tc2+bXqe7Pl6qKqDgCAgzQLYRwATJh8u2XD2u0MFQBA9LeXi+90P70xDL8HoX6nXHk+8Gx7S8ODJ28tLL0oQn0KGfFAmcceauz59c78V1uHzr45Hkd+BhlHo3HWdsVF91Pvni1r/NSpjQ3hs7fml44zUzcrZpxiDix2rR/sXKq6CzO15LkdnxYqChAB+k+aqiAi6NUjuX3G0JeqWMNEKqpJypqg6hIH0pepxrPiaZeCnhIkJ2jqyN5dCuwG6Q1VumsSuS4+Pa6ig4ZNk6qK3gu7Aug0FAFIb6pyCXBf2ITlNxb+XYRTxmhaldpUcZuJFw1TU82pMhNUZUGAa0x0XoTGEyOTmQ+//vl/Fi73RS2BT8cJyHjMrSIIPMu0XE3GiDEM1VeUqXN96DfeLS8fpnwUmYlMQV9F9IBX5mOBxweX6skxVrQR0ALS9ZbNZidaJtXT6aP5Qz/0RWFTYDocVadppYmlytULBH20JrUdKRN0Meh1p3JChTotsyrJTuf0Rza6VbX6UsdH5xYUIAaAIopM4LfTQ/mHfaQ2WWM+m02SiEDtzFi69MvYoZTlVt+3Y6p0EgjOaBwzAcoAkH2/mKSHTp+f6O1+xBj9purcwc6jhT+E5BmBzuQKE7VKUn8rtPyJJG7EeqbnxtyVAADs6iXWrUlZpQMdQ2e/y0fb/NB62xLBMADMz244JY1zi2z8evsHZ27qqkX+CwrQyjon+3M9k+9GrQCQjyJz/2P3C/gXv9J1qBWN+P0AAAAASUVORK5CYII=", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.zapier.com", "rank": 3120, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAYFBMVEX/TwD/UAH/SgD/TgD/UQP/SQD/YBr/yK3/qH//RAD/Vgv/Wg//ZiH/XRT/jVz/Zyf/r4n/oXb/uJf/s4//wqP/vp7/l2f/bSv/0Lj/iVP/xav/cjL/kV7/gUf/mmz/dTcrazM7AAAAcklEQVQYlcWNWQ7CMBBDZ8bNNmnplhQKLbn/LZlKfHADnvxhW7JM9Gf4x/ElwbeCGCTi1QGwnPs8eHi9jV41E0kfpiPMyxpjiXVzJPfHvoQyrc9QYx1s/Jr343yXs41bawpiSS6lrEnMOFyvnQF0zCaiDw7HBHlTi2soAAAAAElFTkSuQmCC", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "ajaib.gitbook.io", "rank": 3420, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.joinmassive.com", "rank": 4319, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABBUlEQVQ4je2QvUoDQRSFvzs7syvBTgUbGxsbayW1tVpIHsCwLJZBsLFKY5PGSskGKwtfwF6ws9HKR9BGK0VI9i/XZiKGLDaWeuAw3MOc7zID//q1pC7UXnuP3KxRcindiycAPdxf4cO9y2Dw9iNAz9un5KZDBmT6SlFtMZQGhdxSyTOla0q//zK5b6bKadwjMB0s4AAnS1hzgzUHOIkwrBKOrjVJGjMATeMT4AgmZW9rFgnZxugjFiDYIKqutNUKvgCaxl3geOot9hsklAUiWcf5hrDL8vwZgGiabML4rvaLSyAHMiBXf/oZQKVpgQdUdxDmZgAWGHurd+XzghGZua9d/Mf0CYsjTTepXr9vAAAAAElFTkSuQmCC", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.codeium.com", "rank": 4476, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAclBMVEULEA8OExIvLy8kJSUhIyIMERAdHx8MEA8MEBD///8GCwoAAAAmJycYGxpkZGAiJiUUFxc5OjiCgXxLTEltbmkwMjAzNzW/vLbh3tdERkL29O0+QUGPjon79ev//vaxr6nx7eSgnphUVVLNysKEhH54eHPmnADoAAAAqElEQVQYlV2KjQ6CMAyEb7CNraMwZcqfKKK+/yvakZio1/Rrenco/oS6/FGNUpdaVO+UB5pZW2tdtJmswfUhWm6PnbNs04mhzj0zNX4olBunWUG11wtRWq63irr17BDp7ruwjS+fwrw5aRAPw6mJ1E9jo0nBqNBNyyNSMSxrK4ZMePqHsPEr74aBeo1kDKWNcg5xAhk5IZicAnAqE5l741tiVBWc+SzMGx0oCSOiNEmIAAAAAElFTkSuQmCC", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "elevenlabs.io", "rank": 4654, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAoklEQVQ4je2TMY4CMQxF30QUOQeHmHMBh+ECSZcjMVDkCmmjeRSgrSKxylLuryzL/8m2bNSgXtRN3f2s/V17UQPvYFbnRb0DR+a0LeoOLJMAw8jceyfnTK2VWis5Z3rvI8DCaLDWmoClFEspArbWhksIk63/6B8Ah1EyxkhKiXVdAUgpEWMcAr5ySI9JM8AWgOsfAFd8vfNZvfn7d76pJzU8ARVLFHvPRt0OAAAAAElFTkSuQmCC", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "www.mux.com", "rank": 4972, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAMFBMVEX6ULX/////+f39st7/9/z8o9j9qdv8ltL9uOH9vuT9u+L9sN79qtv9r93/5vX+3fGyp/3CAAAAV0lEQVQYlY3PSw6AIAwE0Bm+VVTuf1sooMKOYTHNCyEF2MjhfB+8O1sbMmkn0jRgjQWs9gcMgSuMvHC1SxPg1mdmQIxYYR5+eDgW6/sg16MRJx0ky85XC5jVASsu08XUAAAAAElFTkSuQmCC", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.replit.com", "rank": 5201, "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABRElEQVQ4jaWTwU3DQBBF3zg2xgFjIWiBXKACEGVwSguUQwuc0gaiAriEFiIFJ0429to7HBJbwXECUv5pV5r98+fPXzgSsn3RJ6IUIgIUiyRgZIQ5SKAgAuqeCbNF+IZwCyyBPspnnOUPMqKo69oEfn1I50Shz01PiKwj9D08YMAlEVBsmtWydYdgR5qAdZAtmmI9qCCJMdmSsVXuRDF5SQDMJCCZDCEt8L+Bti/dJgLlCaUEJIGE7+t3WBUigY/zfv7ovZAryK8RNsymNmwyhN4pF75HbCtc4OFVyiCdEwE5gLfPg//il4J6hBSYbEaoHLPKIYDNHRHKVxJvedCZA8UAAZBaze/VkvrFulnbxL05CHp41qG6Ir1+ZfZnkNpQBV/g6qzZVGeQGhOTGFMq45XDOJgWDlNUjJk2clU6wnT0ZzoaP16Dn7D4RyuqAAAAAElFTkSuQmCC", "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.benzinga.com", "rank": 5292, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }], "totalRequests": 46, "totalTokens": 158901 };
+        window.filteredServers = null;
 
-        function getFaviconUrl(domain) {
-            return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+
+        function extractApexDomain(hostname) {
+            const parts = hostname.split(".");
+
+            // Handle special cases like .co.uk, .com.au, etc.
+            const twoPartTLDs = new Set([
+                "co.uk",
+                "com.au",
+                "co.jp",
+                "co.nz",
+                "co.za",
+                "com.br",
+                "com.cn",
+                "com.mx",
+                "com.ar",
+                "com.tr",
+                "co.in",
+                "co.id",
+            ]);
+
+            if (parts.length >= 3) {
+                const lastTwo = `${parts[parts.length - 2]}.${parts[parts.length - 1]}`;
+                if (twoPartTLDs.has(lastTwo)) {
+                    // For two-part TLDs, take the last 3 parts
+                    return parts.slice(-3).join(".");
+                }
+            }
+
+            // Default: take the last two parts
+            if (parts.length >= 2) {
+                return parts.slice(-2).join(".");
+            }
+
+            return hostname;
         }
+
 
         function getMcpName(domain) {
             return domain.replace(/\./g, '-');
@@ -1198,8 +1304,14 @@
                 return;
             }
 
-            // Navigate to check tab with URL parameter
-            window.location.href = `?check=${encodeURIComponent(url)}`;
+            // Switch to check tab and set the URL
+            switchTab(1);
+            document.getElementById('check-url').value = url;
+
+            // Trigger validation directly
+            setTimeout(() => {
+                handleCheckValidation();
+            }, 100);
         }
 
         function getInstallMcpUrl(hostname) {
@@ -1346,52 +1458,121 @@
                 tr.innerHTML = `
                     <td>
                         <div class="source-name">
-                            <img src="${getFaviconUrl(server.hostname)}" alt="" class="favicon">
+                            ${server.icon ? `<img src="${server.icon}" alt="" class="favicon">` : `<div class="favicon"/>`}
                             <a href="${llmstxtUrl}" target="_blank" rel="noopener">${server.hostname}</a>
                         </div>
                     </td>
-                    <td><a href="?check=https://${server.hostname}/llms.txt" class="btn-add">⚠️ CHECK</a></td>
+                    <td><button class="btn-add" onclick="checkDomain('${server.hostname}')">⚠️ CHECK</button></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function renderServers() {
-            const tbody = document.getElementById('servers-tbody');
-            const stats = document.getElementById('stats');
+        function checkDomain(hostname) {
+            switchTab(1);
+            document.getElementById('check-url').value = `https://${hostname}/llms.txt`;
+            setTimeout(() => {
+                handleCheckValidation();
+            }, 100);
+        }
+
+        function fuzzyMatch(text, query) {
+            text = text.toLowerCase();
+            query = query.toLowerCase();
+
+            // Direct substring match
+            if (text.includes(query)) {
+                return true;
+            }
+
+            // Fuzzy match - check if all characters in query appear in order
+            let queryIndex = 0;
+            for (let i = 0; i < text.length && queryIndex < query.length; i++) {
+                if (text[i] === query[queryIndex]) {
+                    queryIndex++;
+                }
+            }
+            return queryIndex === query.length;
+        }
+
+        function handleSearch() {
+            const searchInput = document.getElementById('search-input');
+            const query = searchInput.value.trim();
 
             if (!window.data || !window.data.servers) {
-                stats.innerText = 'Loading...';
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading data...</td></tr>';
+                return;
+            }
+
+            if (query === '') {
+                window.filteredServers = null;
+                renderServers();
                 return;
             }
 
             const validServers = window.data.servers.filter(server => server.valid);
+            window.filteredServers = validServers.filter(server =>
+                fuzzyMatch(server.hostname, query)
+            );
 
-            stats.innerText = `${formatNumber(validServers.length)} MCP SERVERS CREATED`;
+            renderServers();
+        }
 
-            // Render valid servers
-            tbody.innerHTML = '';
-            validServers.forEach((server, index) => {
-                const tr = document.createElement('tr');
-                const mcpUrl = getInstallMcpUrl(server.hostname);
-                const llmstxtUrl = `https://${server.hostname}/llms.txt`;
+        function renderServers() {
+            const tbody = document.getElementById('servers-tbody');
+            const stats = document.getElementById('stats');
+            const noResults = document.getElementById('no-results');
+            const createSuggestion = document.getElementById('create-suggestion');
+            const tableContainer = document.querySelector('#tab-2 .table-container');
 
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>
-                        <div class="source-name">
-                            <img src="${getFaviconUrl(server.hostname)}" alt="" class="favicon">
-                            <a href="${llmstxtUrl}" target="_blank" rel="noopener">${server.hostname}</a>
-                        </div>
-                    </td>
-                    <td>${formatNumber(server.total_tokens)}</td>
-                    <td>${formatNumber(server.total_requests)}</td>
-                    <td>${formatNumber(server.unique_users)}</td>
-                    <td><a href="${mcpUrl}" class="btn-add" target="_blank" rel="noopener">⬇ INSTALL</a></td>
-                `;
-                tbody.appendChild(tr);
-            });
+            if (!window.data || !window.data.servers) {
+                stats.innerText = 'Loading...';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading data...</td></tr>';
+                noResults.style.display = 'none';
+                createSuggestion.style.display = 'none';
+                return;
+            }
+
+            const serversToRender = window.filteredServers !== null
+                ? window.filteredServers
+                : window.data.servers.filter(server => server.valid);
+
+            const allValidServers = window.data.servers.filter(server => server.valid);
+            stats.innerText = `${formatNumber(allValidServers.length)} MCP SERVERS CREATED`;
+
+            // Show/hide elements based on results
+            if (serversToRender.length === 0) {
+                tbody.innerHTML = '';
+                tableContainer.style.display = 'none';
+                noResults.style.display = 'block';
+                createSuggestion.style.display = 'block';
+            } else {
+                tableContainer.style.display = 'block';
+                noResults.style.display = 'none';
+                createSuggestion.style.display = window.filteredServers !== null ? 'block' : 'none';
+
+                // Render servers
+                tbody.innerHTML = '';
+                serversToRender.forEach((server, index) => {
+                    const tr = document.createElement('tr');
+                    const mcpUrl = getInstallMcpUrl(server.hostname);
+                    const llmstxtUrl = `https://${server.hostname}/llms.txt`;
+
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>
+                            <div class="source-name">
+                               ${server.icon ? `<img src="${server.icon}" alt="" class="favicon">` : `<div class="favicon"/>`}
+                                <a href="${llmstxtUrl}" target="_blank" rel="noopener">${server.hostname}</a>
+                            </div>
+                        </td>
+                        <td>${formatNumber(server.total_tokens)}</td>
+                        <td>${formatNumber(server.total_requests)}</td>
+                        <td>${formatNumber(server.unique_users)}</td>
+                        <td><a href="${mcpUrl}" class="btn-add" target="_blank" rel="noopener">⬇ INSTALL</a></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
 
             // Render invalid domains in check tab
             renderInvalidDomains();
@@ -1424,6 +1605,9 @@
             const checkUrl = urlParams.get('check');
 
             if (checkUrl) {
+                // Clean URL without reloading
+                window.history.replaceState({}, document.title, window.location.pathname);
+
                 // Switch to check tab
                 switchTab(1);
 
@@ -1431,7 +1615,9 @@
                 document.getElementById('check-url').value = checkUrl;
 
                 // Trigger validation
-                handleCheckValidation();
+                setTimeout(() => {
+                    handleCheckValidation();
+                }, 100);
             }
         }
 

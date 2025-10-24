@@ -626,7 +626,7 @@ export async function validateLlmsTxt(
         ? (validResults.length / linkResults.length) * 100
         : 0;
 
-    if (validPercentage < 100 && linkResults.length > 0) {
+    if (validPercentage < 80 && linkResults.length > 0) {
       const invalidLinks = linkResults
         .filter((r) => !r.valid)
         .map((r) => `${r.url} (${r.failReason})`);

@@ -3,7 +3,7 @@ async function updateIndexHtml() {
     console.log("Fetching index.json...");
     const response = await fetch("https://mcp.llmtext.com/index.json");
     const jsonData = await response.json();
-
+    jsonData.servers = jsonData.servers;
     console.log("Reading index.html...");
     const fs = await import("fs");
     let html = fs.readFileSync("./index.html", "utf8");
