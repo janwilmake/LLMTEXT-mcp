@@ -1,5 +1,5 @@
 .git
-node_mdoules
+node_modules
 .wrangler
 data-preparation
 package-lock.json

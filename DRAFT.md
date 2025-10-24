@@ -26,6 +26,8 @@ LLMTEXT is an Open Source project supporting the llms.txt standard with an ecosy
 - uithub.com
 - context7
 - gitmcp.io
+- How do we want to differentiate this from similar projects like? https://deepwiki.com/
+- https://agents.md
 
 Why does llmtext-mcp deserve a place? because we're just at the beginning of exploring different ways of context engineering, vector search is not the only way.
 

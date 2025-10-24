@@ -1,11 +1,13 @@
 {
   "name": "parse-llms-txt",
-  "version": "0.0.6",
+  "version": "0.0.9",
   "main": "mod.js",
   "bin": "mod.js",
   "files": [
     "mod.js",
     "README.md"
   ],
-  "dependencies": {}
+  "devDependencies": {
+    "@types/node": "24.9.1"
+  }
 }

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+//@ts-check
+/// <reference types="@types/node" />
 
 /**
  * @fileoverview Parser for llms.txt files following the llmstxt.org specification
@@ -49,7 +51,7 @@
  * console.log(parsed.title); // "My Project"
  * console.log(parsed.sections[0].files[0].url); // "https://example.com/doc.md"
  */
-function parseLlmsTxt(markdown) {
+export function parseLlmsTxt(markdown) {
   const lines = markdown.split("\n");
 
   /** @type {LlmsTxtFile} */
@@ -233,15 +235,9 @@ async function main() {
       }
       content = await response.text();
     } else {
-      // Read from file
-      if (typeof Bun !== "undefined") {
-        // Bun runtime
-        content = await Bun.file(input).text();
-      } else {
-        // Node.js runtime
-        const fs = await import("fs/promises");
-        content = await fs.readFile(input, "utf-8");
-      }
+      // Node.js/Bun runtime
+      const fs = await import("fs/promises");
+      content = await fs.readFile(input, "utf-8");
     }
 
     const parsed = parseLlmsTxt(content);
@@ -264,9 +260,6 @@ if (
 ) {
   main();
 }
-
-// ES Module exports
-export { parseLlmsTxt, parseListLine };
 
 // CommonJS compatibility (if needed)
 if (typeof module !== "undefined" && module.exports) {

@@ -4,6 +4,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { withSimplerAuth, UserContext } from "simplerauth-client";
 import { convertRestToMcp } from "rest-mcp";
+import { parseLlmsTxt } from "parse-llms-txt";
 //@ts-ignore
 import popular from "./popular.json";
 
@@ -14,8 +15,15 @@ export interface Env {
 }
 
 interface CachedLlmsTxt {
-  content: string;
   hostname: string;
+  url: string;
+  content: string;
+  parse: {
+    title: string;
+    description?: string;
+    details?: string;
+    sections: any[];
+  };
   cachedAt: number;
   contentType: string;
 }
@@ -31,6 +39,19 @@ export default {
       if (!env.HISTORY_DO) {
         return new Response("HISTORY_DO binding not configured", {
           status: 500,
+        });
+      }
+
+      if (request.method === "OPTIONS") {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers":
+              "Content-Type, Authorization, Accept",
+            "Access-Control-Max-Age": "86400",
+          },
         });
       }
 
@@ -56,7 +77,10 @@ export default {
         const historyDO = env.HISTORY_DO.get(env.HISTORY_DO.idFromName(DO_ID));
         const leaderboard = await historyDO.getLeaderboard(undefined, 10);
         return new Response(JSON.stringify(leaderboard, undefined, 2), {
-          headers: { "Content-Type": "application/json;charset=utf8" },
+          headers: {
+            "Content-Type": "application/json;charset=utf8",
+            "Access-Control-Allow-Origin": "*",
+          },
         });
       }
 
@@ -94,7 +118,12 @@ export default {
         } else {
           return new Response(
             `MCP URL Fetcher - Please login first at ${url.origin}/`,
-            { headers: { "Content-Type": "text/plain" } }
+            {
+              headers: {
+                "Content-Type": "text/plain",
+                "Access-Control-Allow-Origin": "*",
+              },
+            }
           );
         }
       }
@@ -140,16 +169,12 @@ async function fetchLlmsTxt(hostname: string): Promise<CachedLlmsTxt | null> {
 
   try {
     const response = await fetch(url);
-
-    console.log("ok", response.ok, url, response.status);
     if (!response.ok) {
-      console.log("not ok", await response.text());
       return null;
     }
 
     const contentType = response.headers.get("content-type") || "";
 
-    console.log({ contentType });
     // Only accept text/markdown or text/plain
     if (
       !contentType.includes("text/markdown") &&
@@ -160,9 +185,12 @@ async function fetchLlmsTxt(hostname: string): Promise<CachedLlmsTxt | null> {
 
     const content = await response.text();
 
+    const parse = parseLlmsTxt(content);
     const cachedData: CachedLlmsTxt = {
       content,
+      parse,
       hostname,
+      url,
       cachedAt: Date.now(),
       contentType,
     };
@@ -194,6 +222,7 @@ async function fetchUrlContent(url: string): Promise<UrlFetchResult> {
     const response = await fetch(url, {
       headers: {
         "User-Agent": "MCP-URL-Fetcher/1.0",
+        // NB: should ensure this works for all llms.txt!
         Accept: "text/markdown,text/plain",
       },
     });
@@ -212,14 +241,7 @@ async function fetchUrlContent(url: string): Promise<UrlFetchResult> {
       // Replace HTML content with a warning
       content = `⚠️  HTML Content Detected ⚠️
 
-The URL ${url} returned HTML content (Content-Type: ${contentType}).
-
-For better results with HTML content, consider using:
-- An HTML-to-Markdown MCP server
-- A web scraping tool that converts HTML to plain text
-- A different endpoint that returns plain text or JSON
-
-This content has been replaced with this warning to avoid cluttering your context with raw HTML.`;
+The URL ${url} returned HTML content (Content-Type: ${contentType}). This content has been replaced with this warning to avoid cluttering your context with raw HTML. Please notify the user that this llms.txt is invalid and they should contact the author to fix it.`;
       tokens = await countTokens(content);
     } else {
       // Fetch actual content for non-HTML
@@ -320,10 +342,7 @@ async function handleMcp(
   if (!llmsTxtData) {
     return new Response(
       "MCP server not found - invalid or inaccessible llms.txt. The llms.txt must be available at the root of the domain at https://example.com/llms.txt",
-      {
-        status: 404,
-        headers: corsHeaders,
-      }
+      { status: 404, headers: corsHeaders }
     );
   }
 
@@ -378,14 +397,12 @@ async function handleMcp(
         id: message.id,
         result: {
           protocolVersion: "2025-03-26",
-          capabilities: {
-            tools: {},
-          },
+          capabilities: { tools: {} },
           serverInfo: {
             name: `${llmsTxtData.hostname} llms.txt`,
             version: "1.0.0",
           },
-          instructions: `This MCP server provides access to the llms.txt file from ${llmsTxtData.hostname}. Use the 'get' tool to fetch content from URLs, with the llms.txt content included in the tool description.`,
+          instructions: `This MCP server provides access to ${llmsTxtData.url} and all documents it refers to. Use the 'get' tool to fetch ${llmsTxtData.url} first, then content from URLs that seem relevant to the users intent.`,
         },
       };
 
@@ -481,8 +498,16 @@ async function handleMcp(
       const tools = [
         {
           name: "get",
-          title: `Get context for ${llmsTxtData.hostname}`,
-          description: `Fetch content and return them as plain text. Always first retrieve relevant context before doing something that requires new information This MCP server is configured for ${llmsTxtData.hostname} with the following llms.txt content:\n\n${llmsTxtData.content}`,
+          title: `Get context for ${llmsTxtData.parse.title} (${llmsTxtData.hostname})`,
+          description: `Get ${
+            llmsTxtData.parse.title || llmsTxtData.hostname
+          } content. Always first retrieve ${
+            llmsTxtData.url
+          }. To avoid hallucinations, always first retrieve relevant documents to the users intent.\n\n## ${
+            llmsTxtData.parse.title
+          }\n\n> ${llmsTxtData.parse.description}\n\n${
+            llmsTxtData.parse.details
+          }`,
           inputSchema: {
             type: "object",
             required: ["urls"],

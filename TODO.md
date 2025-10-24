@@ -42,21 +42,49 @@ Later:
 ## TODO
 
 - ✅ Ensure to add a highlighted boolean prop to the list so popular ones will stand out. Same for `valid:false`!
-- Flow of dev that looks for a lib should be able to search and below it should say "not found? create mcp"
-- Deployment of github repo should become clearer from lib readme
-- FAQ tab
-- servers on same height as "popular llms.txt mcp servers"
-- installthismcp icons are low-quality
-- The broken `llms.txt`'s should be in a the check tab.
-- If check fails, instruct people to create a better one using the library!
-- Improve MCP by putting `llms.txt` url in tool description + the `{title,description,details}` of it, not the entire thing.
+- ✅ FAQ tab
+- ✅ The broken `llms.txt`'s should be in a the check tab.
+- ✅ If check fails, instruct people to create a better one using the library!
+
+main.ts
+
+- ✅ Improve MCP by putting `llms.txt` url in tool description + the `{title,description,details}` of it, not the entire thing.
+
+llmtext.check
+
+- Minimum 20% of 50 links should be broken
+
+llmtext.login
+
 - Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`.
-- Make MCP available in p0docs + demo on how this works for Travers
-- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website or groq, combined (it's missing!)
-- https://github.com/parallel-web/parallel-llmtext public before tuesday, maybe rename to parallel-llm-context or parallel-context
+
+index.html
+
+- ✅ better subtitle
+- ✅ servers on same height as "popular llms.txt mcp servers"
+- ✅ mobile-friendlier
+- `?check` is annoying if it stays in the url, better to just trigger form submission directly
+- dev that looks for a lib should be able to search (small search input below 'popular llms.txt mcp servers') that does simple fuzzy keyword search that filters the list, and below the list, it should suggest to 'create llms.txt linking to the first tab
+- number the tabs with the number in lay-out for improved readability of the code
+
+installthismcp
+
+- it looks a bit spammy/sketchy. I think consistency in the look and feel across open-source projects with our name on it is important.
+- align installthismcp color-schema and add disclaimer 'what is installthismcp?'
+- icons are low-quality, should be sharper (maybe use different api?)
+
+You're an expert in front-end design and implementation. Refine the screens across this app using the latest standards and trends for high-usability software apps. Your focus should be on intentional design that doesn't distract from the core functions of the app. Use mainly whites and grays for UI elements, with occasional use of color for buttons in highlighted states.
+
+extract-from-sitemap
+
+- Deployment of github repo should become clearer from lib readme
 
 ## Launch
 
+- Install ScreenStudio and make demos after making blog skeletons.
+- Demo on how this works for Travers
+- Make demo on how to make a `llms.txt` for another product, like Cloudflare's main website or groq, combined (it's missing!)
+- https://github.com/parallel-web/parallel-llmtext public before tuesday, maybe rename to parallel-llm-context or parallel-context
 - On parallel docs, link to this (If X OAuth is OK)
 - Open issue in https://github.com/AnswerDotAI/llms-txt
 - Reach out to https://x.com/jeremyphoward (somehow)
@@ -64,7 +92,3 @@ Later:
 - Launch it on MCP directories in a way that context7/gitmcp did it too
 - Use it for https://docs.parallel.ai/llms.txt and make demo
 - X Launch post
-
-## Friday/weekend:
-
-Install ScreenStudio and make demos after making blog skeletons.

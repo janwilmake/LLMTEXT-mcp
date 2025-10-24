@@ -1,8 +1,10 @@
 {
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250826.0"
+    "@cloudflare/workers-types": "^4.20250826.0",
+    "@types/node": "24.9.1"
   },
   "dependencies": {
+    "parse-llms-txt": "0.0.9",
     "rest-mcp": "0.0.2",
     "simplerauth-client": "0.0.20"
   }

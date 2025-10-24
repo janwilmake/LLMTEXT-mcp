@@ -5,7 +5,7 @@ https://uithub.com/janwilmake/gists/tree/main/named-codeblocks.md
 
 check api: https://check.llmtext.com/openapi.json
 
-improve the check tab:
+Improve the check tab:
 
 - if ?check={url} is present, go to that tab call the check api immediately.
 - the search/install form should actually link to ?check={url} instead of installthismcp directly
