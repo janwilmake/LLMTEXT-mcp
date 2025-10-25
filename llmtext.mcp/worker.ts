@@ -14,6 +14,155 @@ export interface Env {
   PORT?: string;
 }
 
+type InitializeResult = {
+  /**
+   * The version of the Model Context Protocol that the server wants to use.
+   * This may not match the version that the client requested. If the client
+   * cannot support this version, it MUST disconnect.
+   */
+  protocolVersion: string;
+
+  capabilities: {
+    /**
+     * Experimental, non-standard capabilities that the server supports.
+     */
+    experimental?: { [key: string]: object };
+
+    /**
+     * Present if the server supports sending log messages to the client.
+     */
+    logging?: object;
+
+    /**
+     * Present if the server supports argument autocompletion suggestions.
+     */
+    completions?: object;
+
+    /**
+     * Present if the server offers any prompt templates.
+     */
+    prompts?: {
+      /**
+       * Whether this server supports notifications for changes to the prompt list.
+       */
+      listChanged?: boolean;
+    };
+
+    /**
+     * Present if the server offers any resources to read.
+     */
+    resources?: {
+      /**
+       * Whether this server supports subscribing to resource updates.
+       */
+      subscribe?: boolean;
+      /**
+       * Whether this server supports notifications for changes to the resource list.
+       */
+      listChanged?: boolean;
+    };
+
+    /**
+     * Present if the server offers any tools to call.
+     */
+    tools?: {
+      /**
+       * Whether this server supports notifications for changes to the tool list.
+       */
+      listChanged?: boolean;
+    };
+  };
+
+  serverInfo: {
+    /**
+     * Intended for programmatic or logical use, but used as a display name
+     * in past specs or fallback (if title isn't present).
+     */
+    name: string;
+
+    /**
+     * Intended for UI and end-user contexts — optimized to be human-readable
+     * and easily understood, even by those unfamiliar with domain-specific terminology.
+     *
+     * If not provided, the name should be used for display (except for Tool,
+     * where `annotations.title` should be given precedence over using `name`,
+     * if present).
+     */
+    title?: string;
+
+    version: string;
+
+    /**
+     * An optional URL of the website for this implementation.
+     */
+    websiteUrl?: string;
+
+    /**
+     * Optional set of sized icons that the client can display in a user interface.
+     *
+     * Clients that support rendering icons MUST support at least the following MIME types:
+     * - `image/png` - PNG images (safe, universal compatibility)
+     * - `image/jpeg` (and `image/jpg`) - JPEG images (safe, universal compatibility)
+     *
+     * Clients that support rendering icons SHOULD also support:
+     * - `image/svg+xml` - SVG images (scalable but requires security precautions)
+     * - `image/webp` - WebP images (modern, efficient format)
+     */
+    icons?: Array<{
+      /**
+       * A standard URI pointing to an icon resource. May be an HTTP/HTTPS URL or a
+       * `data:` URI with Base64-encoded image data.
+       *
+       * Consumers SHOULD takes steps to ensure URLs serving icons are from the
+       * same domain as the client/server or a trusted domain.
+       *
+       * Consumers SHOULD take appropriate precautions when consuming SVGs as they can contain
+       * executable JavaScript.
+       */
+      src: string;
+
+      /**
+       * Optional MIME type override if the source MIME type is missing or generic.
+       * For example: `"image/png"`, `"image/jpeg"`, or `"image/svg+xml"`.
+       */
+      mimeType?: string;
+
+      /**
+       * Optional array of strings that specify sizes at which the icon can be used.
+       * Each string should be in WxH format (e.g., `"48x48"`, `"96x96"`) or `"any"` for scalable formats like SVG.
+       *
+       * If not provided, the client should assume that the icon can be used at any size.
+       */
+      sizes?: string[];
+
+      /**
+       * Optional specifier for the theme this icon is designed for. `light` indicates
+       * the icon is designed to be used with a light background, and `dark` indicates
+       * the icon is designed to be used with a dark background.
+       *
+       * If not provided, the client should assume the icon can be used with any theme.
+       */
+      theme?: "light" | "dark";
+    }>;
+  };
+
+  /**
+   * Instructions describing how to use the server and its features.
+   *
+   * This can be used by clients to improve the LLM's understanding of available
+   * tools, resources, etc. It can be thought of like a "hint" to the model.
+   * For example, this information MAY be added to the system prompt.
+   */
+  instructions?: string;
+
+  /**
+   * See [General fields: `_meta`](/specification/draft/basic/index#meta) for notes on `_meta` usage.
+   *
+   * This is an optional metadata field that can contain arbitrary key-value pairs.
+   * The specification leaves this intentionally flexible for implementation-specific data.
+   */
+  _meta?: { [key: string]: unknown };
+};
 interface CachedLlmsTxt {
   hostname: string;
   url: string;
@@ -300,6 +449,46 @@ async function fetchMultipleUrls(urls: string[]): Promise<{
   return { results, totalTokens, summary };
 }
 
+function extractApexDomain(hostname: string) {
+  const parts = hostname.split(".");
+
+  // Handle special cases like .co.uk, .com.au, etc.
+  const twoPartTLDs = new Set([
+    "co.uk",
+    "com.au",
+    "co.jp",
+    "co.nz",
+    "co.za",
+    "com.br",
+    "com.cn",
+    "com.mx",
+    "com.ar",
+    "com.tr",
+    "co.in",
+    "co.id",
+  ]);
+
+  if (parts.length >= 3) {
+    const lastTwo = `${parts[parts.length - 2]}.${parts[parts.length - 1]}`;
+    if (twoPartTLDs.has(lastTwo)) {
+      // For two-part TLDs, take the last 3 parts
+      return parts.slice(-3).join(".");
+    }
+  }
+
+  // Default: take the last two parts
+  if (parts.length >= 2) {
+    return parts.slice(-2).join(".");
+  }
+
+  return hostname;
+}
+function getFaviconUrl(domain: string, size: number) {
+  return `https://www.google.com/s2/favicons?domain=${extractApexDomain(
+    domain
+  )}&sz=${size}`;
+}
+
 async function handleMcp(
   request: Request,
   env: Env,
@@ -320,14 +509,11 @@ async function handleMcp(
     });
   }
 
-  if (request.method === "GET") {
-    return new Response("Only Streamable HTTP is supported", {
-      status: 405,
-    });
-  }
-
-  if (request.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
+  if (
+    request.method === "GET" &&
+    request.headers.get("accept")?.includes("text/event-stream")
+  ) {
+    return new Response("Only Streamable HTTP is supported", { status: 405 });
   }
 
   const corsHeaders = {
@@ -336,7 +522,6 @@ async function handleMcp(
     "Access-Control-Allow-Headers":
       "Content-Type, Authorization, MCP-Protocol-Version",
   };
-
   // Fetch and validate the llms.txt file
   const llmsTxtData = await fetchLlmsTxt(hostname);
   if (!llmsTxtData) {
@@ -345,6 +530,41 @@ async function handleMcp(
       { status: 404, headers: corsHeaders }
     );
   }
+  const initializeResult: InitializeResult = {
+    protocolVersion: "2025-06-18",
+    capabilities: { tools: {} },
+    serverInfo: {
+      name: `${llmsTxtData.parse.title || llmsTxtData.hostname} llms.txt`,
+      version: "1.0.0",
+      title: `${llmsTxtData.parse.title || llmsTxtData.hostname} llms.txt`,
+      websiteUrl: `https://${llmsTxtData.hostname}`,
+      icons: [
+        {
+          src: getFaviconUrl(llmsTxtData.hostname, 48),
+          sizes: ["32x32", "16x16", "48x48"],
+        },
+        {
+          src: getFaviconUrl(llmsTxtData.hostname, 256),
+          sizes: ["any"],
+        },
+      ],
+    },
+    _meta: {},
+    instructions: `This MCP server provides access to ${llmsTxtData.url} and all documents it refers to. Use the 'get' tool to fetch ${llmsTxtData.url} first, then content from URLs that seem relevant to the users intent.`,
+  };
+
+  if (request.method === "GET") {
+    return new Response(JSON.stringify(initializeResult, undefined, 2), {
+      headers: { "content-type": "application/json" },
+    });
+    // This can be anything!!!!
+  }
+
+  if (request.method !== "POST") {
+    return new Response("Method not allowed", { status: 405 });
+  }
+
+  // It's post, so must be Streamable HTTP
 
   try {
     const message: any = await request.json();
@@ -392,26 +612,23 @@ async function handleMcp(
         );
       }
 
-      const initializeResult = {
-        jsonrpc: "2.0",
-        id: message.id,
-        result: {
-          protocolVersion: "2025-03-26",
-          capabilities: { tools: {} },
-          serverInfo: {
-            name: `${llmsTxtData.hostname} llms.txt`,
-            version: "1.0.0",
+      return new Response(
+        JSON.stringify(
+          {
+            jsonrpc: "2.0",
+            id: message.id,
+            result: initializeResult,
           },
-          instructions: `This MCP server provides access to ${llmsTxtData.url} and all documents it refers to. Use the 'get' tool to fetch ${llmsTxtData.url} first, then content from URLs that seem relevant to the users intent.`,
-        },
-      };
-
-      return new Response(JSON.stringify(initializeResult, undefined, 2), {
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
-        },
-      });
+          undefined,
+          2
+        ),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        }
+      );
     }
 
     // Handle initialized notification
@@ -1022,7 +1239,8 @@ export class HistoryDO extends DurableObject<Env> {
         valid: item.valid,
         hostname: item.hostname,
         rank: item.rank || Infinity,
-        icon: item.icon,
+        // this can reduce # of requests but it also increases the size of index.json significantly. dunno where the sweet spot is
+        //icon: item.icon,
         total_requests: 0,
         total_tokens: 0,
         unique_users: 0,

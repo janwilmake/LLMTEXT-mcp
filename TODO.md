@@ -12,86 +12,25 @@ Later:
 - See [backlog](BACKLOG.md)
 - https://github.com/janwilmake/openapi-mcp-server/issues/35
 
-## Parallel PR
+# WEEKEND
 
-- ✅ intercept `accept:text/markdown` requests
-- ✅ Route accept: `text/markdown` requests should rewrite to llm.parallel.ai
-- ✅ `.md` suffix should be catched as well if `rewriteTo` is available
-- ✅ `llms.txt, llms-full.txt, /mcp` should rewrite to llm.parallel.ai (if available)
-- ✅ Put all .md files into https://github.com/janwilmake/parallel-llmtext using build script.
-- ✅ Every path on parallel.ai has `.md` available (ensure they are all in sitemap, no 404s are in sitemap, and we re-generate from that new sitemap)
-- ✅ Add `<link rel="alternate" type="text/markdown" href="{path}.md" title="Docs" />` into metadata for each html page!
+`installthismcp` - Fix UI here (1 hour)
 
-## Website
-
-- ✅ Adhere to figma design
-- ✅ Ensure mcp.parallel.ai serves data as JSON at `index.json`, including top 10 users leaderboard
-- ✅ link from hostname to raw `llms.txt`
-- ✅ Fetch that and overwrite `window.data` in the HTML using node-script pre-deploy
-- ✅ Document check API and add llmstxt-check-tool.
-- ✅ Checktool bug: 404 for https://docs.zapier.com/llms.txt and even for https://modelcontextprotocol.io/llms.txt even though they exist.
-
-## Finalize MCP listings and flow
-
-- ✅ The check API should use parse-llms-txt and actually give you deeper information about 50 random links in your `llms.txt`
-- ✅ When entering a new llms.txt URL to create an MCP, perform the check first, and only allow going to installation page when it's confirmed that it is actually good
-- ✅ Improve check api testing on bun: https://bun.com/llms.txt. somehow it can't always find the md. Fix this!
-- ✅ Use the check-api on all servers and ensure that the ones that have HTML only in their contents get filtered out. These aren't valid. Still keep them in the dataset as invalid servers, leading to check them.
-- ✅ Show invalid servers at the bottom and replace "Add" button with "Check". Especially nice to showcase the famous companies with invalid llms.txt server.
-
-## TODO
-
-- ✅ Ensure to add a highlighted boolean prop to the list so popular ones will stand out. Same for `valid:false`!
-- ✅ FAQ tab
-- ✅ The broken `llms.txt`'s should be in a the check tab.
-- ✅ If check fails, instruct people to create a better one using the library!
-
-`main.ts`
-
-- ✅ Improve MCP by putting `llms.txt` url in tool description + the `{title,description,details}` of it, not the entire thing.
-- ✅ fix cors problem
-
-`index.html`
-
-- ✅ better subtitle
-- ✅ servers on same height as "popular llms.txt mcp servers"
-- ✅ mobile-friendlier
-- ✅ `?check` is annoying if it stays in the url, better to just trigger form submission directly
-- ✅ dev that looks for a lib should be able to search (small search input below 'popular llms.txt mcp servers') that does simple fuzzy keyword search that filters the list, and below the list, it should suggest to 'create llms.txt linking to the first tab
-- ✅ number the tabs with the number in lay-out for improved readability of the code
-- ✅ made text inputs a bit less strong
-
-`llmtext.check`
-
-- ✅ Minimum 20% of 50 links should be broken
-
-`filter-urls.ts`
-
-- ✅ use the google favicon api (https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://parallel.ai&size=16) and for llmtext my own, and add `data:image/png;base64,` to the JSON such that they are hardcoded in the html.
-- ✅ use that icon in the img instead of the url. things should load much faster now.
-- ✅ do not fall back to url
-- ensure to render placeholder (hardcoded `/favicon.svg`) if favicon wasnt available
-- have favicons found at `/index.json`
-- fix regex so predeploy doesnt break HTML
-- fix layout shift
-- check click should scroll to top
-
-`installthismcp`:
-
-- icons are low-quality, should be sharper (maybe use different api?)
-- ensure to use https://github.com/modelcontextprotocol/registry/blob/be4182606e8f4f223d1e25d0a7c3037ae278458a/docs/reference/server-json/server.schema.json#L371 at `.well-known/mcp.json` (see https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649) somehow.
-- it looks a bit spammy/sketchy. I think consistency in the look and feel across open-source projects with our name on it is important. remove blue bg
+- ✅ icons are low-quality, should be sharper (maybe use different api?)
+- ✅ Find best intermediate solution to giving icons: https://x.com/janwilmake/status/1982034203211358495
+- It looks a bit spammy/sketchy. I think consistency in the look and feel across open-source projects with our name on it is important. remove blue bg
 - align installthismcp color-schema and add disclaimer 'what is installthismcp'?
+- We can try to retrieve the JSON from GET and IF present, use that for icons, and title. also if present show the websiteUrl and version, and have a button to expand instructions.
 
 You're an expert in front-end design and implementation. Refine the screens across this app using the latest standards and trends for high-usability software apps. Your focus should be on intentional design that doesn't distract from the core functions of the app. Use mainly whites and grays for UI elements, with occasional use of color for buttons in highlighted states.
 
-`llmtext.login`
+`llmtext.login` - add in a in-between page (max a few hours)
 
 - Give people an option to opt-out of the social element before logging in with X (for simplicity, login with X remains required). Host this x-login-provider wrapper at `login.llmtext.com`.
 
-`extract-from-sitemap`
+`extract-from-sitemap` - a day???
 
-- Deployment of github repo should become clearer from lib readme
+- Deployment of github repo should become clearer from lib readme. Ideally, should recur daily.
 
 ## Launch
 
