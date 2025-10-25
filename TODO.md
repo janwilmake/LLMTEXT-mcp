@@ -18,9 +18,9 @@ Later:
 
 - ✅ icons are low-quality, should be sharper (maybe use different api?)
 - ✅ Find best intermediate solution to giving icons: https://x.com/janwilmake/status/1982034203211358495
-- It looks a bit spammy/sketchy. I think consistency in the look and feel across open-source projects with our name on it is important. remove blue bg
-- align installthismcp color-schema and add disclaimer 'what is installthismcp'?
-- We can try to retrieve the JSON from GET and IF present, use that for icons, and title. also if present show the websiteUrl and version, and have a button to expand instructions.
+- ✅ It looks a bit spammy/sketchy. I think consistency in the look and feel across open-source projects with our name on it is important. remove blue bg
+- ✅ align installthismcp color-schema and add disclaimer 'what is installthismcp'?
+- ✅ We can try to retrieve the JSON from GET and IF present, use that for icons, and title. also if present show the websiteUrl and version, and have a button to expand instructions.
 
 You're an expert in front-end design and implementation. Refine the screens across this app using the latest standards and trends for high-usability software apps. Your focus should be on intentional design that doesn't distract from the core functions of the app. Use mainly whites and grays for UI elements, with occasional use of color for buttons in highlighted states.
 

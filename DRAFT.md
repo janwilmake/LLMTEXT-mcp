@@ -47,22 +47,25 @@ When building the llms.txt MCP and trying it out on [some of the available MCPs]
 
 The goal of your `llms.txt` should be to give LLMs the best possible overview: a table of contents to determine where to look for the right information. Or as [@travers00 puts it](https://x.com/travers00/status/1975947045497344162), the goal is to retrieve the tokens agents need to answer or make the next best decision in a loop. This means that you should have clear distinct titles and descriptions of pages, the individual results of pages shouldn't be too long.
 
-For example, in [this llms.txt from supabase](https://supabase.com/llms.txt), the first file has 800k tokens. The [cloudflare llms.txt](https://developers.cloudflare.com/llms.txt) is 36k tokens which is quite long for most models and quickly adds to the context window starting to reduce the output quality. To make token-usage efficient when wading through context, it's best if the `llms.txt` itself is not bigger than the pages being linked to. If it is, it becomes a significant addition to the context window every time you may want to retrieve a piece of information.
+Here are the most common mistakes we found in llms.txt files, with examples from popular websites:
 
-As a fist rule, keep it under 10k:
+**Document Size**
 
-- `llms.txt` must be under 10k tokens
-- The pages linked to must be under 10k tokens
+If we want to use llms.txt for LLMs to easily browse through, we should make the documents small enough to not be inefficient doing so. For example, https://developers.cloudflare.com/llms.txt is 36k tokens for just the table of contents, creating a very large minimum amount of tokens to be ingested to look something up in this way. Another example is https://docs.cursor.com/llms.txt, which serves links to several languages. This isn't succinct and creates unneccessary overhead to an LLM that knows most languages.
 
-Other than that we found the following common mistakes in llms.txt files:
+To make token-usage efficient when wading through context, it's best if the `llms.txt` itself is not bigger than the pages being linked to. If it is, it becomes a significant addition to the context window every time you may want to retrieve a piece of information. Another example is https://supabase.com/llms.txt, where first document linked to contains approximately 800k tokens, which is way too large for most LLMs to process. If As a fist rule, we recommend keeping both `llms.txt` and all linked documents under 10.000 tokens.
 
-1. **not served at root** - ensure your llms.txt is served at the root of your (sub)domain: yourwebsite.com/llms.txt
-2. erroring out when presenting an accept header of text/plain or text/markdown. e.g. [mintlify](https://www.mintlify.com/docs/ai/llmstxt) currently does this.
-3. **wrong content-type** - ensure to respond with either text/plain or text/markdown.
-4. **the content is the full docs** - the content must contain markdown links to docs, not all docs in one page. For this you can make available `/llms-full.txt`
-5. **links return html** - the links must lead to a text/markdown or text/plain acceptable response. This is probably the most common mistakes in llms.txt files today from large companies.
+**Incorrect content-type**
 
-Lots of llms.txt are low quality. The llms.txt checking tool aims to improve this.
+The llms.txt itself as well as the links it refers to must lead to a text/markdown or text/plain response. This is probably the most common mistakes in llms.txt files today from large companies.
+
+For example, https://www.bitcoin.com/llms.txt and https://docs.docker.com/llms.txt both return markdown for every document linked to. On the other hand, https://elevenlabs.io/llms.txt responds with a HTML document.
+
+In many cases, the content-type is text/plain or text/markdown, yet, we couldn't parse it according to [the spec](https://llmstxt.org). For example, https://cursor.com/llms.txt just lists raw urls without markdown link format, https://console.groq.com/llms.txt does not present its links in a h2 markdown section (##), and https://lmstudio.ai/llms.txt returns all documents directly, concatenated.
+
+**Not served at the root**
+
+Many companies ended up not serving their llms.txt at the root. For example, https://www.mintlify.com/docs/llms.txt is not hosted at the root, making it hard to find programmatically.
 
 ### 03: Make any llms.txt into MCP
 

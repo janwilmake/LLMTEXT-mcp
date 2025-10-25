@@ -15,6 +15,8 @@ export interface Env {
 }
 
 type InitializeResult = {
+  /** NON_STANDARD way to describe the servers capabilities for human, just like in https://github.com/modelcontextprotocol/registry/blob/be4182606e8f4f223d1e25d0a7c3037ae278458a/docs/reference/server-json/server.schema.json#L371 */
+  description?: string;
   /**
    * The version of the Model Context Protocol that the server wants to use.
    * This may not match the version that the client requested. If the client
@@ -536,8 +538,13 @@ async function handleMcp(
     serverInfo: {
       name: `${llmsTxtData.parse.title || llmsTxtData.hostname} llms.txt`,
       version: "1.0.0",
-      title: `${llmsTxtData.parse.title || llmsTxtData.hostname} llms.txt`,
+      title: `LLMTEXT MCP Server for ${
+        llmsTxtData.parse.title || llmsTxtData.hostname
+      }`,
       websiteUrl: `https://${llmsTxtData.hostname}`,
+      description: `This MCP Server allows your LLM to understand ${
+        llmsTxtData.parse.title || llmsTxtData.hostname
+      } by wading through its llms.txt and linked documents thereof using a simple 'get' tool.\n\nTo use this MCP, login with X is required to collect anonymous usage data.`,
       icons: [
         {
           src: getFaviconUrl(llmsTxtData.hostname, 48),
@@ -549,7 +556,6 @@ async function handleMcp(
         },
       ],
     },
-    _meta: {},
     instructions: `This MCP server provides access to ${llmsTxtData.url} and all documents it refers to. Use the 'get' tool to fetch ${llmsTxtData.url} first, then content from URLs that seem relevant to the users intent.`,
   };
 
