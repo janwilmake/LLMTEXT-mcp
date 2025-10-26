@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "name": "llmtext-x-oauth-provider",
+  "observability": { "logs": { "enabled": true } },
+  "compatibility_date": "2025-10-25",
+  "dev": { "port": 3000 },
+  "env": {
+    "localhost": {
+      // must be put here such that we can still see url.origin on localhost. Must run localhost with --env localhost
+      "routes": []
+    }
+  },
+  "routes": [
+    {
+      "custom_domain": true,
+      "pattern": "login.llmtext.com"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "TEMP_STATE",
+      "id": "eb88c6f1cb1f49b18271462d13e42663",
+      "remote": true
+    }
+  ],
+  "main": "main.ts"
+}

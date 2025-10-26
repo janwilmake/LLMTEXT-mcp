@@ -5,6 +5,23 @@ Other Technical Decisions:
 1. Fallback using extract so it 'just works' for popular docs that don't implement it correctly. Could make things more complicated too because it adds lot of cost potentially if there's wide use. We don't want to have to take it down later if cost gets too high. Right now people won't get installation link from our site if the llms.txt uses html underneath, and MCP gives a warning if someone still tries it.
 2. I'm curious if we could also try a tool that uses extract with additional objective, returning just excerpts, potentially in a way you don't need to even provide urls as by default it can just add all urls? Obviously this would make it much more expensive because each extract request costs money but it could be made a premium feature or the web publishers could pay for it.
 
+## Adopt llms.txt with openapisearch.com too
+
+- https://openapisearch.com/llms.txt with ?search to filter
+- add bi-directional kv for adding new ones and counting usage
+- https://{id}.openapisearch.com/llms.txt for openapi overview with ?search for filter
+- https://{id}.openapisearch.com/{pathOrOpreration} for getting the operation.
+
+This gives additional credit to the llms.txt ecosystem
+
+## Adopt llms.txt for uithub.com too
+
+- github oauth provider public + private
+- https://uithub.com/llms.txt for popular (when logged in: starred and owned repos)
+- https://uithub.com/janwilmake/myrepo
+
+This gives additional credit to the llms.txt ecosystem
+
 ## Improve recurring llms.txt generation
 
 - `llms.txt`: For each source, group links by path like they do in https://github.com/apify/actor-llmstxt-generator/pull/16

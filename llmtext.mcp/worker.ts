@@ -300,7 +300,7 @@ export default {
         return new Response(error.message, { status: 400 });
       }
     },
-    { isLoginRequired: false }
+    { isLoginRequired: false, oauthProviderHost: "login.llmtext.com" }
   ),
 };
 
@@ -369,14 +369,16 @@ interface UrlFetchResult {
 async function fetchUrlContent(url: string): Promise<UrlFetchResult> {
   const startTime = Date.now();
 
-  try {
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "MCP-URL-Fetcher/1.0",
-        // NB: should ensure this works for all llms.txt!
-        Accept: "text/markdown,text/plain",
-      },
-    });
+  const attemptFetch = async (useAcceptHeader: boolean) => {
+    const headers: HeadersInit = {
+      "User-Agent": "MCP-URL-Fetcher/1.0",
+    };
+
+    if (useAcceptHeader) {
+      headers.Accept = "text/markdown,text/plain";
+    }
+
+    const response = await fetch(url, { headers });
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -400,18 +402,59 @@ The URL ${url} returned HTML content (Content-Type: ${contentType}). This conten
       tokens = await countTokens(content);
     }
 
+    return { content, contentType, isHtml, tokens };
+  };
+
+  try {
+    // First attempt with Accept header
+    const result = await attemptFetch(true);
     const responseTime = Date.now() - startTime;
 
     return {
       url,
-      content,
-      contentType,
+      content: result.content,
+      contentType: result.contentType,
       responseTime,
-      tokens,
-      isHtml,
+      tokens: result.tokens,
+      isHtml: result.isHtml,
       success: true,
     };
   } catch (error) {
+    // If we got a 404, retry without Accept header
+    if (error.message.includes("HTTP 404")) {
+      try {
+        const result = await attemptFetch(false);
+        const responseTime = Date.now() - startTime;
+
+        return {
+          url,
+          content: result.content,
+          contentType: result.contentType,
+          responseTime,
+          tokens: result.tokens,
+          isHtml: result.isHtml,
+          success: true,
+        };
+      } catch (fallbackError) {
+        // Both attempts failed
+        const responseTime = Date.now() - startTime;
+        const errorContent = `Error fetching ${url}: ${fallbackError.message} (fallback attempt also failed)`;
+        const tokens = await countTokens(errorContent);
+
+        return {
+          url,
+          content: errorContent,
+          contentType: "text/plain",
+          responseTime,
+          tokens,
+          isHtml: false,
+          success: false,
+          error: fallbackError.message,
+        };
+      }
+    }
+
+    // Non-404 error, return immediately
     const responseTime = Date.now() - startTime;
     const errorContent = `Error fetching ${url}: ${error.message}`;
     const tokens = await countTokens(errorContent);
