@@ -1,16 +1,6 @@
-https://docs.google.com/document/d/1_TJrEVH5TLc2nrTsw6XDZ-npU57vRyyHDQG7ivhimu4/edit?tab=t.0#heading=h.84z3i7289xus
+## Reduce size of tool description
 
-https://www.notion.so/LLM-TXT-Launch-28f58ffbf0e180e79990d259d222cca2
-
-# X POST
-
-I'm super excited to announce LLMTEXT, a new tool I made with the support of @p0. LLMTEXT is an Open Source project supporting the llms.txt standard with an ecosystem of tools and libraries to help web publishers create a more agent-friendly interface, in turn improving the developer experience.
-
-LLMTEXT is launching with the following three OSS tools:
-
-- **llms.txt MCP**: making llms.txt actually useful by turning any website that has an llms.txt into a dedicated MCP server.
-- **llms.txt checker**: validate your llms.txt to ensure it's valid and follows best practices
-- **llms.txt generator**: A library to generate a single llms.txt with accompanied markdown from multiple sources.
+We decided to use an additional tool for retrieving `llms.txt` first to not pollute context too much for people who don't turn off their MCPs. Slightly increases latency but greatly improves ux incase people don't turn these things off.
 
 ## Discuss
 

@@ -2,9 +2,8 @@
 
 Other Technical Decisions:
 
-1. Whether or not to use additional tool for retrieving llms.txt first to not pollute context too much for people who don't turn off their MCPs. Slightly increases latency but greatly improves ux incase people don't turn these things off.
-2. Fallback using extract so it 'just works' for popular docs that don't implement it correctly. Could make things more complicated too because it adds lot of cost potentially if there's wide use. We don't want to have to take it down later if cost gets too high. Right now people won't get installation link from our site if the llms.txt uses html underneath, and MCP gives a warning if someone still tries it.
-3. I'm curious if we could also try a tool that uses extract with additional objective, returning just excerpts, potentially in a way you don't need to even provide urls as by default it can just add all urls? Obviously this would make it much more expensive because each extract request costs money but it could be made a premium feature or the web publishers could pay for it.
+1. Fallback using extract so it 'just works' for popular docs that don't implement it correctly. Could make things more complicated too because it adds lot of cost potentially if there's wide use. We don't want to have to take it down later if cost gets too high. Right now people won't get installation link from our site if the llms.txt uses html underneath, and MCP gives a warning if someone still tries it.
+2. I'm curious if we could also try a tool that uses extract with additional objective, returning just excerpts, potentially in a way you don't need to even provide urls as by default it can just add all urls? Obviously this would make it much more expensive because each extract request costs money but it could be made a premium feature or the web publishers could pay for it.
 
 ## Improve recurring llms.txt generation
 
