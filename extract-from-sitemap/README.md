@@ -107,12 +107,3 @@ This library is in active development. Known limitations:
 - Some CI systems may require additional git configuration
 
 I am working on addressing these issues.
-
-## TODO
-
-- ✅ find auto-run and re-deploy github ci/cd rule
-- ✅ ensure `extract-from-sitemap` requires environment variable from github ci (maybe need to run with '--ci' flag or detect somehow)
-- set up `parallel-llmtext` to rerun every 5 minutes. if it works: every 12 hours
-- also set up auto-deploy workflow to occur AFTER this workflow!
-- put files in `public`
-- add readme to `parallel-llmtext` that shows this is a template, kinda, and you can choose any other deployment method but cloudflare is preferred

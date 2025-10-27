@@ -100,3 +100,16 @@ This is an informal summary of changes happening within this repo.
 - ✅ use that icon in the img instead of the url. things should load much faster now.
 - ✅ do not fall back to url
 - ❌ reverted to just use the icon api at the frontend as it can't be done for all, the html becomes like 500kb, and causes us to require additional state. better to just have it done async and keep the html small!
+
+## Fix llmtext.login (october 25)
+
+Created variation to the x oauth provider that adds a consent screen while removign all statefullness! It's a lot simpler now
+
+## extract-from-sitemap auto-redeploy (october 27)
+
+- ✅ find auto-run and re-deploy github ci/cd rule
+- ✅ ensure `extract-from-sitemap` requires environment variable from github ci (maybe need to run with '--ci' flag or detect somehow)
+- ✅ set up `parallel-llmtext` to rerun every 5 minutes. if it works: every 12 hours
+- ✅ put files in `public`
+- also set up auto-deploy workflow to occur AFTER this workflow!
+- add readme to `parallel-llmtext` that shows this is a template, kinda, and you can choose any other deployment method but cloudflare is preferred
