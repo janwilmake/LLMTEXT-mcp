@@ -32,6 +32,25 @@ const CREDENTIALS_DIR = path.join(os.homedir(), ".llmtext");
 const API_KEY_FILE = path.join(CREDENTIALS_DIR, "api-key");
 
 /**
+ * Detect if running in a CI environment
+ * @returns {boolean}
+ */
+function isCI() {
+  return !!(
+    process.env.CI || // Generic CI flag
+    process.env.CONTINUOUS_INTEGRATION ||
+    process.env.GITHUB_ACTIONS ||
+    process.env.GITLAB_CI ||
+    process.env.CIRCLECI ||
+    process.env.TRAVIS ||
+    process.env.JENKINS_URL ||
+    process.env.BUILDKITE ||
+    process.env.DRONE ||
+    process.env.SEMAPHORE
+  );
+}
+
+/**
  * OAuth handler for Parallel.ai API key authentication
  */
 class OAuth {
@@ -385,13 +404,13 @@ function loadStoredApiKey() {
  * @returns {Promise<string>} The API key
  */
 async function getApiKey() {
-  // Check stored API key first
-  const storedKey = loadStoredApiKey();
-  if (storedKey) {
-    return storedKey;
+  const inCI = isCI();
+
+  if (inCI) {
+    console.log("🔍 CI environment detected");
   }
 
-  // Check environment variables
+  // Check environment variables first (most important for CI)
   let apiKey = process.env.PARALLEL_API_KEY;
 
   if (!apiKey && fs.existsSync(".env")) {
@@ -405,11 +424,33 @@ async function getApiKey() {
 
   if (apiKey) {
     console.log("🔑 Using API key from environment");
-    storeApiKey(apiKey);
+    if (!inCI) {
+      storeApiKey(apiKey);
+    }
     return apiKey;
   }
 
-  // No API key found, start OAuth flow
+  // In CI environments, we cannot do OAuth - require the env var
+  if (inCI) {
+    console.error("\n❌ No API key found in CI environment!");
+    console.error("\nPlease set the PARALLEL_API_KEY environment variable:");
+    console.error("  - For GitHub Actions: Add it as a repository secret");
+    console.error("  - For GitLab CI: Add it as a CI/CD variable");
+    console.error(
+      "  - For other CI systems: Add it as an environment variable"
+    );
+    console.error("\nYou can get your API key from:");
+    console.error("  https://platform.parallel.ai");
+    process.exit(1);
+  }
+
+  // Check stored API key (only in non-CI environments)
+  const storedKey = loadStoredApiKey();
+  if (storedKey) {
+    return storedKey;
+  }
+
+  // No API key found, start OAuth flow (only in interactive environments)
   console.log("🔑 No API key found. Starting OAuth flow...");
   const oauth = new OAuth();
   const newApiKey = await oauth.getApiKey();
