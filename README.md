@@ -4,7 +4,7 @@
 
 1. Visit **[llmtext.com](https://llmtext.com)** to install MCP servers from popular documentation sites, or paste any `llms.txt` URL to create your own.
 
-2. Create your own `llms.txt` from your entire website (not just the docs) by using our [extract-from-sitemap](extract-from-sitemap) tool. See [our template](https://github.com/parallel-web/parallel-llmtext) to easily create your own.
+2. Create your own `llms.txt` from your entire website (not just the docs) by using our [extract-from-sitemap](extract-from-sitemap) tool. See [this template](https://github.com/parallel-web/parallel-llmtext) to easily create your own.
 
 ### More Tools
 
