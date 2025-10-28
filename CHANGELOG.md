@@ -114,17 +114,17 @@ This is an informal summary of changes happening within this repo.
 
 # TODO
 
-## `parallel-web`
-
-- `.md` urls should always return markdown even without accept header
-- add `/openapi.json` and/or `/.well-known/openapi.json` (rewrite to https://docs.parallel.ai/public-openapi.json)
-
 ## `extract-from-sitemap`
 
-- Also set up auto-deploy workflow (deploy to cloudflare) to occur AFTER this workflow!
-- Add readme to `parallel-llmtext` that shows this is a template, kinda, and you can choose any other deployment method but cloudflare is preferred
-- Make it a template.
+- ✅ Add readme to `parallel-llmtext` that shows this is a template, kinda, and you can choose any other deployment method but cloudflare is preferred
+- ⏳ Also set up auto-deploy workflow (deploy to cloudflare) to occur AFTER this workflow!
+- ⏳ Make it a template.
 
 ## Blogs
 
 https://docs.google.com/document/d/1_TJrEVH5TLc2nrTsw6XDZ-npU57vRyyHDQG7ivhimu4/edit?tab=t.9jg1o0e5tjq3
+
+## Docs prs
+
+- test `add-typescript-examples` everywhere
+- improve `mcp-quickstarts` pr
