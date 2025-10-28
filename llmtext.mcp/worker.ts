@@ -5,6 +5,7 @@ import { DurableObject } from "cloudflare:workers";
 import { withSimplerAuth, UserContext } from "simplerauth-client";
 import { convertRestToMcp } from "rest-mcp";
 import { parseLlmsTxt } from "parse-llms-txt";
+import { Tool, MCPServerCard } from "./server-card";
 //@ts-ignore
 import popular from "./popular.json";
 
@@ -14,157 +15,6 @@ export interface Env {
   PORT?: string;
 }
 
-type InitializeResult = {
-  /** NON_STANDARD way to describe the servers capabilities for human, just like in https://github.com/modelcontextprotocol/registry/blob/be4182606e8f4f223d1e25d0a7c3037ae278458a/docs/reference/server-json/server.schema.json#L371 */
-  description?: string;
-  /**
-   * The version of the Model Context Protocol that the server wants to use.
-   * This may not match the version that the client requested. If the client
-   * cannot support this version, it MUST disconnect.
-   */
-  protocolVersion: string;
-
-  capabilities: {
-    /**
-     * Experimental, non-standard capabilities that the server supports.
-     */
-    experimental?: { [key: string]: object };
-
-    /**
-     * Present if the server supports sending log messages to the client.
-     */
-    logging?: object;
-
-    /**
-     * Present if the server supports argument autocompletion suggestions.
-     */
-    completions?: object;
-
-    /**
-     * Present if the server offers any prompt templates.
-     */
-    prompts?: {
-      /**
-       * Whether this server supports notifications for changes to the prompt list.
-       */
-      listChanged?: boolean;
-    };
-
-    /**
-     * Present if the server offers any resources to read.
-     */
-    resources?: {
-      /**
-       * Whether this server supports subscribing to resource updates.
-       */
-      subscribe?: boolean;
-      /**
-       * Whether this server supports notifications for changes to the resource list.
-       */
-      listChanged?: boolean;
-    };
-
-    /**
-     * Present if the server offers any tools to call.
-     */
-    tools?: {
-      /**
-       * Whether this server supports notifications for changes to the tool list.
-       */
-      listChanged?: boolean;
-    };
-  };
-
-  serverInfo: {
-    /**
-     * Intended for programmatic or logical use, but used as a display name
-     * in past specs or fallback (if title isn't present).
-     */
-    name: string;
-
-    /**
-     * Intended for UI and end-user contexts — optimized to be human-readable
-     * and easily understood, even by those unfamiliar with domain-specific terminology.
-     *
-     * If not provided, the name should be used for display (except for Tool,
-     * where `annotations.title` should be given precedence over using `name`,
-     * if present).
-     */
-    title?: string;
-
-    version: string;
-
-    /**
-     * An optional URL of the website for this implementation.
-     */
-    websiteUrl?: string;
-
-    /**
-     * Optional set of sized icons that the client can display in a user interface.
-     *
-     * Clients that support rendering icons MUST support at least the following MIME types:
-     * - `image/png` - PNG images (safe, universal compatibility)
-     * - `image/jpeg` (and `image/jpg`) - JPEG images (safe, universal compatibility)
-     *
-     * Clients that support rendering icons SHOULD also support:
-     * - `image/svg+xml` - SVG images (scalable but requires security precautions)
-     * - `image/webp` - WebP images (modern, efficient format)
-     */
-    icons?: Array<{
-      /**
-       * A standard URI pointing to an icon resource. May be an HTTP/HTTPS URL or a
-       * `data:` URI with Base64-encoded image data.
-       *
-       * Consumers SHOULD takes steps to ensure URLs serving icons are from the
-       * same domain as the client/server or a trusted domain.
-       *
-       * Consumers SHOULD take appropriate precautions when consuming SVGs as they can contain
-       * executable JavaScript.
-       */
-      src: string;
-
-      /**
-       * Optional MIME type override if the source MIME type is missing or generic.
-       * For example: `"image/png"`, `"image/jpeg"`, or `"image/svg+xml"`.
-       */
-      mimeType?: string;
-
-      /**
-       * Optional array of strings that specify sizes at which the icon can be used.
-       * Each string should be in WxH format (e.g., `"48x48"`, `"96x96"`) or `"any"` for scalable formats like SVG.
-       *
-       * If not provided, the client should assume that the icon can be used at any size.
-       */
-      sizes?: string[];
-
-      /**
-       * Optional specifier for the theme this icon is designed for. `light` indicates
-       * the icon is designed to be used with a light background, and `dark` indicates
-       * the icon is designed to be used with a dark background.
-       *
-       * If not provided, the client should assume the icon can be used with any theme.
-       */
-      theme?: "light" | "dark";
-    }>;
-  };
-
-  /**
-   * Instructions describing how to use the server and its features.
-   *
-   * This can be used by clients to improve the LLM's understanding of available
-   * tools, resources, etc. It can be thought of like a "hint" to the model.
-   * For example, this information MAY be added to the system prompt.
-   */
-  instructions?: string;
-
-  /**
-   * See [General fields: `_meta`](/specification/draft/basic/index#meta) for notes on `_meta` usage.
-   *
-   * This is an optional metadata field that can contain arbitrary key-value pairs.
-   * The specification leaves this intentionally flexible for implementation-specific data.
-   */
-  _meta?: { [key: string]: unknown };
-};
 interface CachedLlmsTxt {
   hostname: string;
   url: string;
@@ -181,7 +31,7 @@ interface CachedLlmsTxt {
 
 // In-memory cache for llms.txt files
 const llmsTxtCache = new Map<string, CachedLlmsTxt>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 5 * 60 * 1000;
 
 export default {
   fetch: withSimplerAuth(
@@ -215,15 +65,13 @@ export default {
         .filter((segment) => segment.length > 0);
       const hostname = pathSegments[0];
 
-      // Handle root path
-      // Handle root path
-
       if (path === "/") {
         return new Response(null, {
           status: 302,
           headers: { Location: "/index.json" },
         });
       }
+
       if (path === "/index.json") {
         const historyDO = env.HISTORY_DO.get(env.HISTORY_DO.idFromName(DO_ID));
         const leaderboard = await historyDO.getLeaderboard(undefined, 10);
@@ -285,7 +133,12 @@ export default {
       }
 
       // Handle MCP endpoint for specific hostname
-      if (pathSegments.length >= 2 && pathSegments[1] === "mcp") {
+      if (
+        (pathSegments.length === 2 && pathSegments[1] === "mcp") ||
+        (pathSegments.length === 3 &&
+          pathSegments[1] === ".well-known" &&
+          pathSegments[2] === "mcp")
+      ) {
         return handleMcp(request, env, ctx, hostname);
       }
 
@@ -534,6 +387,100 @@ function getFaviconUrl(domain: string, size: number) {
   )}&sz=${size}`;
 }
 
+function getServerCard(
+  hostname: string,
+  llmsTxtData: CachedLlmsTxt
+): MCPServerCard {
+  const tools: Tool[] = [
+    {
+      name: "get",
+      title: `Get context for ${llmsTxtData.parse.title} (${llmsTxtData.hostname})`,
+      description: `Get ${
+        llmsTxtData.parse.title || llmsTxtData.hostname
+      } content. Always first retrieve ${
+        llmsTxtData.url
+      }. To avoid hallucinations, always first retrieve relevant documents to the users intent.\n\n## ${
+        llmsTxtData.parse.title
+      }\n\n> ${llmsTxtData.parse.description}\n\n${
+        llmsTxtData.parse.details || ""
+      }`,
+      inputSchema: {
+        type: "object",
+        required: ["urls"],
+        properties: {
+          urls: {
+            type: "array",
+            items: { type: "string" },
+            description: "Multiple URLs to fetch content from.",
+          },
+        },
+      },
+    },
+    {
+      name: "leaderboard",
+      title: "Get statistics and leaderboard",
+      description:
+        "View usage statistics for this MCP server, global stats, and your personal usage",
+      inputSchema: {
+        type: "object",
+        properties: {},
+      },
+    },
+  ];
+
+  const serverCard: MCPServerCard = {
+    $schema: "https://modelcontextprotocol.io/schemas/server-card.schema.json",
+    version: "1.0",
+    protocolVersion: "2025-06-18",
+    serverInfo: {
+      name: `${llmsTxtData.hostname}-llms-txt-mcp`,
+      title: `${llmsTxtData.parse.title || llmsTxtData.hostname} llms.txt MCP`,
+      version: "1.0.0",
+      websiteUrl: `https://${llmsTxtData.hostname}`,
+      icons: [
+        {
+          src: getFaviconUrl(llmsTxtData.hostname, 48),
+          sizes: ["32x32", "16x16", "48x48"],
+        },
+        {
+          src: getFaviconUrl(llmsTxtData.hostname, 256),
+          sizes: ["any"],
+        },
+      ],
+    },
+    description: `This MCP Server allows your LLM to understand ${
+      llmsTxtData.parse.title || llmsTxtData.hostname
+    } by wading through its llms.txt and linked documents thereof using a simple 'get' tool.\n\nTo use this MCP, login with X is required to collect anonymous usage data.`,
+    icons: [
+      {
+        src: getFaviconUrl(llmsTxtData.hostname, 48),
+        sizes: ["32x32", "16x16", "48x48"],
+      },
+      {
+        src: getFaviconUrl(llmsTxtData.hostname, 256),
+        sizes: ["any"],
+      },
+    ],
+    transport: {
+      type: "streamable-http",
+      endpoint: `/${hostname}/mcp`,
+    },
+    capabilities: {
+      tools: {},
+    },
+    authentication: {
+      required: true,
+      schemes: ["bearer"],
+    },
+    instructions: `This MCP server provides access to ${llmsTxtData.url} and all documents it refers to. Use the 'get' tool to fetch ${llmsTxtData.url} first, then content from URLs that seem relevant to the users intent.`,
+    tools,
+    resources: undefined,
+    prompts: undefined,
+  };
+
+  return serverCard;
+}
+
 async function handleMcp(
   request: Request,
   env: Env,
@@ -567,6 +514,7 @@ async function handleMcp(
     "Access-Control-Allow-Headers":
       "Content-Type, Authorization, MCP-Protocol-Version",
   };
+
   // Fetch and validate the llms.txt file
   const llmsTxtData = await fetchLlmsTxt(hostname);
   if (!llmsTxtData) {
@@ -575,50 +523,27 @@ async function handleMcp(
       { status: 404, headers: corsHeaders }
     );
   }
-  const initializeResult: InitializeResult = {
-    protocolVersion: "2025-06-18",
-    capabilities: { tools: {} },
-    serverInfo: {
-      name: `${llmsTxtData.parse.title || llmsTxtData.hostname} llms.txt`,
-      version: "1.0.0",
-      title: `LLMTEXT MCP Server for ${
-        llmsTxtData.parse.title || llmsTxtData.hostname
-      }`,
-      websiteUrl: `https://${llmsTxtData.hostname}`,
-      description: `This MCP Server allows your LLM to understand ${
-        llmsTxtData.parse.title || llmsTxtData.hostname
-      } by wading through its llms.txt and linked documents thereof using a simple 'get' tool.\n\nTo use this MCP, login with X is required to collect anonymous usage data.`,
-      icons: [
-        {
-          src: getFaviconUrl(llmsTxtData.hostname, 48),
-          sizes: ["32x32", "16x16", "48x48"],
-        },
-        {
-          src: getFaviconUrl(llmsTxtData.hostname, 256),
-          sizes: ["any"],
-        },
-      ],
-    },
-    instructions: `This MCP server provides access to ${llmsTxtData.url} and all documents it refers to. Use the 'get' tool to fetch ${llmsTxtData.url} first, then content from URLs that seem relevant to the users intent.`,
-  };
 
-  if (request.method === "GET") {
-    return new Response(JSON.stringify(initializeResult, undefined, 2), {
-      headers: { "content-type": "application/json" },
+  // Get the server card (single source of truth)
+  const serverCard = getServerCard(hostname, llmsTxtData);
+
+  // Handle .well-known/mcp endpoint
+  if (new URL(request.url).pathname.endsWith("/.well-known/mcp")) {
+    return new Response(JSON.stringify([serverCard], undefined, 2), {
+      headers: { "content-type": "application/json", ...corsHeaders },
     });
-    // This can be anything!!!!
   }
 
   if (request.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
+    return new Response("Method not allowed", {
+      status: 405,
+      headers: corsHeaders,
+    });
   }
 
-  // It's post, so must be Streamable HTTP
-
+  // Handle Streamable HTTP (POST requests)
   try {
     const message: any = await request.json();
-
-    console.log({ message, auth: ctx.authenticated });
     const historyDO = env.HISTORY_DO.get(env.HISTORY_DO.idFromName(DO_ID));
 
     // Handle ping
@@ -661,13 +586,18 @@ async function handleMcp(
         );
       }
 
+      // Convert server card to initialize result format
+      const initializeResult = {
+        protocolVersion: serverCard.protocolVersion,
+        capabilities: serverCard.capabilities,
+        serverInfo: serverCard.serverInfo,
+        instructions: serverCard.instructions,
+        _meta: serverCard._meta,
+      };
+
       return new Response(
         JSON.stringify(
-          {
-            jsonrpc: "2.0",
-            id: message.id,
-            result: initializeResult,
-          },
+          { jsonrpc: "2.0", id: message.id, result: initializeResult },
           undefined,
           2
         ),
@@ -682,24 +612,17 @@ async function handleMcp(
 
     // Handle initialized notification
     if (message.method === "notifications/initialized") {
-      return new Response(null, {
-        status: 202,
-        headers: corsHeaders,
-      });
+      return new Response(null, { status: 202, headers: corsHeaders });
     }
 
     if (message.method === "prompts/list") {
       return new Response(
         JSON.stringify(
-          {
-            jsonrpc: "2.0",
-            id: message.id,
-            result: { prompts: [] },
-          },
+          { jsonrpc: "2.0", id: message.id, result: { prompts: [] } },
           undefined,
           2
         ),
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
@@ -714,7 +637,7 @@ async function handleMcp(
           undefined,
           2
         ),
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
@@ -730,7 +653,7 @@ async function handleMcp(
           undefined,
           2
         ),
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
@@ -761,42 +684,8 @@ async function handleMcp(
         );
       }
 
-      const tools = [
-        {
-          name: "get",
-          title: `Get context for ${llmsTxtData.parse.title} (${llmsTxtData.hostname})`,
-          description: `Get ${
-            llmsTxtData.parse.title || llmsTxtData.hostname
-          } content. Always first retrieve ${
-            llmsTxtData.url
-          }. To avoid hallucinations, always first retrieve relevant documents to the users intent.\n\n## ${
-            llmsTxtData.parse.title
-          }\n\n> ${llmsTxtData.parse.description}\n\n${
-            llmsTxtData.parse.details
-          }`,
-          inputSchema: {
-            type: "object",
-            required: ["urls"],
-            properties: {
-              urls: {
-                type: "array",
-                items: { type: "string" },
-                description: "Multiple URLs to fetch content from.",
-              },
-            },
-          },
-        },
-        {
-          name: "leaderboard",
-          title: "Get statistics and leaderboard",
-          description:
-            "View usage statistics for this MCP server, global stats, and your personal usage",
-          inputSchema: {
-            type: "object",
-            properties: {},
-          },
-        },
-      ];
+      // Use tools from server card
+      const tools = Array.isArray(serverCard.tools) ? serverCard.tools : [];
 
       return new Response(
         JSON.stringify(
@@ -850,104 +739,19 @@ async function handleMcp(
         let isError = false;
 
         if (name === "get") {
-          const multipleUrls = args?.urls;
-
-          if (!multipleUrls) {
-            result = "Error: Either 'urls' parameter is required";
-            isError = true;
-          } else {
-            try {
-              // Determine which URLs to fetch
-              let urlsToFetch: string[] = [];
-
-              if (multipleUrls && Array.isArray(multipleUrls)) {
-                // Validate and normalize all URLs
-                const origin = `https://${hostname}`;
-
-                for (const url of multipleUrls) {
-                  if (typeof url !== "string") {
-                    throw new Error(`Invalid URL type: ${typeof url}`);
-                  }
-
-                  let normalizedUrl = url.trim();
-
-                  // Handle relative paths
-                  if (normalizedUrl.startsWith("/")) {
-                    // Absolute path: /path
-                    normalizedUrl = `${origin}${normalizedUrl}`;
-                  } else if (normalizedUrl.startsWith("./")) {
-                    // Relative path: ./path
-                    normalizedUrl = `${origin}/${normalizedUrl.slice(2)}`;
-                  } else if (
-                    !normalizedUrl.startsWith("http://") &&
-                    !normalizedUrl.startsWith("https://")
-                  ) {
-                    // Relative path without prefix: path
-                    normalizedUrl = `${origin}/${normalizedUrl}`;
-                  }
-
-                  // Validate the final URL
-                  new URL(normalizedUrl);
-                  urlsToFetch.push(normalizedUrl);
-                }
-              } else {
-                throw new Error("Invalid URL format");
-              }
-
-              const fetchResults = await fetchMultipleUrls(urlsToFetch);
-
-              // Store each URL in history
-              for (const fetchResult of fetchResults.results) {
-                if (fetchResult.success) {
-                  try {
-                    const urlHostname = new URL(fetchResult.url).hostname;
-                    const isLlmsTxt = fetchResult.url.endsWith("/llms.txt");
-
-                    await historyDO.addHistory({
-                      username: ctx.user!.username,
-                      hostname: urlHostname,
-                      mcp_hostname: hostname, // Track which MCP was used
-                      is_llms_txt: isLlmsTxt,
-                      content_type: fetchResult.contentType,
-                      url: fetchResult.url,
-                      tokens: fetchResult.tokens,
-                      response_time: fetchResult.responseTime,
-                    });
-                  } catch (historyError) {
-                    // Log but don't fail the request for history errors
-                    console.error("History storage error:", historyError);
-                  }
-                }
-              }
-
-              // Format the response
-              result = fetchResults.summary;
-
-              fetchResults.results.forEach((fetchResult, index) => {
-                result += `${"=".repeat(50)}\n`;
-                result += `URL ${index + 1}: ${fetchResult.url}\n`;
-                result += `Status: ${
-                  fetchResult.success ? "Success" : "Failed"
-                }\n`;
-                result += `Content-Type: ${fetchResult.contentType}\n`;
-                result += `Response Time: ${fetchResult.responseTime}ms\n`;
-                result += `Tokens: ${fetchResult.tokens}\n`;
-                if (fetchResult.isHtml) {
-                  result += `⚠️  HTML Content (replaced with warning)\n`;
-                }
-                if (fetchResult.error) {
-                  result += `Error: ${fetchResult.error}\n`;
-                }
-                result += `${"=".repeat(50)}\n\n`;
-                result += fetchResult.content + "\n\n";
-              });
-            } catch (urlError) {
-              result = `Error: Invalid URL(s) - ${urlError.message}`;
-              isError = true;
-            }
+          const toolResult = await executeTool_get(
+            ctx.user?.username,
+            hostname,
+            args?.urls
+          );
+          result = toolResult.result;
+          isError = toolResult.isError;
+          if (toolResult.history) {
+            await Promise.all(
+              toolResult.history.map((item) => historyDO.addHistory(item))
+            );
           }
         } else if (name === "leaderboard") {
-          // Get combined statistics
           const userStatsForHost = await historyDO.getPersonalStats(
             ctx.user?.username,
             hostname
@@ -960,7 +764,6 @@ async function handleMcp(
 
           let content = `# Statistics for ${hostname}\n\n`;
 
-          // Host-specific stats
           content += `## ${hostname} Server Statistics\n`;
           content += `- **Total requests**: ${
             hostLeaderboard.totalRequests || 0
@@ -978,7 +781,6 @@ async function handleMcp(
             } tokens\n`;
           });
 
-          // Your usage for this host
           content += `\n## Your Usage on ${hostname}\n`;
           content += `- **Your requests**: ${userStatsForHost.totalRequests}\n`;
           content += `- **Your tokens**: ${userStatsForHost.totalTokens}\n`;
@@ -989,7 +791,6 @@ async function handleMcp(
             });
           }
 
-          // Global stats
           content += `\n## Global Statistics\n`;
           content += `- **Total requests**: ${
             globalLeaderboard.totalRequests || 0
@@ -1018,13 +819,12 @@ async function handleMcp(
               } requests, ${server.total_tokens || 0} tokens\n`;
             });
 
-          // Your global usage
           content += `\n## Your Global Usage\n`;
           content += `- **Your total requests**: ${userStatsGlobal.totalRequests}\n`;
           content += `- **Your total tokens**: ${userStatsGlobal.totalTokens}\n`;
-          if (userStatsGlobal.mcpHosts.length > 0) {
+          if (userStatsGlobal.mcpHosts?.length > 0) {
             content += `- **MCP servers you've used**:\n`;
-            userStatsGlobal.mcpHosts?.forEach((host: any) => {
+            userStatsGlobal.mcpHosts.forEach((host: any) => {
               content += `  - ${host.hostname}: ${host.count} requests\n`;
             });
           }
@@ -1040,10 +840,7 @@ async function handleMcp(
             {
               jsonrpc: "2.0",
               id: message.id,
-              result: {
-                content: [{ type: "text", text: result }],
-                isError,
-              },
+              result: { content: [{ type: "text", text: result }], isError },
             },
             undefined,
             2
@@ -1121,6 +918,101 @@ async function handleMcp(
     );
   }
 }
+
+const executeTool_get = async (
+  username: string,
+  hostname: string,
+  multipleUrls: string[]
+) => {
+  if (!multipleUrls || !Array.isArray(multipleUrls)) {
+    return { result: "Error:  'urls' parameter is required", isError: true };
+  }
+
+  try {
+    // Determine which URLs to fetch
+    let urlsToFetch: string[] = [];
+
+    // Validate and normalize all URLs
+    const origin = `https://${hostname}`;
+
+    for (const url of multipleUrls) {
+      if (typeof url !== "string") {
+        throw new Error(`Invalid URL type: ${typeof url}`);
+      }
+
+      let normalizedUrl = url.trim();
+
+      // Handle relative paths
+      if (normalizedUrl.startsWith("/")) {
+        normalizedUrl = `${origin}${normalizedUrl}`;
+      } else if (normalizedUrl.startsWith("./")) {
+        normalizedUrl = `${origin}/${normalizedUrl.slice(2)}`;
+      } else if (
+        !normalizedUrl.startsWith("http://") &&
+        !normalizedUrl.startsWith("https://")
+      ) {
+        normalizedUrl = `${origin}/${normalizedUrl}`;
+      }
+
+      // Validate the final URL
+      new URL(normalizedUrl);
+      urlsToFetch.push(normalizedUrl);
+    }
+
+    const fetchResults = await fetchMultipleUrls(urlsToFetch);
+
+    const history: any[] = [];
+
+    // Store each URL in history
+    for (const fetchResult of fetchResults.results) {
+      if (fetchResult.success) {
+        try {
+          const urlHostname = new URL(fetchResult.url).hostname;
+          const isLlmsTxt = fetchResult.url.endsWith("/llms.txt");
+          history.push({
+            username,
+            hostname: urlHostname,
+            mcp_hostname: hostname,
+            is_llms_txt: isLlmsTxt,
+            content_type: fetchResult.contentType,
+            url: fetchResult.url,
+            tokens: fetchResult.tokens,
+            response_time: fetchResult.responseTime,
+          });
+        } catch (historyError) {
+          console.error("History storage error:", historyError);
+        }
+      }
+    }
+
+    // Format the response
+    let result = fetchResults.summary;
+
+    fetchResults.results.forEach((fetchResult, index) => {
+      result += `${"=".repeat(50)}\n`;
+      result += `URL ${index + 1}: ${fetchResult.url}\n`;
+      result += `Status: ${fetchResult.success ? "Success" : "Failed"}\n`;
+      result += `Content-Type: ${fetchResult.contentType}\n`;
+      result += `Response Time: ${fetchResult.responseTime}ms\n`;
+      result += `Tokens: ${fetchResult.tokens}\n`;
+      if (fetchResult.isHtml) {
+        result += `⚠️  HTML Content (replaced with warning)\n`;
+      }
+      if (fetchResult.error) {
+        result += `Error: ${fetchResult.error}\n`;
+      }
+      result += `${"=".repeat(50)}\n\n`;
+      result += fetchResult.content + "\n\n";
+    });
+
+    return { result, history };
+  } catch (urlError) {
+    return {
+      result: `Error: Invalid URL(s) - ${urlError.message}`,
+      isError: true,
+    };
+  }
+};
 
 export class HistoryDO extends DurableObject<Env> {
   sql: SqlStorage;

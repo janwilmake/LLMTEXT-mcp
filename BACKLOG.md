@@ -1,3 +1,14 @@
+# Combining MCPs
+
+What if we split up the MCP into MCP tool modules that could be connected to other MCPs, and expose it as library? This way that exposes a tool? Let's first write more about positioning, then talk with parallel to find the best possible positioning.
+
+# Benchmarking & Evals
+
+How do we measure good context retrieval and weigh it against context pollution and latency? What else can we measure to measure quality? Can we optimize for retrieval, and minimize pollution, minimize latency, for a specific source?
+
+https://github.com/mclenhard/mcp-evals
+https://github.com/shinzo-labs/shinzo-ts
+
 # More
 
 Other Technical Decisions:
@@ -5,7 +16,7 @@ Other Technical Decisions:
 1. Fallback using extract so it 'just works' for popular docs that don't implement it correctly. Could make things more complicated too because it adds lot of cost potentially if there's wide use. We don't want to have to take it down later if cost gets too high. Right now people won't get installation link from our site if the llms.txt uses html underneath, and MCP gives a warning if someone still tries it.
 2. I'm curious if we could also try a tool that uses extract with additional objective, returning just excerpts, potentially in a way you don't need to even provide urls as by default it can just add all urls? Obviously this would make it much more expensive because each extract request costs money but it could be made a premium feature or the web publishers could pay for it.
 
-## Adopt llms.txt with openapisearch.com too
+# Adopt llms.txt with openapisearch.com too
 
 - https://openapisearch.com/llms.txt with ?search to filter
 - add bi-directional kv for adding new ones and counting usage
@@ -14,7 +25,7 @@ Other Technical Decisions:
 
 This gives additional credit to the llms.txt ecosystem
 
-## Adopt llms.txt for uithub.com too
+# Adopt llms.txt for uithub.com too
 
 - github oauth provider public + private
 - https://uithub.com/llms.txt for popular (when logged in: starred and owned repos)
@@ -22,7 +33,7 @@ This gives additional credit to the llms.txt ecosystem
 
 This gives additional credit to the llms.txt ecosystem
 
-## Improve recurring llms.txt generation
+# Improve recurring llms.txt generation
 
 - `llms.txt`: For each source, group links by path like they do in https://github.com/apify/actor-llmstxt-generator/pull/16
 - Fix it so it works for recursive sitemaps: https://developers.cloudflare.com/sitemap.xml
@@ -38,11 +49,11 @@ Question: what's the easiest way for people to set up doing prompts and other ap
 - try github way first
 - then make it easier using contextarea if possible
 
-## Benchmark
+# Benchmark
 
 Can I somehow benchmark running the MCP within Claude Sonnet 4.5 programmatically, then also running Context7, and compare total tokens ingested for a correct answer? It would need to be complicated queries that require getting several docs pages for this to work well.
 
-## New APIs for extracting context from multiple pages
+# New APIs for extracting context from multiple pages
 
 1. somehow use objective and other capabilities of `/extract`
 2. likely need to also create a sitemap cache with a DO per domain, but let's deprioritize this since it's sponsored fully by parallel now with $10/user.
