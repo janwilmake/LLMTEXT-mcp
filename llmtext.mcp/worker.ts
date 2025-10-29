@@ -29,13 +29,17 @@ interface CachedLlmsTxt {
   contentType: string;
 }
 
+type Ctx = UserContext & {
+  user: UserContext["user"] & { hide_from_leaderboard: boolean };
+};
+
 // In-memory cache for llms.txt files
 const llmsTxtCache = new Map<string, CachedLlmsTxt>();
 const CACHE_TTL = 5 * 60 * 1000;
 
 export default {
   fetch: withSimplerAuth(
-    async (request: Request, env: Env, ctx: UserContext) => {
+    async (request: Request, env: Env, ctx: Ctx) => {
       // Validate required env
       if (!env.HISTORY_DO) {
         return new Response("HISTORY_DO binding not configured", {
@@ -484,7 +488,7 @@ function getServerCard(
 async function handleMcp(
   request: Request,
   env: Env,
-  ctx: UserContext,
+  ctx: Ctx,
   hostname: string
 ): Promise<Response> {
   // Handle preflight OPTIONS request
@@ -741,15 +745,14 @@ async function handleMcp(
         if (name === "get") {
           const toolResult = await executeTool_get(
             ctx.user?.username,
+            ctx.user?.hide_from_leaderboard,
             hostname,
             args?.urls
           );
           result = toolResult.result;
           isError = toolResult.isError;
           if (toolResult.history) {
-            await Promise.all(
-              toolResult.history.map((item) => historyDO.addHistory(item))
-            );
+            await historyDO.addHistory(toolResult.history);
           }
         } else if (name === "leaderboard") {
           const userStatsForHost = await historyDO.getPersonalStats(
@@ -921,6 +924,7 @@ async function handleMcp(
 
 const executeTool_get = async (
   username: string,
+  hide_from_leaderboard: boolean,
   hostname: string,
   multipleUrls: string[]
 ) => {
@@ -971,6 +975,7 @@ const executeTool_get = async (
           const isLlmsTxt = fetchResult.url.endsWith("/llms.txt");
           history.push({
             username,
+            hide_from_leaderboard,
             hostname: urlHostname,
             mcp_hostname: hostname,
             is_llms_txt: isLlmsTxt,
@@ -1036,9 +1041,18 @@ export class HistoryDO extends DurableObject<Env> {
         url TEXT NOT NULL,
         tokens INTEGER NOT NULL,
         response_time INTEGER NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        hide_from_leaderboard BOOLEAN NOT NULL
       )
     `);
+
+    try {
+      this.sql.exec(`
+        ALTER TABLE history ADD COLUMN hide_from_leaderboard BOOLEAN NOT NULL DEFAULT 0
+      `);
+    } catch (e) {
+      // Column already exists, ignore the error
+    }
 
     this.sql.exec(`
       CREATE INDEX IF NOT EXISTS idx_username ON history(username);
@@ -1049,28 +1063,34 @@ export class HistoryDO extends DurableObject<Env> {
     `);
   }
 
-  async addHistory(data: {
-    username: string;
-    hostname: string;
-    mcp_hostname: string;
-    is_llms_txt: boolean;
-    content_type: string;
-    url: string;
-    tokens: number;
-    response_time: number;
-  }) {
-    this.sql.exec(
-      `INSERT INTO history (username, hostname, mcp_hostname, is_llms_txt, content_type, url, tokens, response_time)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      data.username,
-      data.hostname,
-      data.mcp_hostname,
-      data.is_llms_txt,
-      data.content_type,
-      data.url,
-      data.tokens,
-      data.response_time
-    );
+  async addHistory(
+    items: {
+      username: string;
+      hostname: string;
+      mcp_hostname: string;
+      is_llms_txt: boolean;
+      content_type: string;
+      url: string;
+      tokens: number;
+      response_time: number;
+      hide_from_leaderboard: boolean;
+    }[]
+  ) {
+    items.map((data) => {
+      this.sql.exec(
+        `INSERT INTO history (username, hostname, mcp_hostname, is_llms_txt, content_type, url, tokens, response_time, hide_from_leaderboard)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        data.username,
+        data.hostname,
+        data.mcp_hostname,
+        data.is_llms_txt,
+        data.content_type,
+        data.url,
+        data.tokens,
+        data.response_time,
+        data.hide_from_leaderboard
+      );
+    });
   }
 
   async getPersonalStats(username?: string, mcpHostname?: string) {
@@ -1134,10 +1154,12 @@ export class HistoryDO extends DurableObject<Env> {
       mcpHosts,
     };
   }
+
   async getLeaderboard(mcpHostname?: string, limit?: number) {
     let userQuery = `
     SELECT username, COUNT(*) as total_requests, SUM(tokens) as total_tokens
     FROM history
+    WHERE hide_from_leaderboard = 0
   `;
     let serverQuery = `
     SELECT 
@@ -1146,15 +1168,16 @@ export class HistoryDO extends DurableObject<Env> {
       SUM(tokens) as total_tokens,
       COUNT(DISTINCT username) as unique_users
     FROM history
+    WHERE hide_from_leaderboard = 0
     GROUP BY mcp_hostname
     ORDER BY total_requests DESC
   `;
-    let totalQuery = `SELECT COUNT(*) as total_requests, SUM(tokens) as total_tokens FROM history`;
+    let totalQuery = `SELECT COUNT(*) as total_requests, SUM(tokens) as total_tokens FROM history WHERE hide_from_leaderboard = 0`;
 
     const params = [];
     if (mcpHostname) {
-      userQuery += ` WHERE mcp_hostname = ?`;
-      totalQuery += ` WHERE mcp_hostname = ?`;
+      userQuery += ` AND mcp_hostname = ?`;
+      totalQuery += ` AND mcp_hostname = ?`;
       params.push(mcpHostname);
     }
 
@@ -1201,6 +1224,7 @@ export class HistoryDO extends DurableObject<Env> {
       totalTokens: totals?.total_tokens || 0,
     };
   }
+
   async getActivityTrends(mcpHostname?: string) {
     const cacheKey = `${HistoryDO.TRENDS_CACHE_KEY}_${mcpHostname || "global"}`;
 
