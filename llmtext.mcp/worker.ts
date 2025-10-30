@@ -30,7 +30,10 @@ interface CachedLlmsTxt {
 }
 
 type Ctx = UserContext & {
-  user: UserContext["user"] & { hide_from_leaderboard: boolean };
+  user: UserContext["user"] & {
+    hide_from_leaderboard: boolean;
+    profile_image_url?: string;
+  };
 };
 
 // In-memory cache for llms.txt files
@@ -746,6 +749,7 @@ async function handleMcp(
           const toolResult = await executeTool_get(
             ctx.user?.username,
             ctx.user?.hide_from_leaderboard,
+            ctx.user?.profile_image_url,
             hostname,
             args?.urls
           );
@@ -925,6 +929,7 @@ async function handleMcp(
 const executeTool_get = async (
   username: string,
   hide_from_leaderboard: boolean,
+  profile_image_url: string | undefined,
   hostname: string,
   multipleUrls: string[]
 ) => {
@@ -976,6 +981,7 @@ const executeTool_get = async (
           history.push({
             username,
             hide_from_leaderboard,
+            profile_image_url,
             hostname: urlHostname,
             mcp_hostname: hostname,
             is_llms_txt: isLlmsTxt,
@@ -1042,13 +1048,22 @@ export class HistoryDO extends DurableObject<Env> {
         tokens INTEGER NOT NULL,
         response_time INTEGER NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        hide_from_leaderboard BOOLEAN NOT NULL
+        hide_from_leaderboard BOOLEAN NOT NULL,
+        profile_image_url TEXT
       )
     `);
 
     try {
       this.sql.exec(`
         ALTER TABLE history ADD COLUMN hide_from_leaderboard BOOLEAN NOT NULL DEFAULT 0
+      `);
+    } catch (e) {
+      // Column already exists, ignore the error
+    }
+
+    try {
+      this.sql.exec(`
+        ALTER TABLE history ADD COLUMN profile_image_url TEXT
       `);
     } catch (e) {
       // Column already exists, ignore the error
@@ -1074,12 +1089,13 @@ export class HistoryDO extends DurableObject<Env> {
       tokens: number;
       response_time: number;
       hide_from_leaderboard: boolean;
+      profile_image_url?: string;
     }[]
   ) {
     items.map((data) => {
       this.sql.exec(
-        `INSERT INTO history (username, hostname, mcp_hostname, is_llms_txt, content_type, url, tokens, response_time, hide_from_leaderboard)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO history (username, hostname, mcp_hostname, is_llms_txt, content_type, url, tokens, response_time, hide_from_leaderboard, profile_image_url)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         data.username,
         data.hostname,
         data.mcp_hostname,
@@ -1088,7 +1104,8 @@ export class HistoryDO extends DurableObject<Env> {
         data.url,
         data.tokens,
         data.response_time,
-        data.hide_from_leaderboard
+        data.hide_from_leaderboard,
+        data.profile_image_url || null
       );
     });
   }
@@ -1157,7 +1174,11 @@ export class HistoryDO extends DurableObject<Env> {
 
   async getLeaderboard(mcpHostname?: string, limit?: number) {
     let userQuery = `
-    SELECT username, COUNT(*) as total_requests, SUM(tokens) as total_tokens
+    SELECT 
+      username, 
+      COUNT(*) as total_requests, 
+      SUM(tokens) as total_tokens,
+      profile_image_url
     FROM history
     WHERE hide_from_leaderboard = 0
   `;
@@ -1347,7 +1368,8 @@ export class HistoryDO extends DurableObject<Env> {
         SELECT 
           username,
           COUNT(*) as requests,
-          SUM(tokens) as tokens
+          SUM(tokens) as tokens,
+          profile_image_url
         FROM history 
         WHERE DATE(created_at) = ? ${mcpHostname ? "AND mcp_hostname = ?" : ""}
         GROUP BY username
@@ -1413,7 +1435,8 @@ export class HistoryDO extends DurableObject<Env> {
         SELECT 
           username,
           COUNT(*) as requests,
-          SUM(tokens) as tokens
+          SUM(tokens) as tokens,
+          profile_image_url
         FROM history 
         WHERE strftime('%Y-%W', created_at) = ? ${
           mcpHostname ? "AND mcp_hostname = ?" : ""
