@@ -55,8 +55,8 @@ export default {
     }
 
     // Normalize URL (add protocol if missing)
-    const normalizedUrl = normalizeUrl(targetUrl);
-
+    const normalizedUrl = normalizeUrl(decodeURIComponent(targetUrl));
+    console.log({ normalizedUrl });
     try {
       // Call Parallel Extract API
       const extractResponse = await fetch(

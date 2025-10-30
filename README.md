@@ -17,7 +17,7 @@
 ### Other
 
 - [llmtext](llmtext): the website
-- [llmtext](llmtext.login): X OAuth flow for the MCP
+- [llmtext.login](llmtext.login): X OAuth flow for the MCP
 
 ## Sponsors
 

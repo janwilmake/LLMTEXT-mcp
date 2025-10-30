@@ -1,3 +1,7 @@
+# SEP
+
+Get involved in llms.txt
+
 # Combining MCPs
 
 What if we split up the MCP into MCP tool modules that could be connected to other MCPs, and expose it as library? This way that exposes a tool? Let's first write more about positioning, then talk with parallel to find the best possible positioning.
