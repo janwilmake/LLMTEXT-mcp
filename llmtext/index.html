@@ -4,157 +4,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLMTEXT.com - Tools for the llms.txt standard</title>
+    <title>LLMTEXT.COM - Tools for the llms.txt standard</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background-color: #fcfcfa;
-            color: #1d1b16;
-            line-height: 1.6;
+        :root {
+            --bg: #ffffff;
+            --fg: #000000;
+            --primary: #1a1a1a;
+            --primary-light: #404040;
+            --border: #000000;
+            --secondary: #666666;
+            --hover-bg: #f0f0f0;
+            --error: #000000;
+            --warning: #404040;
+            --success: #1a1a1a;
+            --table-border: #cccccc;
         }
 
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* Header */
         .header {
+            border-bottom: 2px solid var(--border);
             padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e5e5e0;
-            gap: 0.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
-        .logo {
+        .logo-container {
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
         }
 
         .logo-box {
-            background: #1d1b16;
-            padding: 0.0rem 0.5rem;
+            background: var(--fg);
+            color: var(--bg);
+            padding: 0.25rem 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            border: 2px solid var(--fg);
             display: flex;
             align-items: baseline;
             gap: 0.1rem;
-            border-radius: 2px;
         }
 
         .logo-main {
             font-size: 1rem;
-            font-weight: bold;
-            letter-spacing: 0.05em;
-            color: white;
+            font-weight: 700;
         }
 
         .logo-com {
             font-size: 0.7rem;
-            font-weight: bold;
-            letter-spacing: 0.05em;
-            color: white;
+            font-weight: 700;
         }
 
         .powered-by {
             font-size: 0.55rem;
-            color: #666;
+            color: var(--secondary);
             display: flex;
-            flex-direction: row;
-            gap: 4px;
-            justify-items: center;
-            align-items: flex-start;
+            align-items: center;
+            gap: 0.25rem;
         }
 
         .parallel-logo {
             height: 10px;
-            margin-top: 1px;
         }
 
         .nav {
             display: flex;
             gap: 0.5rem;
             align-items: center;
+            flex-wrap: wrap;
+            margin-top: -16px;
         }
 
         .nav-btn {
-            padding: 0.35rem 0.6rem;
-            border: 1.5px solid #ccc;
+            height: 40px;
+            padding: 0.5rem 0.5rem;
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--border);
             background: transparent;
-            color: #1d1b16;
+            color: var(--fg);
             text-decoration: none;
-            border-radius: 3px;
-            font-size: 0.65rem;
+            font-size: 0.5rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .nav-btn.cyan {
-            border-color: #1ABFFB;
-        }
-
-        .nav-btn.orange {
-            border-color: #FF7700;
+            font-family: inherit;
         }
 
         .nav-btn:hover {
-            background: #f0f0ed;
+            background: var(--primary);
+            color: var(--bg);
         }
 
         .github-icon {
-            width: 35px;
-            height: 35px;
-            border: 1.5px solid #1d1b16;
-            border-radius: 3px;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            flex-shrink: 0;
-            color: #1d1b16;
+            color: var(--fg);
             text-decoration: none;
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .github-icon:hover {
+            background: var(--primary);
+            color: var(--bg);
         }
 
         .github-icon svg {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
         }
 
+        /* Container */
         .container {
             max-width: 1200px;
-            flex-direction: column;
             margin: 0 auto;
             padding: 2rem 1rem;
         }
 
         h1 {
             text-align: center;
-            max-width: 800px;
             font-size: 1.5rem;
             margin-bottom: 0.5rem;
-            padding: 0 1rem;
+            font-weight: 700;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            background: var(--bg);
+        }
+
+        h1 a {
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        h1 u {
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 2px;
         }
 
         .subtitle {
             text-align: center;
-            font-size: 12pt;
+            font-size: 0.9rem;
             margin-bottom: 2rem;
+            color: var(--fg);
         }
 
-        a {
-            text-decoration: none;
-            color: black;
-            font-weight: 400;
-        }
-
-        h1 u {
-            text-decoration-color: #FF7700;
-            text-decoration-thickness: 2px;
-        }
-
+        /* Tabs */
         .tabs-container {
             max-width: 900px;
             margin: 0 auto;
@@ -162,41 +183,34 @@
 
         .tabs {
             display: flex;
-            gap: 0.15rem;
+            gap: 0;
             margin-bottom: 0;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .tabs::-webkit-scrollbar {
-            display: none;
+            border-bottom: 2px solid var(--border);
         }
 
         .tab {
-            padding: 0.6rem 0.8rem;
-            background: white;
-            border: 2px solid #1d1b16;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: 2px solid var(--border);
             border-bottom: none;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            color: #1d1b16;
-            transition: all 0.2s;
-            border-radius: 8px 8px 0 0;
+            color: var(--fg);
             position: relative;
             white-space: nowrap;
-            flex-shrink: 0;
+            font-family: inherit;
+            margin-right: -2px;
         }
 
         .tab:hover:not(.active) {
-            background: #f0f0ed;
+            background: var(--hover-bg);
         }
 
         .tab.active {
-            background: #1ABFFB;
-            color: white;
-            border-color: #1d1b16;
+            background: var(--primary);
+            color: var(--bg);
             z-index: 2;
         }
 
@@ -209,172 +223,146 @@
         }
 
         .tab-panel {
-            background: white;
-            border: 2px solid #1d1b16;
-            border-radius: 0 8px 8px 8px;
-            padding: 1.5rem 1rem;
+            border: 2px solid var(--border);
+            padding: 2rem;
+            background: var(--bg);
             margin-top: -2px;
         }
 
         h2 {
             font-size: 1.25rem;
             margin-bottom: 1.5rem;
-            line-height: 1.4;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
         }
 
+        /* Input Group */
         .input-group {
             display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.5rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
 
         input[type="text"] {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #ccc;
-            border-radius: 4px;
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            font-family: inherit;
             font-size: 0.9rem;
-            color: #666;
-            transition: border-color 0.2s ease;
-            outline: none;
+            color: var(--fg);
         }
 
         input[type="text"]:focus {
-            border-color: #1d1b16;
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: inset 0 0 0 1px var(--primary);
         }
 
         input[type="text"]::placeholder {
-            color: #999;
-        }
-
-        .search-input {
-            padding: 0.75rem 1rem;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            color: #1d1b16;
-            margin-bottom: 1rem;
-            transition: border-color 0.2s ease;
-            outline: none;
-        }
-
-        .search-input:focus {
-            border-color: #1d1b16;
-        }
-
-        .search-input::placeholder {
-            color: #999;
+            color: var(--secondary);
         }
 
         .btn-primary {
-            padding: 0.875rem 2rem;
-            background: #1d1b16;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.95rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: var(--bg);
+            border: 2px solid var(--border);
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
+            font-family: inherit;
             white-space: nowrap;
         }
 
         .btn-primary:hover:not(:disabled) {
-            background: #2d2b26;
+            background: var(--primary-light);
         }
 
         .btn-primary:disabled {
-            background: #999;
+            background: var(--secondary);
             cursor: not-allowed;
         }
 
+        /* Search Input */
+        .search-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--fg);
+            margin-bottom: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: inset 0 0 0 1px var(--primary);
+        }
+
+        .search-input::placeholder {
+            color: var(--secondary);
+        }
+
+        /* Stats */
         .stats {
             text-align: right;
             font-size: 0.7rem;
-            color: #999;
+            color: var(--fg);
             margin-bottom: 1rem;
+            font-weight: 600;
         }
 
         h3 {
             font-size: 0.9rem;
             margin-bottom: 1rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
+        /* Table */
         .table-container {
-            overflow-x: visible;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .table-scroll {
-            overflow-x: visible;
-            overflow-y: auto;
+            overflow-x: auto;
+            border: 2px solid var(--border);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            background: var(--bg);
         }
 
         th {
             text-align: left;
-            padding: 0.75rem 0.5rem;
-            font-size: 0.65rem;
+            padding: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            border-bottom: 2px solid #e5e5e0;
-            background: white;
+            border-bottom: 2px solid var(--border);
+            background: var(--bg);
             position: sticky;
             top: 0;
-            z-index: 1;
         }
 
         td {
-            padding: 1rem 0.5rem;
-            border-bottom: 1px solid #e5e5e0;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--table-border);
             font-size: 0.8rem;
-        }
-
-        @media (max-width: 640px) {
-
-            th,
-            td {
-                font-size: 0.7rem;
-                padding: 0.5rem 0.25rem;
-            }
-
-            th:nth-child(5),
-            td:nth-child(5),
-            th:nth-child(3),
-            td:nth-child(3),
-            th:nth-child(4),
-            td:nth-child(4) {
-                display: none;
-            }
         }
 
         tr:last-child td {
             border-bottom: none;
         }
 
-        .btn-add {
-            padding: 0.4rem 0.75rem;
-            background: transparent;
-            border: 1px solid #1d1b16;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            font-weight: 500;
-            white-space: nowrap;
-            text-decoration: none;
-            color: #1d1b16;
-            display: inline-block;
-        }
-
-        .btn-add:hover {
-            background: #f0f0ed;
+        tr:hover {
+            background: var(--hover-bg);
         }
 
         .source-name {
@@ -384,7 +372,7 @@
         }
 
         .source-name a {
-            color: #1d1b16;
+            color: var(--fg);
             text-decoration: none;
         }
 
@@ -395,40 +383,47 @@
         .favicon {
             width: 16px;
             height: 16px;
-            flex-shrink: 0;
+            /* filter: grayscale(100%); */
         }
 
+        .btn-add {
+            padding: 0.4rem 0.75rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            text-decoration: none;
+            color: var(--fg);
+            display: inline-block;
+        }
+
+        .btn-add:hover {
+            background: var(--primary);
+            color: var(--bg);
+        }
+
+        /* Validation Result */
         .validation-result {
             margin-top: 1.5rem;
             padding: 1rem;
-            border-radius: 4px;
-            border: 2px solid #e5e5e0;
+            border: 2px solid var(--border);
+            background: var(--bg);
         }
 
         .validation-result.valid {
-            border-color: #22c55e;
-            background: #f0fdf4;
+            border-color: var(--success);
         }
 
         .validation-result.invalid {
-            border-color: #ef4444;
-            background: #fef2f2;
+            border-color: var(--error);
         }
 
         .validation-result h4 {
             font-size: 1rem;
             margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .validation-result.valid h4 {
-            color: #16a34a;
-        }
-
-        .validation-result.invalid h4 {
-            color: #dc2626;
+            font-weight: 700;
         }
 
         .validation-list {
@@ -440,25 +435,27 @@
         .validation-list li {
             padding: 0.5rem 0;
             font-size: 0.85rem;
-            border-bottom: 1px solid #e5e5e0;
+            border-bottom: 1px solid var(--table-border);
         }
 
         .validation-list li:last-child {
             border-bottom: none;
         }
 
-        .validation-list.errors li {
-            color: #dc2626;
+        .validation-list.errors li::before {
+            content: '✗ ';
+            margin-right: 0.5rem;
         }
 
-        .validation-list.warnings li {
-            color: #ea580c;
+        .validation-list.warnings li::before {
+            content: '⚠ ';
+            margin-right: 0.5rem;
         }
 
         .metadata-section {
             margin-top: 1rem;
             padding-top: 1rem;
-            border-top: 1px solid #e5e5e0;
+            border-top: 2px solid var(--border);
         }
 
         .metadata-section h5 {
@@ -474,133 +471,120 @@
 
         .metadata-table td {
             padding: 0.5rem;
-            border-bottom: 1px solid #e5e5e0;
+            border-bottom: 1px solid var(--table-border);
         }
 
         .metadata-table td:first-child {
             font-weight: 600;
-            color: #666;
+            color: var(--secondary);
             width: 40%;
-        }
-
-        .metadata-table tr:last-child td {
-            border-bottom: none;
         }
 
         .install-mcp-btn {
             margin-top: 1rem;
             display: inline-block;
-            padding: 0.875rem 2rem;
-            background: #1d1b16;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.95rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: var(--bg);
+            border: 2px solid var(--border);
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
-            text-align: center;
+            font-family: inherit;
         }
 
         .install-mcp-btn:hover:not(.disabled) {
-            background: #2d2b26;
+            background: var(--primary-light);
         }
 
         .install-mcp-btn.disabled {
-            background: #999;
+            background: var(--secondary);
             cursor: not-allowed;
-            pointer-events: none;
         }
 
         .fix-suggestion {
             margin-top: 1rem;
             padding: 1rem;
-            background: #fffbeb;
-            border: 2px solid #f59e0b;
-            border-radius: 4px;
+            background: var(--hover-bg);
+            border: 2px solid var(--border);
         }
 
         .fix-suggestion h5 {
             font-size: 0.9rem;
             margin-bottom: 0.5rem;
-            color: #92400e;
         }
 
         .fix-suggestion p {
             font-size: 0.85rem;
-            color: #78350f;
             margin-bottom: 1rem;
         }
 
         .fix-suggestion a {
             display: inline-block;
             padding: 0.75rem 1.5rem;
-            background: #f59e0b;
-            color: white;
-            border-radius: 4px;
+            background: var(--primary);
+            color: var(--bg);
+            border: 2px solid var(--border);
             font-size: 0.9rem;
             font-weight: 600;
             text-decoration: none;
+            font-family: inherit;
         }
 
         .fix-suggestion a:hover {
-            background: #d97706;
+            background: var(--primary-light);
         }
 
         .loading {
             text-align: center;
             padding: 2rem;
-            color: #999;
+            color: var(--secondary);
         }
 
         .invalid-domains-section {
             margin-top: 2rem;
             padding-top: 2rem;
-            border-top: 2px solid #e5e5e0;
-        }
-
-        .invalid-domains-section h3 {
-            color: #dc2626;
-            margin-bottom: 1.5rem;
+            border-top: 2px solid var(--border);
         }
 
         .no-results {
             text-align: center;
             padding: 2rem;
-            color: #999;
+            color: var(--secondary);
             font-size: 0.85rem;
         }
 
         .create-suggestion {
             margin-top: 1rem;
             padding: 1rem;
-            background: #f0f9ff;
-            border: 2px solid #1ABFFB;
-            border-radius: 4px;
+            background: var(--hover-bg);
+            border: 2px solid var(--border);
             text-align: center;
         }
 
         .create-suggestion p {
             font-size: 0.85rem;
-            color: #0c4a6e;
             margin-bottom: 1rem;
         }
 
         .create-suggestion a {
             display: inline-block;
             padding: 0.75rem 1.5rem;
-            background: #1ABFFB;
-            color: white;
-            border-radius: 4px;
+            background: var(--primary);
+            color: var(--bg);
+            border: 2px solid var(--border);
             font-size: 0.9rem;
             font-weight: 600;
             text-decoration: none;
+            font-family: inherit;
         }
 
         .create-suggestion a:hover {
-            background: #0da5e0;
+            background: var(--primary-light);
         }
 
+        /* FAQ */
         .faq-container {
             max-width: 800px;
             margin: 0 auto;
@@ -614,15 +598,13 @@
             font-size: 1.1rem;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e5e5e0;
-            color: #1d1b16;
+            border-bottom: 2px solid var(--border);
         }
 
         .faq-item {
             margin-bottom: 0.5rem;
-            border: 1px solid #e5e5e0;
-            border-radius: 4px;
-            background: white;
+            border: 2px solid var(--border);
+            background: var(--bg);
         }
 
         .faq-item summary {
@@ -630,7 +612,6 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 0.9rem;
-            color: #1d1b16;
             list-style: none;
             display: flex;
             align-items: center;
@@ -638,41 +619,32 @@
             user-select: none;
         }
 
-        .faq-item summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .faq-item summary::after {
-            content: '+';
-            font-size: 1.5rem;
-            font-weight: 400;
-            color: #666;
-            transition: transform 0.2s;
+        .faq-item summary::before {
+            content: '[ ]';
+            margin-right: 0.5rem;
+            color: var(--primary);
+            white-space: nowrap;
             flex-shrink: 0;
-            margin-left: 1rem;
         }
 
-        .faq-item[open] summary::after {
-            transform: rotate(45deg);
+        .faq-item[open] summary::before {
+            content: '[✓]';
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .faq-item summary:hover {
-            background: #f9f9f7;
+            background: var(--hover-bg);
         }
 
         .faq-answer {
             padding: 0 1rem 1rem 1rem;
-            color: #4a4a4a;
             font-size: 0.85rem;
             line-height: 1.6;
         }
 
         .faq-answer p {
             margin-bottom: 0.75rem;
-        }
-
-        .faq-answer p:last-child {
-            margin-bottom: 0;
         }
 
         .faq-answer ul,
@@ -685,32 +657,85 @@
             margin-bottom: 0.5rem;
         }
 
-        .faq-answer strong {
-            color: #1d1b16;
-            font-weight: 600;
-        }
-
         .faq-answer code {
-            background: #f5f5f0;
-            padding: 0.15rem 0.4rem;
-            border-radius: 3px;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.8rem;
-            color: #d73a49;
+            background: var(--hover-bg);
+            padding: 0.2rem 0.4rem;
+            font-family: inherit;
+            border: 1px solid var(--table-border);
         }
 
         .faq-answer a {
-            color: #1ABFFB;
+            color: var(--fg);
             text-decoration: underline;
         }
 
         .faq-answer a:hover {
-            color: #0da5e0;
+            background: var(--hover-bg);
         }
 
         @media (max-width: 640px) {
-            .faq-section h3 {
-                font-size: 1rem;
+            .tab {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.7rem;
+            }
+
+            /* Hide columns 3, 4, 5 on mobile */
+            th:nth-child(3),
+            td:nth-child(3),
+            th:nth-child(4),
+            td:nth-child(4),
+            th:nth-child(5),
+            td:nth-child(5) {
+                display: none;
+            }
+
+            td:nth-child(1) {
+                max-width: 180px;
+            }
+
+            td:nth-child(2) {
+                max-width: 180px;
+            }
+
+            .source-name {
+                max-width: 100%;
+                overflow: hidden;
+            }
+
+            .source-name a {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: block;
+            }
+
+            /* NEW: Ensure buttons don't wrap */
+            .btn-add {
+                white-space: nowrap;
+                font-size: 0.65rem;
+                padding: 0.35rem 0.6rem;
+            }
+
+            th:nth-child(6),
+            td:nth-child(6) {
+                width: 70px;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            .install-mcp-btn {
+                font-size: 0.8rem;
+                padding: 0.6rem 1rem;
+                white-space: nowrap;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .btn-primary {
+                width: 100%;
+                white-space: nowrap;
             }
 
             .faq-item summary {
@@ -718,16 +743,37 @@
                 font-size: 0.85rem;
             }
 
-            .faq-item summary::after {
-                font-size: 1.25rem;
-                margin-left: 0.5rem;
-            }
-
             .faq-answer {
                 padding: 0 0.75rem 0.75rem 0.75rem;
                 font-size: 0.8rem;
             }
         }
+
+        @media (max-width: 450px) {
+            td:nth-child(2) {
+                max-width: 100px !important;
+            }
+
+            .btn-add {
+                font-size: 0.6rem;
+                padding: 0.3rem 0.5rem;
+            }
+
+            th:nth-child(6),
+            td:nth-child(6) {
+                width: 60px;
+                padding-left: 0.25rem;
+                padding-right: 0.25rem;
+            }
+
+            th:nth-child(1),
+            td:nth-child(1) {
+                width: 40px;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+        }
+
 
         @media (min-width: 640px) {
             .header {
@@ -747,7 +793,7 @@
             }
 
             .nav-btn {
-                padding: 0.4rem 0.9rem;
+                padding: 0.5rem 1rem;
                 font-size: 0.75rem;
             }
 
@@ -805,21 +851,21 @@
 
 <body>
     <div class="header">
-        <div class="logo">
+        <div class="logo-container">
             <div class="logo-box">
                 <span class="logo-main">LLMTEXT</span>
-                <span class="logo-com">.com</span>
+                <span class="logo-com">.COM</span>
             </div>
             <div class="powered-by">
                 <span>powered by</span>
                 <a href="https://parallel.ai" target="_blank">
-                    <img src="/dark-parallel-text-270.svg" alt="parallel" class="parallel-logo"></a>
+                    <img src="/dark-parallel-text-270.svg" alt="parallel" class="parallel-logo">
+                </a>
             </div>
         </div>
         <div class="nav">
-            <a href="https://github.com/janwilmake/llmtext-mcp/issues/new" class="nav-btn cyan"
-                target="_blank">FEEDBACK</a>
-            <a href="https://parallel.ai/blog" class="nav-btn orange" target="_blank">LEARN MORE</a>
+            <a href="https://github.com/janwilmake/llmtext-mcp/issues/new" class="nav-btn" target="_blank">FEEDBACK</a>
+            <a href="https://parallel.ai/blog" class="nav-btn" target="_blank">LEARN MORE</a>
             <a href="https://github.com/janwilmake/llmtext-mcp" class="github-icon" target="_blank">
                 <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
                     <path
@@ -830,11 +876,8 @@
     </div>
 
     <div class="container">
-        <div style="width:100%; display:flex; justify-content:center">
-            <h1>Tools for the <a href="https://llmstxt.org" target="_blank"><u>llms.txt</u></a> standard</h1>
-        </div>
-
-        <h2 class="subtitle">Reduce hallucinations in Cursor, Claude, and other LLMs</h2>
+        <h1>TOOLS FOR THE <a href="https://llmstxt.org" target="_blank"><u>llms.txt</u></a> STANDARD</h1>
+        <p class="subtitle">Reduce hallucinations in Cursor, Claude, and other LLMs</p>
 
         <div class="tabs-container">
             <div class="tabs">
@@ -847,21 +890,20 @@
             <!-- Tab 0: Create -->
             <div class="tab-content" id="tab-0">
                 <div class="tab-panel">
-                    <h2>Create LLMS.TXT from sources</h2>
-                    <p style="margin-bottom: 1.5rem; color: #666;">Generate an llms.txt with accompanied markdown
-                        content from multiple sources, to help agents access everything easily.</p>
+                    <h2>CREATE llms.txt FROM SOURCES</h2>
+                    <p style="margin-bottom: 1.5rem;">Generate an llms.txt with accompanied markdown content from
+                        multiple sources, to help agents access everything easily.</p>
                     <a href="https://github.com/janwilmake/llmtext-mcp/tree/main/extract-from-sitemap"
-                        class="btn-primary"
-                        style="text-decoration: none; display: inline-block; text-align: center;">View on GitHub</a>
+                        class="btn-primary" style="text-decoration: none;">VIEW ON GITHUB</a>
                 </div>
             </div>
 
             <!-- Tab 1: Check -->
             <div class="tab-content" id="tab-1">
                 <div class="tab-panel">
-                    <h2>Validate LLMS.TXT files</h2>
-                    <p style="margin-bottom: 1.5rem; color: #666;">Check if your llms.txt file follows the official
-                        specification from llmstxt.org</p>
+                    <h2>VALIDATE llms.txt FILES</h2>
+                    <p style="margin-bottom: 1.5rem;">Check if your llms.txt file follows the official specification
+                        from llmstxt.org</p>
 
                     <div class="input-group">
                         <input type="text" id="check-url" placeholder="https://example.com/llms.txt">
@@ -871,20 +913,17 @@
                     <div id="validation-result"></div>
 
                     <div id="invalid-domains-list" class="invalid-domains-section" style="display: none;">
-                        <h3>Invalid submitted llms.txt's</h3>
+                        <h3>INVALID SUBMITTED llms.txt FILES</h3>
                         <div class="table-container">
-                            <div class="table-scroll">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>SOURCE</th>
-                                            <th>CHECK</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="invalid-domains-tbody">
-                                    </tbody>
-                                </table>
-                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>SOURCE</th>
+                                        <th>CHECK</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invalid-domains-tbody"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -893,48 +932,41 @@
             <!-- Tab 2: Install -->
             <div class="tab-content active" id="tab-2">
                 <div class="tab-panel">
-                    <h2>Turn any <strong>llms.txt</strong> URL into a dedicated MCP server
-                        that has all the context</h2>
+                    <h2>TURN ANY llms.txt URL INTO A DEDICATED MCP SERVER</h2>
 
                     <div class="input-group">
                         <input type="text" id="llmtext-url" placeholder="https://example.com/llms.txt">
                         <button class="btn-primary" onclick="handleCheckUrl()">CHECK & INSTALL</button>
                     </div>
 
-                    <div
-                        style="display:flex; flex:1; flex-direction:row; align-items:center; justify-content:space-between;">
-                        <h3>Popular llms.txt MCP Servers</h3>
-                        <div id="stats" class="stats">Loading...</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 1rem;">
+                        <h3>POPULAR llms.txt MCP SERVERS</h3>
+                        <div id="stats" class="stats">LOADING...</div>
                     </div>
 
-                    <input type="text" id="search-input" class="search-input" placeholder="Search by domain name..."
+                    <input type="text" id="search-input" class="search-input" placeholder="SEARCH BY DOMAIN NAME..."
                         oninput="handleSearch()">
 
                     <div class="table-container">
-                        <div class="table-scroll">
-                            <table id="servers-table">
-                                <thead>
-                                    <tr>
-                                        <th>RANK</th>
-                                        <th>SOURCE</th>
-                                        <th>TOKENS INGESTED</th>
-                                        <th>VOLUME</th>
-                                        <th>USERS</th>
-                                        <th>INSTALL</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="servers-tbody">
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id="no-results" class="no-results" style="display: none;">
-                            No matching servers found.
-                        </div>
+                        <table id="servers-table">
+                            <thead>
+                                <tr>
+                                    <th>RANK</th>
+                                    <th>SOURCE</th>
+                                    <th>TOKENS</th>
+                                    <th>VOLUME</th>
+                                    <th>USERS</th>
+                                    <th>INSTALL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="servers-tbody"></tbody>
+                        </table>
                     </div>
+                    <div id="no-results" class="no-results" style="display: none;">NO MATCHING SERVERS FOUND</div>
 
                     <div id="create-suggestion" class="create-suggestion" style="display: none;">
                         <p>Can't find what you're looking for? Create your own llms.txt file!</p>
-                        <a href="#" onclick="event.preventDefault(); switchTab(0);">Create LLMS.TXT</a>
+                        <a href="#" onclick="event.preventDefault(); switchTab(0);">CREATE llms.txt</a>
                     </div>
                 </div>
             </div>
@@ -942,11 +974,11 @@
             <!-- Tab 3: FAQ -->
             <div class="tab-content" id="tab-3">
                 <div class="tab-panel">
-                    <h2>Frequently Asked Questions</h2>
+                    <h2>FREQUENTLY ASKED QUESTIONS</h2>
 
                     <div class="faq-container">
                         <div class="faq-section">
-                            <h3>Getting Started</h3>
+                            <h3>GETTING STARTED</h3>
 
                             <details class="faq-item">
                                 <summary>What is llms.txt?</summary>
@@ -1000,7 +1032,7 @@
                         </div>
 
                         <div class="faq-section">
-                            <h3>Technical Questions</h3>
+                            <h3>TECHNICAL QUESTIONS</h3>
 
                             <details class="faq-item">
                                 <summary>What format should my llms.txt file follow?</summary>
@@ -1027,10 +1059,9 @@
                                         <li><strong>Wrong content-type:</strong> Must respond with text/plain or
                                             text/markdown</li>
                                         <li><strong>Links return HTML:</strong> Linked pages must return plain
-                                            text/markdown, not HTML</li>
+                                            text/markdown</li>
                                         <li><strong>Too large:</strong> File exceeds 10k tokens</li>
-                                        <li><strong>Full docs in one file:</strong> Should link to separate pages, not
-                                            include everything</li>
+                                        <li><strong>Full docs in one file:</strong> Should link to separate pages</li>
                                     </ul>
                                     <p>Use our <strong>CHECK</strong> tool to identify specific issues.</p>
                                 </div>
@@ -1073,7 +1104,7 @@
                         </div>
 
                         <div class="faq-section">
-                            <h3>Practical Usage</h3>
+                            <h3>PRACTICAL USAGE</h3>
 
                             <details class="faq-item">
                                 <summary>How do I install an MCP server?</summary>
@@ -1135,7 +1166,7 @@
                         </div>
 
                         <div class="faq-section">
-                            <h3>Comparison & Integration</h3>
+                            <h3>COMPARISON & INTEGRATION</h3>
 
                             <details class="faq-item">
                                 <summary>How is this different from RAG or vector search?</summary>
@@ -1179,7 +1210,7 @@
                         </div>
 
                         <div class="faq-section">
-                            <h3>Business & Strategy</h3>
+                            <h3>BUSINESS & STRATEGY</h3>
 
                             <details class="faq-item">
                                 <summary>Why should my company invest in llms.txt?</summary>
@@ -1218,9 +1249,9 @@
                             <details class="faq-item">
                                 <summary>Who else is using llms.txt?</summary>
                                 <div class="faq-answer">
-                                    <p>Check our <strong>03 INSTALL</strong> tab to see popular sites already
-                                        using llms.txt. The list includes major documentation platforms, API providers,
-                                        and developer tools. You can browse by popularity and tokens ingested.</p>
+                                    <p>Check our <strong>03 INSTALL</strong> tab to see popular sites already using
+                                        llms.txt. The list includes major documentation platforms, API providers, and
+                                        developer tools. You can browse by popularity and tokens ingested.</p>
                                 </div>
                             </details>
                         </div>
@@ -1231,45 +1262,25 @@
     </div>
 
     <script>
-        // Initial dummy data
-        window.data = { "users": [{ "username": "janwilmake", "total_requests": 46, "total_tokens": 158901 }], "servers": [{ "hostname": "parallel.ai", "total_requests": 36, "total_tokens": 107789, "unique_users": 1, "valid": true }, { "hostname": "docs.tavus.io", "total_requests": 3, "total_tokens": 5211, "unique_users": 1, "valid": true }, { "hostname": "llmtext.com", "total_requests": 3, "total_tokens": 21898, "unique_users": 1, "valid": true }, { "hostname": "docs.perplexity.ai", "total_requests": 2, "total_tokens": 8785, "unique_users": 1, "valid": true }, { "hostname": "bun.com", "total_requests": 1, "total_tokens": 2204, "unique_users": 1, "valid": true }, { "hostname": "docs.x.com", "total_requests": 1, "total_tokens": 13014, "unique_users": 1, "valid": true }, { "valid": true, "hostname": "developers.cloudflare.com", "rank": 5, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "ast-grep.github.io", "rank": 123, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "community-charts.github.io", "rank": 123, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": true, "hostname": "docs.sourceforge.net", "rank": 212, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "weather.com", "rank": 224, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "developers.hubspot.com", "rank": 246, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "docs.linktr.ee", "rank": 249, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "docs.docker.com", "rank": 551, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }, { "valid": false, "hostname": "ant.design", "rank": 66095, "total_requests": 0, "total_tokens": 0, "unique_users": 0 }], "totalRequests": 46, "totalTokens": 158901 };
+        // Initial data
+        window.data = { "users": [{ "username": "janwilmake", "total_requests": 46, "total_tokens": 158901 }], "servers": [{ "hostname": "parallel.ai", "total_requests": 36, "total_tokens": 107789, "unique_users": 1, "valid": true }, { "hostname": "docs.tavus.io", "total_requests": 3, "total_tokens": 5211, "unique_users": 1, "valid": true }, { "hostname": "llmtext.com", "total_requests": 3, "total_tokens": 21898, "unique_users": 1, "valid": true }, { "hostname": "docs.perplexity.ai", "total_requests": 2, "total_tokens": 8785, "unique_users": 1, "valid": true }, { "hostname": "bun.com", "total_requests": 1, "total_tokens": 2204, "unique_users": 1, "valid": true }], "totalRequests": 46, "totalTokens": 158901 };
         window.filteredServers = null;
-
 
         function extractApexDomain(hostname) {
             const parts = hostname.split(".");
-
-            // Handle special cases like .co.uk, .com.au, etc.
-            const twoPartTLDs = new Set([
-                "co.uk",
-                "com.au",
-                "co.jp",
-                "co.nz",
-                "co.za",
-                "com.br",
-                "com.cn",
-                "com.mx",
-                "com.ar",
-                "com.tr",
-                "co.in",
-                "co.id",
-            ]);
-
+            const twoPartTLDs = new Set(["co.uk", "com.au", "co.jp", "co.nz", "co.za", "com.br"]);
             if (parts.length >= 3) {
                 const lastTwo = `${parts[parts.length - 2]}.${parts[parts.length - 1]}`;
                 if (twoPartTLDs.has(lastTwo)) {
-                    // For two-part TLDs, take the last 3 parts
                     return parts.slice(-3).join(".");
                 }
             }
-
-            // Default: take the last two parts
             if (parts.length >= 2) {
                 return parts.slice(-2).join(".");
             }
-
             return hostname;
         }
+
         function getFaviconUrl(domain) {
             return `https://www.google.com/s2/favicons?domain=${extractApexDomain(domain)}&sz=32`;
         }
@@ -1300,17 +1311,12 @@
         function handleCheckUrl() {
             const input = document.getElementById('llmtext-url');
             const url = input.value.trim();
-
             if (!url) {
                 alert('Please enter a URL');
                 return;
             }
-
-            // Switch to check tab and set the URL
             switchTab(1);
             document.getElementById('check-url').value = url;
-
-            // Trigger validation directly
             setTimeout(() => {
                 handleCheckValidation();
             }, 100);
@@ -1332,21 +1338,19 @@
                 return;
             }
 
-            // Disable button and show loading
             button.disabled = true;
             button.textContent = 'VALIDATING...';
-            resultDiv.innerHTML = '<div class="loading">Validating your llms.txt file...</div>';
+            resultDiv.innerHTML = '<div class="loading">VALIDATING YOUR llms.txt FILE...</div>';
 
             try {
                 const response = await fetch(`https://check.llmtext.com/check?url=${encodeURIComponent(url)}`);
                 const data = await response.json();
-
                 renderValidationResult(data, url);
             } catch (error) {
                 resultDiv.innerHTML = `
                     <div class="validation-result invalid">
-                        <h4>❌ Validation Error</h4>
-                        <p style="color: #dc2626; font-size: 0.85rem;">Failed to validate URL: ${error.message}</p>
+                        <h4>✗ VALIDATION ERROR</h4>
+                        <p style="font-size: 0.85rem;">Failed to validate URL: ${error.message}</p>
                     </div>
                 `;
             } finally {
@@ -1358,21 +1362,17 @@
         function renderValidationResult(data, url) {
             const resultDiv = document.getElementById('validation-result');
             const validClass = data.valid ? 'valid' : 'invalid';
-            const icon = data.valid ? '✅' : '❌';
-            const title = data.valid ? 'Valid LLMS.TXT' : 'Invalid LLMS.TXT';
+            const icon = data.valid ? '✓' : '✗';
+            const title = data.valid ? 'VALID llms.txt' : 'INVALID llms.txt';
 
             const hostname = extractHostname(url);
             const installUrl = hostname ? getInstallMcpUrl(hostname) : '#';
             const installDisabled = !data.valid ? 'disabled' : '';
 
-            let html = `
-                <div class="validation-result ${validClass}">
-                    <h4>${icon} ${title}</h4>
-            `;
+            let html = `<div class="validation-result ${validClass}"><h4>${icon} ${title}</h4>`;
 
-            // Show errors if any
             if (data.errors && data.errors.length > 0) {
-                html += '<h5 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem;">Errors:</h5>';
+                html += '<h5 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem;">ERRORS:</h5>';
                 html += '<ul class="validation-list errors">';
                 data.errors.forEach(error => {
                     html += `<li>${error}</li>`;
@@ -1380,9 +1380,8 @@
                 html += '</ul>';
             }
 
-            // Show warnings if any
             if (data.warnings && data.warnings.length > 0) {
-                html += '<h5 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem;">Warnings:</h5>';
+                html += '<h5 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem;">WARNINGS:</h5>';
                 html += '<ul class="validation-list warnings">';
                 data.warnings.forEach(warning => {
                     html += `<li>${warning}</li>`;
@@ -1390,57 +1389,34 @@
                 html += '</ul>';
             }
 
-            // Show metadata if available
             if (data.metadata) {
-                html += '<div class="metadata-section">';
-                html += '<h5>Metadata</h5>';
-                html += '<table class="metadata-table">';
-
+                html += '<div class="metadata-section"><h5>METADATA</h5><table class="metadata-table">';
                 for (const [key, value] of Object.entries(data.metadata)) {
                     if (value !== null && value !== undefined) {
                         const displayValue = typeof value === 'object' ? JSON.stringify(value, null, 2) : value;
-                        html += `
-                            <tr>
-                                <td>${key}</td>
-                                <td>${displayValue}</td>
-                            </tr>
-                        `;
+                        html += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
                     }
                 }
-
-                html += '</table>';
-                html += '</div>';
+                html += '</table></div>';
             }
 
-            // Show fix suggestion for invalid files
             if (!data.valid) {
                 html += `
                     <div class="fix-suggestion">
-                        <h5>💡 Suggestion</h5>
-                        <p>Fix your llms.txt by recreating it with our library. It ensures your file follows the official specification.</p>
-                        <a href="#" onclick="event.preventDefault(); switchTab(0);">Recreate with Library</a>
+                        <h5>💡 SUGGESTION</h5>
+                        <p>Fix your llms.txt by recreating it with our library.</p>
+                        <a href="#" onclick="event.preventDefault(); switchTab(0);">RECREATE WITH LIBRARY</a>
                     </div>
                 `;
             }
 
-            // Install MCP button
-            html += `
-                <a href="${installUrl}" 
-                   class="install-mcp-btn ${installDisabled}" 
-                   ${data.valid ? 'target="_blank" rel="noopener"' : ''}>
-                    Install this MCP
-                </a>
-            `;
-
+            html += `<a href="${installUrl}" class="install-mcp-btn ${installDisabled}" ${data.valid ? 'target="_blank" rel="noopener"' : ''}>INSTALL THIS MCP</a>`;
             html += '</div>';
             resultDiv.innerHTML = html;
         }
 
         function renderInvalidDomains() {
-            if (!window.data || !window.data.servers) {
-                return;
-            }
-
+            if (!window.data || !window.data.servers) return;
             const invalidServers = window.data.servers.filter(server => !server.valid);
             const section = document.getElementById('invalid-domains-list');
             const tbody = document.getElementById('invalid-domains-tbody');
@@ -1456,7 +1432,6 @@
             invalidServers.forEach((server) => {
                 const tr = document.createElement('tr');
                 const llmstxtUrl = `https://${server.hostname}/llms.txt`;
-
                 tr.innerHTML = `
                     <td>
                         <div class="source-name">
@@ -1464,7 +1439,7 @@
                             <a href="${llmstxtUrl}" target="_blank" rel="noopener">${server.hostname}</a>
                         </div>
                     </td>
-                    <td><button class="btn-add" onclick="checkDomain('${server.hostname}')">⚠️ CHECK</button></td>
+                    <td><button class="btn-add" onclick="checkDomain('${server.hostname}')">⚠ CHECK</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1481,18 +1456,10 @@
         function fuzzyMatch(text, query) {
             text = text.toLowerCase();
             query = query.toLowerCase();
-
-            // Direct substring match
-            if (text.includes(query)) {
-                return true;
-            }
-
-            // Fuzzy match - check if all characters in query appear in order
+            if (text.includes(query)) return true;
             let queryIndex = 0;
             for (let i = 0; i < text.length && queryIndex < query.length; i++) {
-                if (text[i] === query[queryIndex]) {
-                    queryIndex++;
-                }
+                if (text[i] === query[queryIndex]) queryIndex++;
             }
             return queryIndex === query.length;
         }
@@ -1501,9 +1468,7 @@
             const searchInput = document.getElementById('search-input');
             const query = searchInput.value.trim();
 
-            if (!window.data || !window.data.servers) {
-                return;
-            }
+            if (!window.data || !window.data.servers) return;
 
             if (query === '') {
                 window.filteredServers = null;
@@ -1527,8 +1492,8 @@
             const tableContainer = document.querySelector('#tab-2 .table-container');
 
             if (!window.data || !window.data.servers) {
-                stats.innerText = 'Loading...';
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading data...</td></tr>';
+                stats.innerText = 'LOADING...';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">LOADING DATA...</td></tr>';
                 noResults.style.display = 'none';
                 createSuggestion.style.display = 'none';
                 return;
@@ -1541,7 +1506,6 @@
             const allValidServers = window.data.servers.filter(server => server.valid);
             stats.innerText = `${formatNumber(allValidServers.length)} MCP SERVERS CREATED`;
 
-            // Show/hide elements based on results
             if (serversToRender.length === 0) {
                 tbody.innerHTML = '';
                 tableContainer.style.display = 'none';
@@ -1552,7 +1516,6 @@
                 noResults.style.display = 'none';
                 createSuggestion.style.display = window.filteredServers !== null ? 'block' : 'none';
 
-                // Render servers
                 tbody.innerHTML = '';
                 serversToRender.forEach((server, index) => {
                     const tr = document.createElement('tr');
@@ -1576,7 +1539,6 @@
                 });
             }
 
-            // Render invalid domains in check tab
             renderInvalidDomains();
         }
 
@@ -1601,35 +1563,23 @@
             });
         }
 
-        // Check for ?check= parameter on load
         function checkUrlParameter() {
             const urlParams = new URLSearchParams(window.location.search);
             const checkUrl = urlParams.get('check');
 
             if (checkUrl) {
-                // Clean URL without reloading
                 window.history.replaceState({}, document.title, window.location.pathname);
-
-                // Switch to check tab
                 switchTab(1);
-
-                // Set the URL in the input
                 document.getElementById('check-url').value = checkUrl;
-
-                // Trigger validation
                 setTimeout(() => {
                     handleCheckValidation();
                 }, 100);
             }
         }
 
-        // Initial render with dummy data
         renderServers();
-
-        // Check URL parameters
         checkUrlParameter();
 
-        // Fetch real data in background
         fetch('https://mcp.llmtext.com/index.json')
             .then(response => response.json())
             .then(data => {
