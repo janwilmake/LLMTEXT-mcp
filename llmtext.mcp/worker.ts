@@ -457,7 +457,7 @@ function getServerCard(
     },
     description: `This MCP Server allows your LLM to understand ${
       llmsTxtData.parse.title || llmsTxtData.hostname
-    } by wading through its llms.txt and linked documents thereof using a simple 'get' tool.\n\nTo use this MCP, login with X is required to collect anonymous usage data.`,
+    } by wading through its llms.txt and linked documents thereof using a simple 'get' tool.\n\nTo use this MCP, login with X is required to store your history.`,
     icons: [
       {
         src: getFaviconUrl(llmsTxtData.hostname, 48),
