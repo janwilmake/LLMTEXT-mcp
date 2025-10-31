@@ -21,6 +21,16 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    if (path.startsWith("/check/")) {
+      const hostname = path.split("/check/")[1];
+      // Redirect to index with check parameter
+      const checkUrl = `https://${hostname}/llms.txt`;
+      return Response.redirect(
+        `${url.origin}/?check=${encodeURIComponent(checkUrl)}`,
+        302
+      );
+    }
+
     if (path === "/llms.txt") {
       return handleLlmsTxt();
     }

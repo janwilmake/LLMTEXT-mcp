@@ -1,5 +1,5 @@
 {
-  "name": "llmstxt-generate",
+  "name": "llms-txt-generate",
   "version": "0.0.3",
   "main": "cli.js",
   "files": [

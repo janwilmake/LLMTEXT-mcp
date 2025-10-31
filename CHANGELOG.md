@@ -111,3 +111,10 @@ This is an informal summary of changes happening within this repo.
 - ✅ ensure `extract-from-sitemap` requires environment variable from github ci (maybe need to run with '--ci' flag or detect somehow)
 - ✅ set up `parallel-llmtext` to rerun every 5 minutes. if it works: every 12 hours
 - ✅ put files in `public`
+
+## launch 2025-10-30
+
+- ✅ Refine layout to: https://rules-httpsuithu-titmr1a6derkt1.letmeprompt.com/index.html
+- ✅ add og metadata
+- ✅ add in profile images to index.json
+- ✅ improve readme
