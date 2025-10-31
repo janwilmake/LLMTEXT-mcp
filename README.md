@@ -1,5 +1,7 @@
 # LLMTEXT - Tools for the adoption of the `llms.txt` standard
 
+![](context-funnel.drawio.png)
+
 ## Get started
 
 1. Visit **[llmtext.com](https://llmtext.com)** to install MCP servers from popular documentation sites, or paste any `llms.txt` URL to create your own.
