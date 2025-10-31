@@ -13,7 +13,7 @@
 ### More Tools
 
 - [llmtext.check](llmtext.check): Check llms.txt validity
-- [llmstxt-generate](llmstxt-generate): Use this in combination with [getassetmanifest](getassetmanifest) if you want to deploy static assets already present in your fs as a `llms.txt`.
+- [llms-txt-generate](llms-txt-generate): Use this in combination with [getassetmanifest](getassetmanifest) if you want to deploy static assets already present in your fs as a `llms.txt`.
 - [llmtext.mcp](llmtext.mcp): converts a llms.txt into a dedicated MCP server
 - [llmtext.reader](llmtext.reader): converts HTML into simplified "browser-reader HTML", drastically improving token density
 - [parse-llms-txt](parse-llms-txt) - parse llms.txt according to [the standard](https://llmstxt.org)
