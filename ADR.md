@@ -10,30 +10,6 @@ We decided to use an additional tool for retrieving `llms.txt` first to not poll
   - LLMTEXT MCP
 - X OAuth: Parallel Account?
 
-# What are goals for this project, what is the value, what are non-goals?
-
-**Why we built this**
-
-- Brand awareness Parallel
-- Viral potential
-- Establish Developer Trust
-- Facilitate the creation of an independent project aiming to be taken over by OSS community
-
-**What we think the value is: A free tool that is "public good infrastructure" for the internet for AIs**
-
-- **For web-publishers**: to make their content more accessible to AI agents
-- **For end-users**: to easily talk with an AI version of every website
-- **For developers (and their agents)**: to more easily build new products with context of websites, alleviating barrier of scraping
-
-**Non goals**
-
-- Extra revenue for parallel
-
-**How to get this**
-
-- Make it 'Sponsored/powered/backed by Parallel', not 'by Parallel'
-- Owned by Jan, sponsored by Parallel credits, backed by Parallel team
-
 # Why separate repo & hostname is best practice?
 
 After considering this for a while, it seems to me that a separate repo is better practice than putting it on the root. Why?
