@@ -1,5 +1,7 @@
 # LLMTEXT - Tools for the adoption of the `llms.txt` standard
 
+[Read the announcement post](https://parallel.ai/blog/LLMTEXT-for-llmstxt)
+
 ![](context-funnel.drawio.png)
 
 ## Get started
