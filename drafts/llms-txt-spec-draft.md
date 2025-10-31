@@ -2,7 +2,7 @@
 
 **Status:** Draft  
 **Last Updated:** 2024-09-03  
-**Authors:** Jeremy Howard
+**Authors:** Jeremy Howard, Jan Wilmake
 
 ## Abstract
 
