@@ -23,8 +23,8 @@
 
 <a href="https://parallel.ai">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="llmtext/og-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="llmtext/og-light.png">
-  <img alt="Logo" src="llmtext/og-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="llmtext/og-dark.jpg">
+  <source media="(prefers-color-scheme: light)" srcset="llmtext/og-light.jpg">
+  <img alt="Logo" src="llmtext/og-dark.jpg">
 </picture>
 </a>
