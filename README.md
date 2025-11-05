@@ -17,6 +17,7 @@
 - [llmtext.mcp](llmtext.mcp): converts a llms.txt into a dedicated MCP server
 - [llmtext.reader](llmtext.reader): converts HTML into simplified "browser-reader HTML", drastically improving token density
 - [parse-llms-txt](parse-llms-txt) - parse llms.txt according to [the standard](https://llmstxt.org)
+- [markdown-renderer](https://github.com/janwilmake/markdown-renderer) - Chrome/Safari Extension that renders markdown responses
 
 ### Other
 
@@ -32,3 +33,25 @@
   <img alt="Logo" src="llmtext/og-dark.jpg">
 </picture>
 </a>
+
+<!--
+
+I had a repo to scrape the entire website of simonw
+
+Notable private projects - https://github.com/janwilmake/xybrowse
+
+https://github.com/janwilmake/markdownbrowser
+https://github.com/janwilmake/openwebgate - THIS IS THE SHADOW SITE PRINCIPLE
+
+https://github.com/janwilmake/llmtext.browser
+https://github.com/janwilmake/llmtext.crawler
+https://github.com/janwilmake/llmtext.expand
+https://github.com/janwilmake/llmtext.callmeinstead
+
+https://github.com/janwilmake/web-reader
+
+shadowsites
+
+https://github.com/janwilmake/arxivmd.org
+https://github.com/janwilmake/googllm https://github.com/janwilmake/googllm-parallel https://github.com/janwilmake/googllm-raw
+-->

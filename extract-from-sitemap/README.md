@@ -7,6 +7,12 @@ This repo allows you to create a static markdown bundle based on one or multiple
 3. Set up CI/CD in your repo to automatically update your extracted static files as often as needed. See [CI/CD Setup](#cicd-setup) below.
 4. Use an agent-rewriter such as [next-agent-rewriter](../next-agent-rewriter) to rewrite agent requests to the appropriate static markdown files. In addition, it's best practice to add a link in your html to show the markdown variant is available, like this: `<link rel="alternate" type="text/markdown" href="{path}.md" title="Docs" />`
 
+## File overview
+
+- `mod.js` - Core module for programmatic sitemap extraction and LLMText config processing
+
+- `cli.js` - CLI tool usable through `npx extract-from-sitemap`, handling multiple sources, file system I/O, authentication, and configuration loading
+
 ## CI/CD Setup
 
 ### GitHub Actions

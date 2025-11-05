@@ -7,26 +7,7 @@ const crypto = require("crypto");
 const http = require("http");
 const { URL, URLSearchParams } = require("url");
 const os = require("os");
-const { extractFromSitemap } = require("./mod.js");
-
-/**
- * @typedef {Object} SourceConfig
- * @property {string} title - The title for this source
- * @property {string} [origin] - The origin URL to process (optional)
- * @property {string} [outDir] - Output directory for this source's extracted files
- * @property {boolean} [forceExtract] - Whether to force extraction for this source
- * @property {boolean} [keepOriginalUrls] - Whether to keep original URL structure and not save files locally
- * @property {Array<{title: string, description: string, filename: string, url: string}>} [customUrls] - Custom URLs to extract for this source
- * @property {string} [titleRemovePattern] - Regex pattern to remove from titles (case-insensitive)
- */
-/**
- * @typedef {Object} Config
- * @property {string} title - Title of your document
- * @property {string} description - Description of the documentation collection
- * @property {string} [details] - Optional additional details about the collection
- * @property {string} outDir - Top-level output directory for combined llms.txt
- * @property {SourceConfig[]} sources - Array of source configurations
- */
+const { processLLMTextConfig } = require("./mod.js");
 
 const CREDENTIALS_DIR = path.join(os.homedir(), ".llmtext");
 const API_KEY_FILE = path.join(CREDENTIALS_DIR, "api-key");
@@ -220,7 +201,7 @@ class OAuth {
 
 /**
  * Load configuration from llmtext.json
- * @returns {Promise<Config>} The configuration object
+ * @returns {Promise<any>} The configuration object
  */
 async function loadConfig() {
   const configPath = path.resolve("llmtext.json");
@@ -460,129 +441,6 @@ async function getApiKey() {
 }
 
 /**
- * Process custom URLs through extraction API
- * @param {Array<{title: string, description: string, filename: string, url: string}>} customUrls - Custom URLs to process
- * @param {string} apiKey - API key for authentication
- * @returns {Promise<Record<string, any>>} Extracted files
- */
-async function processCustomUrls(customUrls, apiKey) {
-  const files = {};
-
-  for (const customUrl of customUrls) {
-    console.log(`📄 Processing custom URL: ${customUrl.url}`);
-
-    try {
-      const response = await fetch("https://api.parallel.ai/v1beta/extract", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "parallel-beta": "search-extract-2025-10-10",
-          "x-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          urls: [customUrl.url],
-          full_content: true,
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.results && result.results.length > 0) {
-          const extracted = result.results[0];
-          const filename = customUrl.filename + ".md";
-
-          files[filename] = {
-            content: extracted.full_content || "",
-            title: customUrl.title,
-            description: customUrl.description,
-            extracted: true,
-            publishedDate: extracted.published_date || "",
-            status: 200,
-            tokens: Math.round((extracted.full_content || "").length / 5),
-            originalUrl: customUrl.url,
-          };
-        }
-      } else {
-        throw new Error(`${response.status} - ${await response.statusText()}`);
-      }
-    } catch (error) {
-      console.error(
-        `❌ Error processing custom URL ${customUrl.url}:`,
-        error.message
-      );
-    }
-  }
-
-  return files;
-}
-
-/**
- * Get path prefix for links in llms.txt
- * @param {string} topLevelOutDir - Top-level output directory
- * @param {string} sourceOutDir - Source-specific output directory
- * @returns {string} Path prefix for links
- */
-function getPathPrefix(topLevelOutDir, sourceOutDir) {
-  const resolvedTopLevel = path.resolve(topLevelOutDir);
-  const resolvedSource = path.resolve(sourceOutDir);
-
-  if (resolvedSource === resolvedTopLevel) {
-    return "";
-  }
-
-  const relativePath = path.relative(resolvedTopLevel, resolvedSource);
-  return relativePath || "";
-}
-
-/**
- * Generate combined llms.txt from all sources
- * @param {string} title - Top-level title
- * @param {string} description - Top-level description
- * @param {string} [details] - Optional top-level details
- * @param {Array<{title: string, files: Record<string, any>, keepOriginalUrls?: boolean, pathPrefix: string}>} allSources - All processed sources
- * @returns {string} Combined llms.txt content
- */
-function generateCombinedLlmsTxt(title, description, details, allSources) {
-  let combinedTxt = `# ${title}\n\n> ${description}\n\n`;
-
-  if (details) {
-    combinedTxt += `${details}\n\n`;
-  }
-
-  for (const source of allSources) {
-    combinedTxt += `## ${source.title}\n\n`;
-
-    // Sort files by path for consistent ordering
-    const sortedFiles = Object.entries(source.files).sort(([a], [b]) =>
-      a.localeCompare(b)
-    );
-
-    for (const [path, file] of sortedFiles) {
-      if (file.content || file.title) {
-        const title = file.title || path.replace(".md", "");
-        const description = file.description
-          ? `: ${file.description.replaceAll("\n", " ")}`
-          : "";
-
-        // Generate link based on keepOriginalUrls and pathPrefix
-        let link;
-        if (source.keepOriginalUrls) {
-          link = file.originalUrl;
-        } else {
-          link = source.pathPrefix + (path.startsWith("/") ? path : "/" + path);
-        }
-
-        combinedTxt += `- [${title}](${link})${description}\n`;
-      }
-    }
-
-    combinedTxt += "\n";
-  }
-
-  return combinedTxt;
-}
-
-/**
  * Clear stored API key credentials
  */
 async function clearCredentials() {
@@ -595,6 +453,33 @@ async function clearCredentials() {
     }
   } catch (error) {
     console.error("❌ Error clearing credentials:", error.message);
+  }
+}
+
+/**
+ * Write file hierarchy to disk
+ * @param {Record<string, {content?: string, error?: string}>} fileHierarchy - File hierarchy to write
+ */
+function writeFileHierarchy(fileHierarchy) {
+  for (const [filePath, item] of Object.entries(fileHierarchy)) {
+    try {
+      const resolvedPath = path.resolve(filePath);
+      const fileDir = path.dirname(resolvedPath);
+
+      // Create directory if it doesn't exist
+      fs.mkdirSync(fileDir, { recursive: true });
+
+      if (item.content) {
+        fs.writeFileSync(resolvedPath, item.content);
+        console.log(`📝 Wrote: ${filePath}`);
+      } else if (item.error) {
+        console.error(`❌ Error for ${filePath}: ${item.error}`);
+      }
+    } catch (error) {
+      console.error(
+        `❌ Failed to write ${filePath}: ${error.message || "Unknown error"}`
+      );
+    }
   }
 }
 
@@ -615,131 +500,22 @@ async function main() {
     const config = await loadConfig();
     const apiKey = await getApiKey();
 
-    // Ensure top-level output directory exists
-    fs.mkdirSync(config.outDir, { recursive: true });
+    console.log("\n🔄 Processing LLMText configuration...");
 
-    const allSources = [];
-    let totalTokens = 0;
-    let totalPages = 0;
-    let totalErrors = 0;
+    // Process the entire config using the new function
+    const result = await processLLMTextConfig(config, apiKey);
 
-    // Process each source
-    for (const [sourceIndex, sourceConfig] of config.sources.entries()) {
-      const sourceName = `${sourceConfig.title} (source ${sourceIndex + 1})`;
+    // Write all files to disk
+    console.log("\n📁 Writing files to disk...");
+    writeFileHierarchy(result.files);
 
-      console.log(
-        `\n🌐 Processing ${sourceName} (forceExtract: ${sourceConfig.forceExtract}, keepOriginalUrls: ${sourceConfig.keepOriginalUrls})`
-      );
-
-      // Ensure source output directory exists (if not keeping original URLs)
-      if (!sourceConfig.keepOriginalUrls) {
-        fs.mkdirSync(sourceConfig.outDir, { recursive: true });
-      }
-
-      let sourceFiles = {};
-
-      try {
-        // Process origin if provided
-        if (sourceConfig.origin) {
-          const result = await extractFromSitemap(
-            sourceConfig.origin,
-            sourceConfig.forceExtract,
-            apiKey,
-            sourceConfig.titleRemovePattern
-          );
-
-          console.log(
-            `✅ Extracted ${result.totalPages} pages with ${result.totalTokens} tokens`
-          );
-          if (result.errors > 0) {
-            console.log(`⚠️  ${result.errors} errors occurred`);
-          }
-
-          sourceFiles = result.files;
-          totalTokens += result.totalTokens;
-          totalPages += result.totalPages;
-          totalErrors += result.errors;
-        }
-
-        // Process custom URLs for this source
-        if (sourceConfig.customUrls && sourceConfig.customUrls.length > 0) {
-          console.log(
-            `📋 Processing ${sourceConfig.customUrls.length} custom URLs for this source...`
-          );
-          const customFiles = await processCustomUrls(
-            sourceConfig.customUrls,
-            apiKey
-          );
-
-          // Merge custom files with sitemap files
-          sourceFiles = { ...sourceFiles, ...customFiles };
-
-          for (const file of Object.values(customFiles)) {
-            totalTokens += file.tokens;
-            totalPages++;
-          }
-        }
-
-        // Write files to source directory (only if not keeping original URLs)
-        if (!sourceConfig.keepOriginalUrls) {
-          for (const [filePath, file] of Object.entries(sourceFiles)) {
-            let filename = filePath.startsWith("/")
-              ? filePath.slice(1)
-              : filePath;
-
-            const fullFilePath = path.join(sourceConfig.outDir, filename);
-            const fileDir = path.dirname(fullFilePath);
-
-            fs.mkdirSync(fileDir, { recursive: true });
-            fs.writeFileSync(fullFilePath, file.content);
-
-            console.log(
-              `📝 Wrote: ${path.join(sourceConfig.outDir, filename)} (${
-                file.tokens
-              } tokens)`
-            );
-          }
-        } else {
-          console.log(
-            `📋 Keeping original URLs - not saving files locally for ${sourceName}`
-          );
-        }
-
-        // Calculate path prefix for this source
-        const pathPrefix = sourceConfig.keepOriginalUrls
-          ? ""
-          : getPathPrefix(config.outDir, sourceConfig.outDir);
-
-        // Add to all sources for combined llms.txt
-        allSources.push({
-          title: sourceConfig.title,
-          files: sourceFiles,
-          keepOriginalUrls: sourceConfig.keepOriginalUrls,
-          pathPrefix: pathPrefix,
-        });
-      } catch (error) {
-        console.error(`❌ Error processing ${sourceName}:`, error.message);
-        totalErrors++;
-      }
-    }
-
-    // Generate and write combined llms.txt to top-level outDir
-    if (allSources.length > 0) {
-      const combinedLlmsTxt = generateCombinedLlmsTxt(
-        config.title,
-        config.description,
-        config.details,
-        allSources
-      );
-      const combinedLlmsTxtPath = path.join(config.outDir, "llms.txt");
-      fs.writeFileSync(combinedLlmsTxtPath, combinedLlmsTxt);
-      console.log(`\n📋 Generated combined llms.txt: ${combinedLlmsTxtPath}`);
-    }
-
+    // Print summary
     console.log("\n✨ Extraction completed!");
-    console.log(`📊 Total: ${totalPages} pages, ${totalTokens} tokens`);
-    if (totalErrors > 0) {
-      console.log(`⚠️  Errors: ${totalErrors}`);
+    console.log(
+      `📊 Total: ${result.stats.totalPages} pages, ${result.stats.totalTokens} tokens`
+    );
+    if (result.stats.totalErrors > 0) {
+      console.log(`⚠️  Errors: ${result.stats.totalErrors}`);
     }
     console.log(
       `📁 Top-level output directory: ${path.resolve(config.outDir)}`

@@ -23,6 +23,40 @@
  */
 
 /**
+ * @typedef {Object} SourceConfig
+ * @property {string} title - The title for this source
+ * @property {string} [origin] - The origin URL to process (optional)
+ * @property {string} [outDir] - Output directory for this source's extracted files
+ * @property {boolean} [forceExtract] - Whether to force extraction for this source
+ * @property {boolean} [keepOriginalUrls] - Whether to keep original URL structure and not save files locally
+ * @property {Array<{title: string, description: string, filename: string, url: string}>} [customUrls] - Custom URLs to extract for this source
+ * @property {string} [titleRemovePattern] - Regex pattern to remove from titles (case-insensitive)
+ */
+
+/**
+ * @typedef {Object} LLMTextConfig
+ * @property {string} title - Title of your document
+ * @property {string} description - Description of the documentation collection
+ * @property {string} [details] - Optional additional details about the collection
+ * @property {string} outDir - Top-level output directory for combined llms.txt
+ * @property {SourceConfig[]} sources - Array of source configurations
+ */
+
+/**
+ * @typedef {Object} FileHierarchyItem
+ * @property {string} [content] - File content if successful
+ * @property {string} [error] - Error message if failed
+ */
+
+/**
+ * @typedef {Object} ProcessedSource
+ * @property {string} title - Source title
+ * @property {Record<string, FileResult>} files - Extracted files
+ * @property {boolean} keepOriginalUrls - Whether to keep original URLs
+ * @property {string} pathPrefix - Path prefix for links
+ */
+
+/**
  * Extract content from sitemap URLs with markdown variant detection
  * @param {string} origin - The origin URL to extract from
  * @param {boolean} forceExtract - Whether to force using extract API instead of markdown variants
@@ -174,6 +208,279 @@ export async function extractFromSitemap(
     extractApiCallCount,
     fetchCount,
   };
+}
+
+/**
+ * Process custom URLs through extraction API
+ * @param {Array<{title: string, description: string, filename: string, url: string}>} customUrls - Custom URLs to process
+ * @param {string} apiKey - API key for authentication
+ * @returns {Promise<Record<string, FileResult>>} Extracted files
+ */
+export async function processCustomUrls(customUrls, apiKey) {
+  const files = {};
+
+  for (const customUrl of customUrls) {
+    try {
+      const response = await fetch("https://api.parallel.ai/v1beta/extract", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "parallel-beta": "search-extract-2025-10-10",
+          "x-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          urls: [customUrl.url],
+          full_content: true,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.results && result.results.length > 0) {
+          const extracted = result.results[0];
+          const filename = customUrl.filename + ".md";
+
+          files[filename] = {
+            content: extracted.full_content || "",
+            title: customUrl.title,
+            description: customUrl.description,
+            extracted: true,
+            publishedDate: extracted.published_date || "",
+            status: 200,
+            tokens: Math.round((extracted.full_content || "").length / 5),
+            originalUrl: customUrl.url,
+          };
+        }
+      } else {
+        throw new Error(`${response.status} - ${await response.statusText()}`);
+      }
+    } catch (error) {
+      const filename = customUrl.filename + ".md";
+      files[filename] = {
+        error: error instanceof Error ? error.message : "Unknown error",
+        content: "",
+        title: customUrl.title,
+        description: customUrl.description,
+        extracted: false,
+        status: 0,
+        tokens: 0,
+        publishedDate: "",
+        originalUrl: customUrl.url,
+      };
+    }
+  }
+
+  return files;
+}
+
+/**
+ * Process LLMText config and generate file hierarchy
+ * @param {LLMTextConfig} config - The LLMText configuration
+ * @param {string} apiKey - Parallel API key
+ * @returns {Promise<{files: Record<string, FileHierarchyItem>, sources: ProcessedSource[], stats: {totalTokens: number, totalPages: number, totalErrors: number}}>}
+ */
+export async function processLLMTextConfig(config, apiKey) {
+  const allSources = [];
+  let totalTokens = 0;
+  let totalPages = 0;
+  let totalErrors = 0;
+
+  // Process each source
+  for (const sourceConfig of config.sources) {
+    let sourceFiles = {};
+
+    try {
+      // Process origin if provided
+      if (sourceConfig.origin) {
+        const result = await extractFromSitemap(
+          sourceConfig.origin,
+          sourceConfig.forceExtract || false,
+          apiKey,
+          sourceConfig.titleRemovePattern
+        );
+
+        sourceFiles = result.files;
+        totalTokens += result.totalTokens;
+        totalPages += result.totalPages;
+        totalErrors += result.errors;
+      }
+
+      // Process custom URLs for this source
+      if (sourceConfig.customUrls && sourceConfig.customUrls.length > 0) {
+        const customFiles = await processCustomUrls(
+          sourceConfig.customUrls,
+          apiKey
+        );
+
+        // Merge custom files with sitemap files
+        sourceFiles = { ...sourceFiles, ...customFiles };
+
+        for (const file of Object.values(customFiles)) {
+          totalTokens += file.tokens;
+          totalPages++;
+          if (file.error) totalErrors++;
+        }
+      }
+
+      // Calculate path prefix for this source
+      const pathPrefix = sourceConfig.keepOriginalUrls
+        ? ""
+        : getPathPrefix(config.outDir, sourceConfig.outDir || config.outDir);
+
+      // Add to all sources
+      allSources.push({
+        title: sourceConfig.title,
+        files: sourceFiles,
+        keepOriginalUrls: sourceConfig.keepOriginalUrls || false,
+        pathPrefix: pathPrefix,
+        outDir: sourceConfig.outDir || config.outDir,
+      });
+    } catch (error) {
+      totalErrors++;
+      // Add empty source with error
+      allSources.push({
+        title: sourceConfig.title,
+        files: {
+          error: {
+            error: error instanceof Error ? error.message : "Unknown error",
+            content: "",
+            title: "",
+            description: "",
+            extracted: false,
+            status: 0,
+            tokens: 0,
+            publishedDate: "",
+            originalUrl: "",
+          },
+        },
+        keepOriginalUrls: sourceConfig.keepOriginalUrls || false,
+        pathPrefix: "",
+        outDir: sourceConfig.outDir || config.outDir,
+      });
+    }
+  }
+
+  // Generate file hierarchy
+  const fileHierarchy = {};
+
+  // Add source files
+  for (const source of allSources) {
+    if (!source.keepOriginalUrls) {
+      for (const [filePath, file] of Object.entries(source.files)) {
+        let filename = filePath.startsWith("/") ? filePath.slice(1) : filePath;
+        const fullPath = `${source.outDir}/${filename}`;
+
+        fileHierarchy[fullPath] = file.error
+          ? { error: file.error }
+          : { content: file.content };
+      }
+    }
+  }
+
+  // Generate combined llms.txt
+  const combinedLlmsTxt = generateCombinedLlmsTxt(
+    config.title,
+    config.description,
+    config.details,
+    allSources
+  );
+
+  fileHierarchy[`${config.outDir}/llms.txt`] = {
+    content: combinedLlmsTxt,
+  };
+
+  return {
+    files: fileHierarchy,
+    sources: allSources,
+    stats: {
+      totalTokens,
+      totalPages,
+      totalErrors,
+    },
+  };
+}
+
+/**
+ * Generate combined llms.txt from all sources
+ * @param {string} title - Top-level title
+ * @param {string} description - Top-level description
+ * @param {string} [details] - Optional top-level details
+ * @param {ProcessedSource[]} allSources - All processed sources
+ * @returns {string} Combined llms.txt content
+ */
+function generateCombinedLlmsTxt(title, description, details, allSources) {
+  let combinedTxt = `# ${title}\n\n> ${description}\n\n`;
+
+  if (details) {
+    combinedTxt += `${details}\n\n`;
+  }
+
+  for (const source of allSources) {
+    combinedTxt += `## ${source.title}\n\n`;
+
+    // Sort files by path for consistent ordering
+    const sortedFiles = Object.entries(source.files).sort(([a], [b]) =>
+      a.localeCompare(b)
+    );
+
+    for (const [path, file] of sortedFiles) {
+      if (file.content || file.title) {
+        const title = file.title || path.replace(".md", "");
+        const description = file.description
+          ? `: ${file.description.replaceAll("\n", " ")}`
+          : "";
+
+        // Generate link based on keepOriginalUrls and pathPrefix
+        let link;
+        if (source.keepOriginalUrls) {
+          link = file.originalUrl;
+        } else {
+          link = source.pathPrefix + (path.startsWith("/") ? path : "/" + path);
+        }
+
+        combinedTxt += `- [${title}](${link})${description}\n`;
+      }
+    }
+
+    combinedTxt += "\n";
+  }
+
+  return combinedTxt;
+}
+
+/**
+ * Get path prefix for links in llms.txt
+ * @param {string} topLevelOutDir - Top-level output directory
+ * @param {string} sourceOutDir - Source-specific output directory
+ * @returns {string} Path prefix for links
+ */
+function getPathPrefix(topLevelOutDir, sourceOutDir) {
+  // Normalize paths for comparison
+  const normalizeSlashes = (p) => p.replace(/\\/g, "/");
+  const normalizedTop = normalizeSlashes(topLevelOutDir);
+  const normalizedSource = normalizeSlashes(sourceOutDir);
+
+  if (normalizedSource === normalizedTop) {
+    return "";
+  }
+
+  // Calculate relative path
+  const topParts = normalizedTop.split("/").filter(Boolean);
+  const sourceParts = normalizedSource.split("/").filter(Boolean);
+
+  // Find common prefix
+  let commonLength = 0;
+  while (
+    commonLength < topParts.length &&
+    commonLength < sourceParts.length &&
+    topParts[commonLength] === sourceParts[commonLength]
+  ) {
+    commonLength++;
+  }
+
+  // Build relative path
+  const relativeParts = sourceParts.slice(commonLength);
+  return relativeParts.length > 0 ? relativeParts.join("/") : "";
 }
 
 /**
