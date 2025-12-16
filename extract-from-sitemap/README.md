@@ -10,7 +10,6 @@ This repo allows you to create a static markdown bundle based on one or multiple
 ## File overview
 
 - `mod.js` - Core module for programmatic sitemap extraction and LLMText config processing
-
 - `cli.js` - CLI tool usable through `npx extract-from-sitemap`, handling multiple sources, file system I/O, authentication, and configuration loading
 
 ## CI/CD Setup
