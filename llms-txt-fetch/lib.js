@@ -1,23 +1,6 @@
 import { parseLlmsTxt } from "parse-llms-txt";
 
 /**
- * Sanitizes a URL pathname to create a valid filename
- * @param {string} pathname - URL pathname to sanitize
- * @returns {string} Sanitized filename
- */
-function sanitizePathname(pathname) {
-  return (
-    pathname
-      .replace(/^\/+|\/+$/g, "") // Remove leading/trailing slashes
-      .replace(/\//g, "-") // Replace slashes with hyphens
-      .replace(/[^a-zA-Z0-9._-]/g, "_") // Replace invalid chars
-      .replace(/_{2,}/g, "_") // Collapse multiple underscores
-      .replace(/-{2,}/g, "-") || // Collapse multiple hyphens
-    "index"
-  );
-}
-
-/**
  * Sanitizes a section name for use in paths
  * @param {string} sectionName - Section name to sanitize
  * @returns {string} Sanitized section name
@@ -27,6 +10,28 @@ function sanitizeSectionName(sectionName) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Sanitizes a URL pathname while preserving directory structure
+ * @param {string} pathname - URL pathname to sanitize
+ * @returns {string} Sanitized pathname with slashes preserved
+ */
+function sanitizePathname(pathname) {
+  return (
+    pathname
+      .replace(/^\/+|\/+$/g, "") // Remove leading/trailing slashes
+      .split("/") // Split into path segments
+      .map((segment) =>
+        segment
+          .replace(/[^a-zA-Z0-9._-]/g, "_") // Replace invalid chars in each segment
+          .replace(/_{2,}/g, "_") // Collapse multiple underscores
+          .replace(/-{2,}/g, "-"),
+      ) // Collapse multiple hyphens
+      .filter((segment) => segment.length > 0) // Remove empty segments
+      .join("/") || // Rejoin with slashes
+    "index"
+  );
 }
 
 /**
@@ -80,7 +85,7 @@ export async function parseLlmsTxtAndDownload(llmsTxtUrl) {
         const url = new URL(file.url);
         const pathname = sanitizePathname(url.pathname);
 
-        // Create path: section/filename
+        // Create path: section/pathname (with slashes preserved in pathname)
         const filePath = `${sectionDir}/${pathname}`;
 
         console.error(`  Downloading: ${file.name} -> ${filePath}`);

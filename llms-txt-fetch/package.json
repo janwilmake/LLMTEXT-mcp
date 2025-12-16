@@ -1,6 +1,6 @@
 {
   "name": "llms-txt-fetch",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Download and organize all files referenced in an llms.txt file",
   "type": "module",
   "main": "lib.js",
