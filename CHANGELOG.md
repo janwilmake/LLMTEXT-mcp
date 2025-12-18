@@ -121,6 +121,6 @@ This is an informal summary of changes happening within this repo.
 
 ## Improvements 2025-12-18
 
-- Added new library to fetch all contents from a llms.txt
-- Created `explore-sitemaps`: a way to quickly get robots.txt, sitemaps and rss feeds in a structured format
-- Renamed / restructured repo
+- ✅ Added `llms-txt-fetch`: new library to fetch all contents from a llms.txt
+- ✅ Created `explore-sitemaps`: a way to quickly get robots.txt, sitemaps and rss feeds in a structured format
+- ✅ Renamed / restructured repo
