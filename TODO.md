@@ -1,3 +1,5 @@
+Fix issues - https://github.com/janwilmake/LLMTEXT-mcp/issues
+
 # extract-from-sitemap
 
 - `llms-full.txt` should have a concatenation of the llms.txt and all linked to files underneath - Also generate `llms-full.txt`, and create `.genignore` files to ensure it's not included

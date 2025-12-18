@@ -12,9 +12,9 @@
 
 ### More Tools
 
-- [llmtext.check](llmtext.check): Check llms.txt validity
+- [llms-txt-validator](llms-txt-validate): Check llms.txt validity
 - [llms-txt-generate](llms-txt-generate): Use this in combination with [getassetmanifest](getassetmanifest) if you want to deploy static assets already present in your fs as a `llms.txt`.
-- [llmtext.mcp](llmtext.mcp): converts a llms.txt into a dedicated MCP server
+- [llms-txt-mcp](llms-txt-mcp): converts a llms.txt into a dedicated MCP server
 - [llmtext.reader](llmtext.reader): converts HTML into simplified "browser-reader HTML", drastically improving token density
 - [parse-llms-txt](parse-llms-txt) - parse llms.txt according to [the standard](https://llmstxt.org)
 - [markdown-renderer](https://github.com/janwilmake/markdown-renderer) - Chrome/Safari Extension that renders markdown responses
