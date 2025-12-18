@@ -12,6 +12,8 @@
 
 ### Libraries
 
+- [getassetmanifest](getassetmanifest): deploy static assets already present in your fs as a `llms.txt`.
+- [extract-from-sitemap](extract-from-sitemap): Generate llms.txt from a sitemap
 - [llms-txt-fetch](llms-txt-fetch): fetch all contents of a `llms.txt`
 - [llms-txt-generate](llms-txt-generate): Use this in combination with [getassetmanifest](getassetmanifest) if you want to deploy static assets already present in your fs as a `llms.txt`.
 - [llms-txt-mcp](llms-txt-mcp): converts a llms.txt into a dedicated MCP server
