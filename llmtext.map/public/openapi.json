@@ -1,0 +1,477 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Site Index Crawler API",
+    "description": "Crawls and parses site indexes including robots.txt, sitemaps, RSS feeds, and llms.txt files",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://map.llmtext.com"
+    }
+  ],
+  "paths": {
+    "/crawl/{domain}": {
+      "get": {
+        "summary": "Crawl a domain's index files",
+        "description": "Fetches and parses robots.txt, sitemaps, RSS feeds, and llms.txt for the specified domain",
+        "operationId": "crawlDomain",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "description": "Domain to crawl (e.g., example.com)",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "simple": {
+                "value": "example.com"
+              },
+              "subdomain": {
+                "value": "docs.github.com"
+              }
+            }
+          },
+          {
+            "name": "userAgent",
+            "in": "query",
+            "required": false,
+            "description": "User agent to check robots.txt rules against",
+            "schema": {
+              "type": "string",
+              "default": "*"
+            },
+            "examples": {
+              "default": {
+                "value": "*"
+              },
+              "gptbot": {
+                "value": "GPTBot"
+              },
+              "googlebot": {
+                "value": "Googlebot"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful crawl result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrawlResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid path - usage instructions returned",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Crawl failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CrawlResult": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "The crawled domain"
+          },
+          "userAgent": {
+            "type": "string",
+            "description": "User agent used for checking rules"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the crawl was performed"
+          },
+          "robotsTxt": {
+            "$ref": "#/components/schemas/RobotsTxtResult"
+          },
+          "allowedToScrape": {
+            "$ref": "#/components/schemas/AllowedResult"
+          },
+          "sitemaps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SitemapResult"
+            }
+          },
+          "rssFeeds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RSSResult"
+            }
+          },
+          "llmsTxt": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LlmsTxtResult"
+            }
+          },
+          "refreshRecommendation": {
+            "$ref": "#/components/schemas/RefreshRecommendation"
+          },
+          "fetchCount": {
+            "type": "integer",
+            "description": "Number of HTTP requests made"
+          },
+          "maxFetches": {
+            "type": "integer",
+            "description": "Maximum allowed fetches (1000)"
+          }
+        },
+        "required": [
+          "domain",
+          "userAgent",
+          "timestamp",
+          "robotsTxt",
+          "allowedToScrape",
+          "sitemaps",
+          "rssFeeds",
+          "llmsTxt",
+          "refreshRecommendation",
+          "fetchCount",
+          "maxFetches"
+        ]
+      },
+      "RobotsTxtResult": {
+        "type": "object",
+        "properties": {
+          "raw": {
+            "type": "string",
+            "description": "Raw robots.txt content"
+          },
+          "parsed": {
+            "$ref": "#/components/schemas/ParsedRobotsTxt"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "ParsedRobotsTxt": {
+        "type": "object",
+        "properties": {
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RobotsRule"
+            }
+          },
+          "sitemaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "host": {
+            "type": "string"
+          }
+        }
+      },
+      "RobotsRule": {
+        "type": "object",
+        "properties": {
+          "userAgent": {
+            "type": "string"
+          },
+          "allow": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "disallow": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "crawlDelay": {
+            "type": "number"
+          },
+          "sitemaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AllowedResult": {
+        "type": "object",
+        "properties": {
+          "allowed": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "matchedRule": {
+            "type": "string"
+          }
+        },
+        "required": ["allowed", "reason"]
+      },
+      "SitemapResult": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "parsed": {
+            "$ref": "#/components/schemas/ParsedSitemap"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": ["url"]
+      },
+      "ParsedSitemap": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["index"]
+              },
+              "sitemaps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "loc": {
+                      "type": "string"
+                    },
+                    "lastmod": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["loc"]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["urlset"]
+              },
+              "urls": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SitemapEntry"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "SitemapEntry": {
+        "type": "object",
+        "properties": {
+          "loc": {
+            "type": "string"
+          },
+          "lastmod": {
+            "type": "string"
+          },
+          "changefreq": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "number"
+          }
+        },
+        "required": ["loc"]
+      },
+      "RSSResult": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "parsed": {
+            "$ref": "#/components/schemas/ParsedRSS"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": ["url"]
+      },
+      "ParsedRSS": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "lastBuildDate": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RSSItem"
+            }
+          }
+        },
+        "required": ["items"]
+      },
+      "RSSItem": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "pubDate": {
+            "type": "string"
+          },
+          "guid": {
+            "type": "string"
+          }
+        }
+      },
+      "LlmsTxtResult": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "parsed": {
+            "$ref": "#/components/schemas/LlmsTxtFile"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": ["url"]
+      },
+      "LlmsTxtFile": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Section"
+            }
+          }
+        },
+        "required": ["title", "sections"]
+      },
+      "Section": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileEntry"
+            }
+          }
+        },
+        "required": ["name", "files"]
+      },
+      "FileEntry": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": ["name", "url"]
+      },
+      "RefreshRecommendation": {
+        "type": "object",
+        "properties": {
+          "recommendedRefreshHours": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "factors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["recommendedRefreshHours", "reason", "factors"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          }
+        },
+        "required": ["error", "message", "domain"]
+      }
+    }
+  }
+}

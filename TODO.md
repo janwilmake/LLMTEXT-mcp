@@ -4,25 +4,6 @@
 - Remove newlines in descriptions to be according to spec.
 - Ensure not to hit `/extract` urls count limitation or other errors. Log them.
 
-# sitemap explorer lib: explore-sitemap
-
-Goal:
-
-- know the size of a website more cheaply
-- know when pages change more effectively
-
-Spec
-
-- input: domain name
-- output:
-  - parsed robots.txt
-  - business logic on what is allowed to scrape
-  - parsed sitemaps as JSON
-  - business logic to determine when to refresh
-  - look for `llms.txt` and parse it/them
-
-TODO: create separate `explore-sitemap` lib that works fully with the entire sitemap spec, including RSS and other things google and other crawlers would also support.
-
 # More...
 
 - See how we can prevent old files! aparently it's not good like this
