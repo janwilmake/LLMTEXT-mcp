@@ -10,19 +10,24 @@
 
 2. Create your own `llms.txt` from your entire website (not just the docs) by using our [extract-from-sitemap](extract-from-sitemap) tool. See [this template](https://github.com/parallel-web/parallel-llmtext) to easily create your own.
 
-### More Tools
+### Libraries
 
-- [llms-txt-validator](llms-txt-validate): Check llms.txt validity
+- [llms-txt-fetch](llms-txt-fetch): fetch all contents of a `llms.txt`
 - [llms-txt-generate](llms-txt-generate): Use this in combination with [getassetmanifest](getassetmanifest) if you want to deploy static assets already present in your fs as a `llms.txt`.
 - [llms-txt-mcp](llms-txt-mcp): converts a llms.txt into a dedicated MCP server
-- [llmtext.reader](llmtext.reader): converts HTML into simplified "browser-reader HTML", drastically improving token density
-- [parse-llms-txt](parse-llms-txt) - parse llms.txt according to [the standard](https://llmstxt.org)
-- [markdown-renderer](https://github.com/janwilmake/markdown-renderer) - Chrome/Safari Extension that renders markdown responses
+- [llms-txt-parse](llms-txt-parse): parse llms.txt according to [the standard](https://llmstxt.org)
+- [llms-txt-validate](llms-txt-validate): Check llms.txt validity
 
 ### Other
 
 - [llmtext](llmtext): the website
 - [llmtext.login](llmtext.login): X OAuth flow for the MCP
+- [llmtext.reader](llmtext.reader): converts HTML into simplified "browser-reader HTML", drastically improving token density
+
+### Other interesting repos
+
+- [markdown-renderer](https://github.com/janwilmake/markdown-renderer): Chrome/Safari Extension that renders markdown responses
+- [markdownbrowser](https://github.com/janwilmake/markdownbrowser)
 
 ## Sponsors
 
