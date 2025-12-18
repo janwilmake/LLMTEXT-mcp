@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
-  "name": "explore-sitemap",
+  "name": "explore-sitemaps",
   "main": "worker.ts",
   "compatibility_date": "2025-12-01",
   "routes": [{ "custom_domain": true, "pattern": "map.llmtext.com" }]
