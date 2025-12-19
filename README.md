@@ -19,10 +19,11 @@
 - [llms-txt-mcp](llms-txt-mcp): converts a llms.txt into a dedicated MCP server
 - [llms-txt-parse](llms-txt-parse): parse llms.txt according to [the standard](https://llmstxt.org)
 - [llms-txt-validate](llms-txt-validate): Check llms.txt validity
+- [shared-crawler](shared-crawler): Crawls a website and stores results in DOs so anyone can access them cheaply. Available via https://crawl.llmtext.com. Is used
 
 ### Other
 
-- [llmtext](llmtext): the website
+- [llmtext](llmtext): the website. Also exposes https://llmtext.com/%s where %s can be any url to get markdown for it. Depends on [shared-crawler](shared-crawler) for that.
 - [llmtext.login](llmtext.login): X OAuth flow for the MCP
 - [llmtext.reader](llmtext.reader): converts HTML into simplified "browser-reader HTML", drastically improving token density
 

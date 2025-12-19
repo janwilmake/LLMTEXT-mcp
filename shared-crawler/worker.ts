@@ -135,6 +135,7 @@ export class DomainDO extends DurableObject<Env> {
 
   private getDocument(url: string): Document | null {
     const results = this.sql
+      //@ts-ignore
       .exec<Document>(`SELECT * FROM documents WHERE url = ?`, url)
       .toArray();
     return results[0] || null;

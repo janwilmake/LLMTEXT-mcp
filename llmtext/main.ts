@@ -5,7 +5,6 @@ export interface Env {
   // No bindings needed - user will configure via settings if needed
 }
 
-const PARALLEL_API_BASE = "https://api.parallel.ai";
 const PARALLEL_OAUTH_BASE = "https://platform.parallel.ai";
 const CLIENT_ID = "llmtext.com";
 const REDIRECT_URI = "https://llmtext.com/callback";
