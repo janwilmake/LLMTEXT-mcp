@@ -16,7 +16,7 @@ export default {
   async fetch(
     request: Request,
     env: Env,
-    ctx: ExecutionContext
+    ctx: ExecutionContext,
   ): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
@@ -27,7 +27,7 @@ export default {
       const checkUrl = `https://${hostname}/llms.txt`;
       return Response.redirect(
         `${url.origin}/?check=${encodeURIComponent(checkUrl)}`,
-        302
+        302,
       );
     }
 
@@ -60,7 +60,7 @@ export default {
     if (!targetUrl) {
       return new Response(
         "Usage: https://llmtext.com/example.com or https://llmtext.com/https://example.com",
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -69,59 +69,34 @@ export default {
     console.log({ normalizedUrl });
     try {
       // Call Parallel Extract API
-      const extractResponse = await fetch(
-        `${PARALLEL_API_BASE}/v1beta/extract`,
-        {
-          method: "POST",
-          headers: {
-            "x-api-key": apiKey,
-            "parallel-beta": "search-extract-2025-10-10",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            urls: [normalizedUrl],
-            excerpts: false,
-            full_content: true,
-          }),
-        }
-      );
+      const extractResponse = await fetch(`https://crawl.llmtext.com/crawl`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          url: normalizedUrl,
+          options: { depth: 1, async: "links" },
+        }),
+      });
 
       if (!extractResponse.ok) {
         const errorText = await extractResponse.text();
         return new Response(
           `Parallel API error (${extractResponse.status}): ${errorText}`,
-          { status: extractResponse.status }
+          { status: extractResponse.status },
         );
       }
 
-      const extractData = (await extractResponse.json()) as ExtractResponse;
-
-      // Check for errors
-      if (extractData.errors && extractData.errors.length > 0) {
-        const error = extractData.errors[0];
-        return new Response(
-          `Extract error: ${error.error_type}${
-            error.content ? `\n${error.content}` : ""
-          }`,
-          { status: 500 }
-        );
-      }
-
-      // Return full content
-      if (extractData.results && extractData.results.length > 0) {
-        const result = extractData.results[0];
-        return new Response(result.full_content || "No content extracted", {
-          headers: {
-            "Content-Type": "text/markdown; charset=utf-8",
-          },
-        });
-      }
-
-      return new Response("No results found", { status: 404 });
+      const json: any = await extractResponse.json();
+      const content = json.results[0]?.content;
+      return new Response(content || "No content extracted", {
+        headers: {
+          "Content-Type": "text/markdown; charset=utf-8",
+        },
+      });
     } catch (error) {
       return new Response(
         `Error: ${error instanceof Error ? error.message : String(error)}`,
-        { status: 500 }
+        { status: 500 },
       );
     }
   },
@@ -299,7 +274,7 @@ function handleUnauthorized(origin: string, path: string): Response {
         <p>To convert web pages to clean markdown format, you need to authenticate with your Parallel account.</p>
         
         <a href="/authorize?redirect_to=${encodeURIComponent(
-          path
+          path,
         )}" class="btn-login">
             Login with Parallel
         </a>
@@ -330,7 +305,7 @@ async function redirectToOAuth(originalPath: string): Promise<Response> {
       originalPath,
       codeVerifier,
       timestamp: Date.now(),
-    })
+    }),
   );
 
   const authUrl = new URL(`${PARALLEL_OAUTH_BASE}/getKeys/authorize`);
@@ -402,8 +377,8 @@ async function handleCallback(request: Request): Promise<Response> {
     headers.set(
       "Set-Cookie",
       `${COOKIE_NAME}=${encodeURIComponent(
-        tokenData.access_token
-      )}; HttpOnly;${securePart} SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}; Path=/`
+        tokenData.access_token,
+      )}; HttpOnly;${securePart} SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}; Path=/`,
     );
 
     return new Response(null, { status: 302, headers });
@@ -412,7 +387,7 @@ async function handleCallback(request: Request): Promise<Response> {
       `Error exchanging token: ${
         error instanceof Error ? error.message : String(error)
       }`,
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -435,28 +410,6 @@ function base64UrlEncode(buffer: Uint8Array): string {
   return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
 
-// Type definitions for Parallel API responses
-interface ExtractResponse {
-  extract_id: string;
-  results: ExtractResult[];
-  errors: ExtractError[];
-}
-
-interface ExtractResult {
-  url: string;
-  excerpts: string[] | null;
-  full_content: string | null;
-  title: string | null;
-  publish_date: string | null;
-}
-
-interface ExtractError {
-  url: string;
-  error_type: string;
-  http_status_code: number | null;
-  content: string | null;
-}
-
 const handleLlmsTxt = async () => {
   try {
     // Fetch the JSON data
@@ -471,16 +424,16 @@ const handleLlmsTxt = async () => {
 
     const totalServers = activeServersList.length;
     const activeServers = activeServersList.filter(
-      (s: any) => s.total_requests > 0
+      (s: any) => s.total_requests > 0,
     ).length;
     const totalUsers = data.users.length;
     const totalRequests = data.users.reduce(
       (sum: number, u: any) => sum + u.total_requests,
-      0
+      0,
     );
     const totalTokens = data.users.reduce(
       (sum: number, u: any) => sum + u.total_tokens,
-      0
+      0,
     );
 
     content += `> MCP Server Usage Statistics\n`;
@@ -526,7 +479,7 @@ const handleLlmsTxt = async () => {
         headers: {
           "Content-Type": "text/plain",
         },
-      }
+      },
     );
   }
 };
