@@ -1,4 +1,7 @@
-Fix issues - https://github.com/janwilmake/LLMTEXT-mcp/issues
+# Issues
+
+- https://github.com/janwilmake/LLMTEXT-mcp/issues/1: not working in cursor; see why it keeps loading tools!
+- https://github.com/janwilmake/LLMTEXT-mcp/issues/2: path error should not misvalidate. allow llms.txt at any path
 
 # extract-from-sitemap
 
