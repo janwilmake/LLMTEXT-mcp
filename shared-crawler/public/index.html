@@ -52,8 +52,24 @@
             cursor: pointer;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background: #0055aa;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .api-key-help {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        .api-key-help a {
+            color: #0066cc;
         }
 
         #results {
@@ -105,8 +121,8 @@
         <label for="async">Async Mode</label>
         <select id="async" name="async">
             <option value="none">None (wait for all)</option>
-            <option value="links">Links (stream links)</option>
-            <option value="all">All (immediate response)</option>
+            <option value="links">Links (linked items are saved but not streamed)</option>
+            <option value="all">All (immediate response, no pages returned)</option>
         </select>
 
         <label for="format">Response Format</label>
@@ -118,8 +134,12 @@
 
         <label for="apiKey">Parallel API Key</label>
         <input type="password" id="apiKey" name="apiKey" placeholder="Your API key">
+        <p class="api-key-help">
+            Don't have an API key? <a href="https://platform.parallel.ai/settings?tab=api-keys" target="_blank"
+                rel="noopener">Get one here →</a>
+        </p>
 
-        <button type="submit">Crawl</button>
+        <button type="submit" id="submitBtn">Crawl</button>
     </form>
 
     <div id="results"></div>
@@ -127,9 +147,40 @@
     <script>
         const form = document.getElementById('crawlForm');
         const results = document.getElementById('results');
+        const apiKeyInput = document.getElementById('apiKey');
+        const submitBtn = document.getElementById('submitBtn');
+        const API_KEY_STORAGE_KEY = 'parallel_api_key';
+
+        // Load API key from localStorage on page load
+        const savedApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+        if (savedApiKey) {
+            apiKeyInput.value = savedApiKey;
+        }
+
+        // Save API key to localStorage when it changes
+        apiKeyInput.addEventListener('change', () => {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                localStorage.setItem(API_KEY_STORAGE_KEY, key);
+            } else {
+                localStorage.removeItem(API_KEY_STORAGE_KEY);
+            }
+        });
+
+        let isCrawling = false;
+
+        function setFormDisabled(disabled) {
+            isCrawling = disabled;
+            submitBtn.disabled = disabled;
+            submitBtn.textContent = disabled ? 'Crawling...' : 'Crawl';
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            if (isCrawling) return;
+
+            setFormDisabled(true);
             results.innerHTML = 'Starting crawl...\n';
 
             const url = document.getElementById('url').value;
@@ -137,7 +188,12 @@
             const strategy = document.getElementById('strategy').value;
             const asyncMode = document.getElementById('async').value;
             const format = document.getElementById('format').value;
-            const apiKey = document.getElementById('apiKey').value;
+            const apiKey = apiKeyInput.value.trim();
+
+            // Save API key if provided
+            if (apiKey) {
+                localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
+            }
 
             const headers = {
                 'Content-Type': 'application/json',
@@ -145,53 +201,62 @@
             };
             if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-            if (format === 'text/event-stream') {
-                const response = await fetch('/crawl', {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({ url, options: { depth, strategy, async: asyncMode } })
-                });
+            try {
+                if (format === 'text/event-stream') {
+                    const response = await fetch('/crawl', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({ url, options: { depth, strategy, async: asyncMode } })
+                    });
 
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let buffer = '';
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
 
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop() || '';
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split('\n');
+                        buffer = lines.pop() || '';
 
-                    let currentEvent = '';
-                    for (const line of lines) {
-                        if (line.startsWith('event: ')) {
-                            currentEvent = line.slice(7);
-                        } else if (line.startsWith('data: ')) {
-                            const data = JSON.parse(line.slice(6));
-                            const div = document.createElement('div');
-                            div.className = `event ${currentEvent}`;
-                            if (currentEvent === 'document') {
-                                div.textContent = `✓ ${data.url} (${data.source}, ${data.content.length} chars)`;
-                            } else if (currentEvent === 'error') {
-                                div.textContent = `✗ ${data.url}: ${data.error}`;
-                            } else if (currentEvent === 'done') {
-                                div.textContent = `Done! Total: ${data.total} pages`;
+                        let currentEvent = '';
+                        for (const line of lines) {
+                            if (line.startsWith('event: ')) {
+                                currentEvent = line.slice(7);
+                            } else if (line.startsWith('data: ')) {
+                                const data = JSON.parse(line.slice(6));
+                                const div = document.createElement('div');
+                                div.className = `event ${currentEvent}`;
+                                if (currentEvent === 'document') {
+                                    div.textContent = `✓ ${data.url} (${data.source}, ${data.content.length} chars)`;
+                                } else if (currentEvent === 'error') {
+                                    div.textContent = `✗ ${data.url}: ${data.error}`;
+                                } else if (currentEvent === 'done') {
+                                    div.textContent = `Done! Total: ${data.total} pages`;
+                                }
+                                results.appendChild(div);
+                                results.scrollTop = results.scrollHeight;
                             }
-                            results.appendChild(div);
-                            results.scrollTop = results.scrollHeight;
                         }
                     }
+                } else {
+                    const response = await fetch('/crawl', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({ url, options: { depth, strategy, async: asyncMode } })
+                    });
+                    const text = await response.text();
+                    results.textContent = text;
                 }
-            } else {
-                const response = await fetch('/crawl', {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({ url, options: { depth, strategy, async: asyncMode } })
-                });
-                const text = await response.text();
-                results.textContent = text;
+            } catch (error) {
+                const div = document.createElement('div');
+                div.className = 'event error';
+                div.textContent = `Error: ${error.message}`;
+                results.appendChild(div);
+            } finally {
+                setFormDisabled(false);
             }
         });
     </script>

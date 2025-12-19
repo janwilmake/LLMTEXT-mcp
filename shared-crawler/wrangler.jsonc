@@ -8,5 +8,6 @@
   "durable_objects": {
     "bindings": [{ "name": "DomainDO", "class_name": "DomainDO" }]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DomainDO"] }]
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DomainDO"] }],
+  "routes": [{ "custom_domain": true, "pattern": "crawl.llmtext.com" }]
 }

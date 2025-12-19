@@ -220,20 +220,22 @@ export class DomainDO extends DurableObject<Env> {
 
   private async tryLlmsTxt(url: string): Promise<CrawlResult | null> {
     // Try appending .md
-    const mdUrl = url.endsWith("/") ? `${url}index.html.md` : `${url}.md`;
+    const mdUrl = url.endsWith("/") ? `${url}index.md` : `${url}.md`;
     try {
       const res = await fetch(mdUrl, {
         headers: { "User-Agent": "CrawlerBot/1.0" },
       });
       if (res.ok) {
         const content = await res.text();
-        return {
-          url,
-          content,
-          links: this.extractLinks(content, url),
-          cached: false,
-          source: "llms-txt",
-        };
+        if (!content.includes("<!DOCTYPE") && !content.includes("<html")) {
+          return {
+            url,
+            content,
+            links: this.extractLinks(content, url),
+            cached: false,
+            source: "llms-txt",
+          };
+        }
       }
     } catch {}
 
