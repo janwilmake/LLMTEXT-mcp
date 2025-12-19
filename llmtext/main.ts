@@ -413,7 +413,12 @@ const handleLlmsTxt = async () => {
   try {
     // Fetch the JSON data
     const response = await fetch("https://mcp.llmtext.com/index.json");
-    const data: any = await response.json();
+    const data: {
+      users: any[];
+      servers: any[];
+      totalRequests: number;
+      totalTokens: number;
+    } = await response.json();
 
     // Generate llms.txt content
     let content = "# llms.txt\n\n";
