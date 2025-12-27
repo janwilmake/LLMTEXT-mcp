@@ -5,6 +5,7 @@
 
 # extract-from-sitemap
 
+- `extract-from-sitemap`: Add support for RSS/Atom
 - `llms-full.txt` should have a concatenation of the llms.txt and all linked to files underneath - Also generate `llms-full.txt`, and create `.genignore` files to ensure it's not included
 - Remove newlines in descriptions to be according to spec.
 - Ensure not to hit `/extract` urls count limitation or other errors. Log them.

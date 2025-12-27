@@ -51,6 +51,109 @@ export default {
   ): Promise<Response> {
     const url = new URL(request.url);
 
+    if (
+      url.pathname.match(/^\/([^\/]+)\/llms\.txt$/) &&
+      request.method === "GET"
+    ) {
+      const hostname = url.pathname.split("/")[1];
+
+      try {
+        const domainDO = env.DomainDO.get(env.DomainDO.idFromName(hostname));
+
+        // Get all documents for this domain
+        const documents = await domainDO.getAllDocuments();
+
+        if (!documents || documents.length === 0) {
+          return new Response(
+            `# ${hostname}\n\n> No documents currently indexed for this domain.\n\n## Note\n\nThis llms.txt file is automatically generated from our crawler's index and may not be complete. The website owner should ideally provide their own official llms.txt file.`,
+            {
+              status: 404,
+              headers: {
+                "Content-Type": "text/plain; charset=utf-8",
+                "X-Generated": "true",
+              },
+            },
+          );
+        }
+
+        // Generate llms.txt content
+        let content = `# ${hostname}\n\n`;
+        content += `> Automatically generated index of ${
+          documents.length
+        } crawled document${
+          documents.length !== 1 ? "s" : ""
+        } from ${hostname}.\n\n`;
+        content += `**⚠️ Important:** This llms.txt file is auto-generated from our crawler's index and may be incomplete or outdated. The website owner should provide their own official llms.txt file at https://${hostname}/llms.txt for accurate and complete documentation.\n\n`;
+
+        // Group documents by path prefix for better organization
+        const pathGroups = new Map<string, typeof documents>();
+
+        for (const doc of documents) {
+          try {
+            const docUrl = new URL(doc.url);
+            const pathParts = docUrl.pathname.split("/").filter((p) => p);
+            const section = pathParts.length > 0 ? pathParts[0] : "root";
+
+            if (!pathGroups.has(section)) {
+              pathGroups.set(section, []);
+            }
+            pathGroups.get(section)!.push(doc);
+          } catch {
+            if (!pathGroups.has("other")) {
+              pathGroups.set("other", []);
+            }
+            pathGroups.get("other")!.push(doc);
+          }
+        }
+
+        // Generate sections
+        for (const [section, docs] of pathGroups) {
+          const sectionTitle =
+            section.charAt(0).toUpperCase() + section.slice(1);
+          content += `## ${sectionTitle}\n\n`;
+
+          for (const doc of docs.slice(0, 50)) {
+            // Limit to 50 docs per section
+            const title = doc.title || new URL(doc.url).pathname;
+            const description = doc.description
+              ? `: ${doc.description.slice(0, 100)}${
+                  doc.description.length > 100 ? "..." : ""
+                }`
+              : "";
+            content += `- [${title}](https://llmtext.com/${doc.url})${description}\n`;
+          }
+
+          if (docs.length > 50) {
+            content += `- *(${
+              docs.length - 50
+            } more documents available in this section)*\n`;
+          }
+          content += `\n`;
+        }
+
+        return new Response(content, {
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "X-Generated": "true",
+            "X-Document-Count": documents.length.toString(),
+          },
+        });
+      } catch (error) {
+        return new Response(
+          `# ${hostname}\n\n> Error generating llms.txt: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }\n\n## Note\n\nThis llms.txt file is automatically generated and an error occurred. The website owner should provide their own official llms.txt file.`,
+          {
+            status: 500,
+            headers: {
+              "Content-Type": "text/plain; charset=utf-8",
+              "X-Generated": "true",
+            },
+          },
+        );
+      }
+    }
+
     if (url.pathname === "/crawl" && request.method === "POST") {
       const body = (await request.json()) as {
         url: string;
@@ -217,6 +320,20 @@ export class DomainDO extends DurableObject<Env> {
       } catch {}
     }
     return [...new Set(links)];
+  }
+
+  async getAllDocuments(): Promise<Document[]> {
+    const results = this.sql
+      //@ts-ignore
+      .exec<Document>(
+        `
+      SELECT url, title, description, size, modified_at, visits 
+      FROM documents 
+      ORDER BY visits DESC, modified_at DESC
+    `,
+      )
+      .toArray();
+    return results;
   }
 
   private async tryLlmsTxt(url: string): Promise<CrawlResult | null> {

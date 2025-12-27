@@ -28,8 +28,13 @@ Plan: Crawler with shared data between users
 
 This gives the ability to browse the internet while viewing what the AI system would see, but very cost effectively because of the shared index. Latency will be a single round-trip if indexed. Creating the SQLite index even when the website already offers markdown variants is useful because it allows doing a filter on its data very fast. It will be slowest when using extract.
 
+endpoint GET /{hostname}/llms.txt
+
+this endpoint should present all available documents from the site in llms.txt format. it should be with disclaimer that it's not certain to be complete and the owner of the website should distribute one themselves.
+
 Context:
 
+- llms.txt standard: https://llmstxt.org/index.md
 - Cloudflare Durable objects: https://flaredream.com/system-ts.md
 - extract api: https://docs.parallel.ai/api-reference/extract-beta/extract.md
 
