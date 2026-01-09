@@ -1,3 +1,5 @@
+import { parseLlmsTxt } from "llms-txt-parse";
+
 /**
  * @typedef {Object} FileResult
  * @property {string} [error] - Error message if file processing failed
@@ -57,7 +59,227 @@
  */
 
 /**
+ * Fetch llms.txt from origin if available
+ * @param {string} origin - The origin to check for llms.txt
+ * @returns {Promise<string|null>} The llms.txt content or null if not found
+ */
+async function fetchLlmsTxt(origin) {
+  const baseUrl = origin.startsWith("http") ? origin : `https://${origin}`;
+  const domain = new URL(baseUrl).origin;
+
+  try {
+    const res = await fetch(`${domain}/llms.txt`, {
+      headers: { "User-Agent": "sitemap-to-llmtext-bot/1.0" },
+    });
+
+    if (res.ok) {
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("text")) {
+        return await res.text();
+      }
+    }
+  } catch {}
+
+  return null;
+}
+
+/**
+ * Extract content using llms.txt entries
+ * @param {import("../llms-txt-parse/mod.js").LlmsTxtFile} llmsTxt - Parsed llms.txt structure
+ * @param {string} origin - The origin URL for resolving relative URLs
+ * @param {string} apiKey - Parallel API key
+ * @param {string} [titleRemovePattern] - Optional regex pattern to remove from titles
+ * @returns {Promise<ResponseData>}
+ */
+async function extractFromLlmsTxtEntries(
+  llmsTxt,
+  origin,
+  apiKey,
+  titleRemovePattern,
+) {
+  const startTime = Date.now();
+  let fetchCount = 0;
+  let extractApiCallCount = 0;
+
+  const files = {};
+  const urlsNeedingExtract = [];
+
+  const baseUrl = origin.startsWith("http") ? origin : `https://${origin}`;
+  const domain = new URL(baseUrl).origin;
+
+  // Collect all file entries from all sections
+  const allEntries = llmsTxt.sections.flatMap((section) =>
+    section.files.map((file) => ({
+      ...file,
+      section: section.name,
+    })),
+  );
+
+  // Fetch all URLs from llms.txt entries
+  await Promise.all(
+    allEntries.map(async (entry) => {
+      // Resolve relative URLs against origin
+      let resolvedUrl;
+      try {
+        resolvedUrl = new URL(entry.url, domain).href;
+      } catch {
+        resolvedUrl = entry.url;
+      }
+
+      try {
+        // Try fetching the markdown URL directly
+        const res = await fetch(resolvedUrl, {
+          headers: {
+            Accept: "text/markdown, text/plain, */*",
+            "User-Agent": "sitemap-to-llmtext-bot/1.0",
+          },
+        });
+        fetchCount++;
+
+        const path = getPathFromUrl(resolvedUrl);
+        // Ensure .md extension
+        const filePath = path.endsWith(".md") ? path : path + ".md";
+
+        if (res.ok) {
+          const content = await res.text();
+
+          // Check if we actually got markdown (not HTML)
+          const isMarkdown =
+            !content.trim().startsWith("<!DOCTYPE") &&
+            !content.trim().startsWith("<html");
+
+          if (isMarkdown && content.trim()) {
+            files[filePath] = {
+              content,
+              title: cleanTitle(entry.name, titleRemovePattern),
+              description: cleanDescription(entry.notes || "", entry.name),
+              extracted: false,
+              status: res.status,
+              tokens: Math.round(content.length / 5),
+              publishedDate: "",
+              originalUrl: resolvedUrl,
+            };
+            return;
+          }
+        }
+
+        // Mark for extraction fallback
+        files[filePath] = {
+          content: "",
+          title: cleanTitle(entry.name, titleRemovePattern),
+          description: cleanDescription(entry.notes || "", entry.name),
+          extracted: false,
+          status: res.status,
+          tokens: 0,
+          publishedDate: "",
+          originalUrl: resolvedUrl,
+          error: "Could not fetch markdown content",
+        };
+        urlsNeedingExtract.push(resolvedUrl);
+      } catch (error) {
+        const path = getPathFromUrl(resolvedUrl);
+        const filePath = path.endsWith(".md") ? path : path + ".md";
+        files[filePath] = {
+          error: error instanceof Error ? error.message : "Unknown error",
+          content: "",
+          title: cleanTitle(entry.name, titleRemovePattern),
+          description: cleanDescription(entry.notes || "", entry.name),
+          extracted: false,
+          status: 0,
+          tokens: 0,
+          publishedDate: "",
+          originalUrl: resolvedUrl,
+        };
+        urlsNeedingExtract.push(resolvedUrl);
+      }
+    }),
+  );
+
+  // Use Parallel Extract API for URLs that didn't return content
+  if (urlsNeedingExtract.length > 0 && apiKey) {
+    try {
+      extractApiCallCount = 1;
+      const extractResults = await callParallelExtractAPI(
+        urlsNeedingExtract,
+        apiKey,
+      );
+
+      // Merge extract results
+      for (const result of extractResults.results) {
+        const path = getPathFromUrl(result.url);
+        const filePath = path.endsWith(".md") ? path : path + ".md";
+        const existing = files[filePath] || {
+          content: "",
+          title: "",
+          description: "",
+          extracted: false,
+          status: 0,
+          tokens: 0,
+          publishedDate: "",
+          originalUrl: result.url,
+        };
+
+        const content = result.full_content || existing.content;
+        files[filePath] = {
+          content,
+          title: cleanTitle(result.title || existing.title, titleRemovePattern),
+          description: cleanDescription(
+            existing.description,
+            result.title || existing.title,
+          ),
+          extracted: !!result.full_content,
+          publishedDate: result.published_date || existing.publishedDate,
+          status: existing.status,
+          tokens: Math.round(content.length / 5),
+          originalUrl: existing.originalUrl,
+        };
+      }
+
+      // Handle extract errors
+      for (const error of extractResults.errors) {
+        const path = getPathFromUrl(error.url);
+        const filePath = path.endsWith(".md") ? path : path + ".md";
+        if (files[filePath]) {
+          files[filePath].error = error.message;
+        }
+      }
+    } catch (error) {
+      console.error("Extract API error:", error);
+    }
+  }
+
+  // Sort files by path
+  const sortedFiles = Object.keys(files)
+    .sort()
+    .reduce((acc, key) => {
+      acc[key] = files[key];
+      return acc;
+    }, {});
+
+  // Calculate totals
+  const totalTokens = Object.values(sortedFiles).reduce(
+    (sum, file) => sum + file.tokens,
+    0,
+  );
+  const totalPages = Object.keys(sortedFiles).length;
+  const errors = Object.values(sortedFiles).filter((file) => file.error).length;
+  const processingTimeMs = Date.now() - startTime;
+
+  return {
+    files: sortedFiles,
+    totalTokens,
+    totalPages,
+    errors,
+    processingTimeMs,
+    extractApiCallCount,
+    fetchCount,
+    usedLlmsTxt: true,
+  };
+}
+
+/**
  * Extract content from sitemap URLs with markdown variant detection
+ * Tries llms.txt first if available, then falls back to sitemap
  * @param {string} origin - The origin URL to extract from
  * @param {boolean} forceExtract - Whether to force using extract API instead of markdown variants
  * @param {string} apiKey - Parallel API key
@@ -68,16 +290,35 @@ export async function extractFromSitemap(
   origin,
   forceExtract = false,
   apiKey,
-  titleRemovePattern
+  titleRemovePattern,
 ) {
   const startTime = Date.now();
   let fetchCount = 0;
   let extractApiCallCount = 0;
 
-  // Discover sitemap
+  // Try llms.txt first
+  const llmsTxtContent = await fetchLlmsTxt(origin);
+  if (llmsTxtContent) {
+    const llmsTxt = parseLlmsTxt(llmsTxtContent);
+    const totalEntries = llmsTxt.sections.reduce(
+      (sum, section) => sum + section.files.length,
+      0,
+    );
+    if (totalEntries > 0) {
+      console.log(`Found llms.txt with ${totalEntries} entries for ${origin}`);
+      return extractFromLlmsTxtEntries(
+        llmsTxt,
+        origin,
+        apiKey,
+        titleRemovePattern,
+      );
+    }
+  }
+
+  // Fall back to sitemap discovery
   const sitemapUrl = await discoverSitemap(origin);
   if (!sitemapUrl) {
-    throw new Error(`Could not find sitemap for ${origin}`);
+    throw new Error(`Could not find sitemap or llms.txt for ${origin}`);
   }
 
   // Parse sitemap and get URLs
@@ -128,7 +369,7 @@ export async function extractFromSitemap(
           urlsNeedingExtract.push(urlStr);
         }
       }
-    })
+    }),
   );
 
   // Use Parallel Extract API for URLs that didn't return content
@@ -137,7 +378,7 @@ export async function extractFromSitemap(
       extractApiCallCount = 1;
       const extractResults = await callParallelExtractAPI(
         urlsNeedingExtract,
-        apiKey
+        apiKey,
       );
 
       // Merge extract results
@@ -160,7 +401,7 @@ export async function extractFromSitemap(
           title: cleanTitle(result.title || existing.title, titleRemovePattern),
           description: cleanDescription(
             existing.description,
-            result.title || existing.title
+            result.title || existing.title,
           ),
           extracted: !!result.full_content,
           publishedDate: result.published_date || existing.publishedDate,
@@ -193,7 +434,7 @@ export async function extractFromSitemap(
   // Calculate totals
   const totalTokens = Object.values(sortedFiles).reduce(
     (sum, file) => sum + file.tokens,
-    0
+    0,
   );
   const totalPages = Object.keys(sortedFiles).length;
   const errors = Object.values(sortedFiles).filter((file) => file.error).length;
@@ -296,7 +537,7 @@ export async function processLLMTextConfig(config, apiKey) {
           sourceConfig.origin,
           sourceConfig.forceExtract || false,
           apiKey,
-          sourceConfig.titleRemovePattern
+          sourceConfig.titleRemovePattern,
         );
 
         sourceFiles = result.files;
@@ -309,7 +550,7 @@ export async function processLLMTextConfig(config, apiKey) {
       if (sourceConfig.customUrls && sourceConfig.customUrls.length > 0) {
         const customFiles = await processCustomUrls(
           sourceConfig.customUrls,
-          apiKey
+          apiKey,
         );
 
         // Merge custom files with sitemap files
@@ -382,7 +623,7 @@ export async function processLLMTextConfig(config, apiKey) {
     config.title,
     config.description,
     config.details,
-    allSources
+    allSources,
   );
 
   fileHierarchy[`${config.outDir}/llms.txt`] = {
@@ -420,7 +661,7 @@ function generateCombinedLlmsTxt(title, description, details, allSources) {
 
     // Sort files by path for consistent ordering
     const sortedFiles = Object.entries(source.files).sort(([a], [b]) =>
-      a.localeCompare(b)
+      a.localeCompare(b),
     );
 
     for (const [path, file] of sortedFiles) {
@@ -601,7 +842,7 @@ async function parseSitemap(sitemapUrl) {
   if (childSitemaps.length > 0) {
     // Recursively parse child sitemaps
     const childUrls = await Promise.all(
-      childSitemaps.map((url) => parseSitemap(url))
+      childSitemaps.map((url) => parseSitemap(url)),
     );
     return childUrls.flat();
   }
@@ -681,7 +922,7 @@ async function fetchUrlContent(urlStr, forceExtract = false) {
 
       // Look for markdown alternate link
       const mdAlternateMatch = html.match(
-        /<link\s+rel=["']alternate["']\s+type=["']text\/markdown["']\s+href=["']([^"']+)["'][^>]*>/i
+        /<link\s+rel=["']alternate["']\s+type=["']text\/markdown["']\s+href=["']([^"']+)["'][^>]*>/i,
       );
 
       if (mdAlternateMatch) {
@@ -765,7 +1006,7 @@ function extractMetadata(html) {
 
   // Extract og:description
   const ogDescMatch = html.match(
-    /<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i
+    /<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i,
   );
   if (ogDescMatch) {
     description = ogDescMatch[1].trim();
@@ -774,7 +1015,7 @@ function extractMetadata(html) {
   // Fallback to meta description
   if (!description) {
     const metaDescMatch = html.match(
-      /<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i
+      /<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i,
     );
     if (metaDescMatch) {
       description = metaDescMatch[1].trim();
@@ -848,7 +1089,7 @@ async function callParallelExtractAPI(urls, apiKey) {
 
   if (!response.ok) {
     throw new Error(
-      `Extract API failed: ${response.status} ${response.statusText}`
+      `Extract API failed: ${response.status} ${response.statusText}`,
     );
   }
 
