@@ -1,4 +1,4 @@
-import { parseLlmsTxt } from "llms-txt-parse";
+import { parseLlmsTxt } from "parse-llms-txt";
 
 /**
  * @typedef {Object} FileResult
