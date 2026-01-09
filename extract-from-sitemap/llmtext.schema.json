@@ -41,6 +41,11 @@
       "items": {
         "type": "object",
         "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["llms.txt", "sitemap", "custom"],
+            "description": "The source type: 'llms.txt' to fetch from origin's llms.txt, 'sitemap' to fetch from origin's sitemap, 'custom' to use only customUrls"
+          },
           "title": {
             "type": "string",
             "description": "Title for this source (used in the combined llms.txt)",
@@ -126,13 +131,25 @@
             }
           }
         },
-        "required": ["title"],
+        "required": ["title", "type"],
         "additionalProperties": false,
-        "anyOf": [
-          { "required": ["origin"] },
+        "allOf": [
           {
-            "properties": { "customUrls": { "minItems": 1 } },
-            "required": ["customUrls"]
+            "if": {
+              "properties": { "type": { "enum": ["llms.txt", "sitemap"] } }
+            },
+            "then": {
+              "required": ["origin"]
+            }
+          },
+          {
+            "if": {
+              "properties": { "type": { "const": "custom" } }
+            },
+            "then": {
+              "properties": { "customUrls": { "minItems": 1 } },
+              "required": ["customUrls"]
+            }
           }
         ]
       }
@@ -148,6 +165,7 @@
       "outDir": "./docs",
       "sources": [
         {
+          "type": "llms.txt",
           "title": "Parallel AI Documentation",
           "origin": "https://docs.parallel.ai",
           "outDir": "./docs/parallel-docs",
@@ -155,6 +173,7 @@
           "keepOriginalUrls": false
         },
         {
+          "type": "sitemap",
           "title": "Parallel AI Website",
           "origin": "https://parallel.ai",
           "outDir": "./docs/parallel-main",
@@ -162,6 +181,7 @@
           "keepOriginalUrls": false
         },
         {
+          "type": "custom",
           "title": "Custom Resources",
           "outDir": "./docs/custom",
           "forceExtract": true,
@@ -176,6 +196,7 @@
           ]
         },
         {
+          "type": "custom",
           "title": "External References",
           "keepOriginalUrls": true,
           "forceExtract": false,

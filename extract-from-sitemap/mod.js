@@ -26,8 +26,9 @@ import { parseLlmsTxt } from "parse-llms-txt";
 
 /**
  * @typedef {Object} SourceConfig
+ * @property {"llms.txt" | "sitemap" | "custom"} type - The source type
  * @property {string} title - The title for this source
- * @property {string} [origin] - The origin URL to process (optional)
+ * @property {string} [origin] - The origin URL to process (required for llms.txt and sitemap types)
  * @property {string} [outDir] - Output directory for this source's extracted files
  * @property {boolean} [forceExtract] - Whether to force extraction for this source
  * @property {boolean} [keepOriginalUrls] - Whether to keep original URL structure and not save files locally
@@ -278,8 +279,34 @@ async function extractFromLlmsTxtEntries(
 }
 
 /**
- * Extract content from sitemap URLs with markdown variant detection
- * Tries llms.txt first if available, then falls back to sitemap
+ * Extract content from llms.txt only (no fallback to sitemap)
+ * @param {string} origin - The origin URL to extract from
+ * @param {string} apiKey - Parallel API key
+ * @param {string} [titleRemovePattern] - Optional regex pattern to remove from titles
+ * @returns {Promise<ResponseData>}
+ */
+export async function extractFromLlmsTxt(origin, apiKey, titleRemovePattern) {
+  const llmsTxtContent = await fetchLlmsTxt(origin);
+  if (!llmsTxtContent) {
+    throw new Error(`Could not find llms.txt for ${origin}`);
+  }
+
+  const llmsTxt = parseLlmsTxt(llmsTxtContent);
+  const totalEntries = llmsTxt.sections.reduce(
+    (sum, section) => sum + section.files.length,
+    0,
+  );
+
+  if (totalEntries === 0) {
+    throw new Error(`llms.txt found but contains no entries for ${origin}`);
+  }
+
+  console.log(`Found llms.txt with ${totalEntries} entries for ${origin}`);
+  return extractFromLlmsTxtEntries(llmsTxt, origin, apiKey, titleRemovePattern);
+}
+
+/**
+ * Extract content from sitemap URLs with markdown variant detection (no llms.txt fallback)
  * @param {string} origin - The origin URL to extract from
  * @param {boolean} forceExtract - Whether to force using extract API instead of markdown variants
  * @param {string} apiKey - Parallel API key
@@ -296,29 +323,9 @@ export async function extractFromSitemap(
   let fetchCount = 0;
   let extractApiCallCount = 0;
 
-  // Try llms.txt first
-  const llmsTxtContent = await fetchLlmsTxt(origin);
-  if (llmsTxtContent) {
-    const llmsTxt = parseLlmsTxt(llmsTxtContent);
-    const totalEntries = llmsTxt.sections.reduce(
-      (sum, section) => sum + section.files.length,
-      0,
-    );
-    if (totalEntries > 0) {
-      console.log(`Found llms.txt with ${totalEntries} entries for ${origin}`);
-      return extractFromLlmsTxtEntries(
-        llmsTxt,
-        origin,
-        apiKey,
-        titleRemovePattern,
-      );
-    }
-  }
-
-  // Fall back to sitemap discovery
   const sitemapUrl = await discoverSitemap(origin);
   if (!sitemapUrl) {
-    throw new Error(`Could not find sitemap or llms.txt for ${origin}`);
+    throw new Error(`Could not find sitemap for ${origin}`);
   }
 
   // Parse sitemap and get URLs
@@ -531,8 +538,19 @@ export async function processLLMTextConfig(config, apiKey) {
     let sourceFiles = {};
 
     try {
-      // Process origin if provided
-      if (sourceConfig.origin) {
+      // Process based on type
+      if (sourceConfig.type === "llms.txt" && sourceConfig.origin) {
+        const result = await extractFromLlmsTxt(
+          sourceConfig.origin,
+          apiKey,
+          sourceConfig.titleRemovePattern,
+        );
+
+        sourceFiles = result.files;
+        totalTokens += result.totalTokens;
+        totalPages += result.totalPages;
+        totalErrors += result.errors;
+      } else if (sourceConfig.type === "sitemap" && sourceConfig.origin) {
         const result = await extractFromSitemap(
           sourceConfig.origin,
           sourceConfig.forceExtract || false,
@@ -544,22 +562,21 @@ export async function processLLMTextConfig(config, apiKey) {
         totalTokens += result.totalTokens;
         totalPages += result.totalPages;
         totalErrors += result.errors;
-      }
+      } else if (sourceConfig.type === "custom") {
+        // Process custom URLs for this source
+        if (sourceConfig.customUrls && sourceConfig.customUrls.length > 0) {
+          const customFiles = await processCustomUrls(
+            sourceConfig.customUrls,
+            apiKey,
+          );
 
-      // Process custom URLs for this source
-      if (sourceConfig.customUrls && sourceConfig.customUrls.length > 0) {
-        const customFiles = await processCustomUrls(
-          sourceConfig.customUrls,
-          apiKey,
-        );
+          sourceFiles = customFiles;
 
-        // Merge custom files with sitemap files
-        sourceFiles = { ...sourceFiles, ...customFiles };
-
-        for (const file of Object.values(customFiles)) {
-          totalTokens += file.tokens;
-          totalPages++;
-          if (file.error) totalErrors++;
+          for (const file of Object.values(customFiles)) {
+            totalTokens += file.tokens;
+            totalPages++;
+            if (file.error) totalErrors++;
+          }
         }
       }
 

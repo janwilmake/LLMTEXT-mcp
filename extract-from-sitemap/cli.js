@@ -222,6 +222,7 @@ async function loadConfig() {
           outDir: "./docs",
           sources: [
             {
+              type: "llms.txt",
               title: "Parallel AI Documentation",
               origin: "https://docs.parallel.ai",
               forceExtract: false,
@@ -229,6 +230,7 @@ async function loadConfig() {
               keepOriginalUrls: false,
             },
             {
+              type: "sitemap",
               title: "Parallel AI Website",
               origin: "https://parallel.ai",
               forceExtract: true,
@@ -236,6 +238,7 @@ async function loadConfig() {
               keepOriginalUrls: false,
             },
             {
+              type: "custom",
               title: "Custom Resources",
               forceExtract: true,
               outDir: "./docs/custom",
@@ -250,6 +253,7 @@ async function loadConfig() {
               ],
             },
             {
+              type: "custom",
               title: "External References",
               keepOriginalUrls: true,
               forceExtract: false,
@@ -291,6 +295,14 @@ async function loadConfig() {
       if (!sourceConfig.title) {
         throw new Error(`sources[${index}].title is required`);
       }
+      if (!sourceConfig.type) {
+        throw new Error(`sources[${index}].type is required`);
+      }
+      if (!["llms.txt", "sitemap", "custom"].includes(sourceConfig.type)) {
+        throw new Error(
+          `sources[${index}].type must be one of: llms.txt, sitemap, custom`
+        );
+      }
 
       // Set defaults
       sourceConfig.forceExtract = sourceConfig.forceExtract ?? false;
@@ -313,13 +325,21 @@ async function loadConfig() {
         }
       }
 
-      // Either origin or customUrls must be provided
+      // Validate type-specific requirements
       if (
-        !sourceConfig.origin &&
+        (sourceConfig.type === "llms.txt" || sourceConfig.type === "sitemap") &&
+        !sourceConfig.origin
+      ) {
+        throw new Error(
+          `sources[${index}] with type '${sourceConfig.type}' requires origin`
+        );
+      }
+      if (
+        sourceConfig.type === "custom" &&
         (!sourceConfig.customUrls || sourceConfig.customUrls.length === 0)
       ) {
         throw new Error(
-          `sources[${index}] must have either origin or customUrls`
+          `sources[${index}] with type 'custom' requires customUrls with at least one entry`
         );
       }
 
