@@ -1,10 +1,11 @@
 {
   "name": "parse-llms-txt",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "main": "mod.js",
-  "bin": "mod.js",
+  "bin": "cli.js",
   "files": [
     "mod.js",
+    "cli.js",
     "README.md"
   ],
   "devDependencies": {

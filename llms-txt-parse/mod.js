@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 //@ts-check
 /// <reference types="@types/node" />
 
@@ -201,67 +200,5 @@ function parseListLine(line) {
   return null;
 }
 
-/**
- * CLI main function - handles command line arguments and file/URL processing
- *
- * Usage:
- * - node parse-llms-txt.js <file-path>
- * - node parse-llms-txt.js <url>
- * - bun parse-llms-txt.js <file-or-url>
- *
- * @returns {Promise<void>}
- */
-async function main() {
-  const args = process.argv.slice(2);
-
-  if (args.length === 0) {
-    console.error("Usage: node parse-llms-txt.js <file-or-url>");
-    console.error("");
-    console.error("Examples:");
-    console.error("  node parse-llms-txt.js llms.txt");
-    console.error("  node parse-llms-txt.js https://docs.parallel.ai/llms.txt");
-    process.exit(1);
-  }
-
-  const input = args[0];
-  let content;
-
-  try {
-    if (input.startsWith("http://") || input.startsWith("https://")) {
-      // Fetch from URL
-      const response = await fetch(input);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      content = await response.text();
-    } else {
-      // Node.js/Bun runtime
-      const fs = await import("fs/promises");
-      content = await fs.readFile(input, "utf-8");
-    }
-
-    const parsed = parseLlmsTxt(content);
-    console.log(JSON.stringify(parsed, null, 2));
-  } catch (error) {
-    console.error(
-      "Error:",
-      error instanceof Error ? error.message : String(error)
-    );
-    process.exit(1);
-  }
-}
-
-// Run CLI if this file is executed directly
-if (
-  typeof process !== "undefined" &&
-  process.argv
-  // &&
-  // import.meta.url === `file://${process.argv[1]}`
-) {
-  main();
-}
-
-// CommonJS compatibility (if needed)
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = { parseLlmsTxt, parseListLine };
-}
+// Also export parseListLine for CLI use
+export { parseListLine };

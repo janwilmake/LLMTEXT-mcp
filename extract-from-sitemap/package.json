@@ -1,7 +1,7 @@
 {
   "name": "extract-from-sitemap",
   "bin": "cli.js",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "main": "mod.js",
   "description": "A module and CLI that allows extracting all pages from a sitemap into markdown and a llms.txt, using Parallel.ai APIs.",
   "files": [
@@ -13,6 +13,6 @@
     "@cloudflare/workers-types": "4.20251011.0"
   },
   "dependencies": {
-    "parse-llms-txt": "^0.0.9"
+    "parse-llms-txt": "^0.0.10"
   }
 }
