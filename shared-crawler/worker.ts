@@ -43,12 +43,43 @@ interface CrawlResult {
   source: "cache" | "llms-txt" | "markdown-accept" | "extract";
 }
 
+// CORS headers helper
+function getCorsHeaders(): Record<string, string> {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
+    "Access-Control-Max-Age": "86400",
+  };
+}
+
+// Helper to add CORS headers to any response
+function addCorsHeaders(response: Response): Response {
+  const newHeaders = new Headers(response.headers);
+  Object.entries(getCorsHeaders()).forEach(([key, value]) => {
+    newHeaders.set(key, value);
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders,
+  });
+}
+
 export default {
   async fetch(
     request: Request,
     env: Env,
     ctx: ExecutionContext,
   ): Promise<Response> {
+    // Handle OPTIONS preflight requests
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: getCorsHeaders(),
+      });
+    }
+
     const url = new URL(request.url);
 
     if (
@@ -69,6 +100,7 @@ export default {
             {
               status: 404,
               headers: {
+                ...getCorsHeaders(),
                 "Content-Type": "text/plain; charset=utf-8",
                 "X-Generated": "true",
               },
@@ -120,7 +152,7 @@ export default {
                   doc.description.length > 100 ? "..." : ""
                 }`
               : "";
-            content += `- [${title}](https://llmtext.com/${doc.url})${description}\n`;
+            content += `- [${title}](${doc.url})${description}\n`;
           }
 
           if (docs.length > 50) {
@@ -133,6 +165,7 @@ export default {
 
         return new Response(content, {
           headers: {
+            ...getCorsHeaders(),
             "Content-Type": "text/plain; charset=utf-8",
             "X-Generated": "true",
             "X-Document-Count": documents.length.toString(),
@@ -146,6 +179,7 @@ export default {
           {
             status: 500,
             headers: {
+              ...getCorsHeaders(),
               "Content-Type": "text/plain; charset=utf-8",
               "X-Generated": "true",
             },
@@ -165,7 +199,10 @@ export default {
       if (!targetUrl) {
         return new Response(JSON.stringify({ error: "url is required" }), {
           status: 400,
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            ...getCorsHeaders(),
+            "Content-Type": "application/json",
+          },
         });
       }
 
@@ -179,7 +216,10 @@ export default {
           JSON.stringify({ error: "PARALLEL_API_KEY required" }),
           {
             status: 401,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              ...getCorsHeaders(),
+              "Content-Type": "application/json",
+            },
           },
         );
       }
@@ -199,7 +239,10 @@ export default {
       }
     }
 
-    return new Response("POST /crawl with { url, options }", { status: 404 });
+    return new Response("POST /crawl with { url, options }", {
+      status: 404,
+      headers: getCorsHeaders(),
+    });
   },
 } satisfies ExportedHandler<Env>;
 
@@ -577,6 +620,7 @@ export class DomainDO extends DurableObject<Env> {
 
     return new Response(stream.readable, {
       headers: {
+        ...getCorsHeaders(),
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
@@ -600,7 +644,10 @@ export class DomainDO extends DurableObject<Env> {
       // Return immediately, process in background
       this.ctx.waitUntil(this.processQueue(queue, visited, options, apiKey));
       return new Response(JSON.stringify({ status: "processing", url }), {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          ...getCorsHeaders(),
+          "Content-Type": "application/json",
+        },
       });
     }
 
@@ -652,7 +699,10 @@ export class DomainDO extends DurableObject<Env> {
     }
 
     return new Response(JSON.stringify({ results, total: results.length }), {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...getCorsHeaders(),
+        "Content-Type": "application/json",
+      },
     });
   }
 
@@ -695,7 +745,10 @@ export class DomainDO extends DurableObject<Env> {
     });
 
     return new Response(parts.join("") + `--${boundary}--`, {
-      headers: { "Content-Type": `multipart/form-data; boundary=${boundary}` },
+      headers: {
+        ...getCorsHeaders(),
+        "Content-Type": `multipart/form-data; boundary=${boundary}`,
+      },
     });
   }
 
@@ -740,7 +793,10 @@ export class DomainDO extends DurableObject<Env> {
       .join("\n\n---\n\n");
 
     return new Response(markdown, {
-      headers: { "Content-Type": "text/markdown" },
+      headers: {
+        ...getCorsHeaders(),
+        "Content-Type": "text/markdown",
+      },
     });
   }
 
