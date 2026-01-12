@@ -1,0 +1,1 @@
+I tried building something with https://github.com/kagisearch/smallweb/blob/main/smallweb.txt today: smallweb is a list of blog feeds from hackernews users. this worker is an attempt at creating an up-to-date crawl of these posts in this feed.

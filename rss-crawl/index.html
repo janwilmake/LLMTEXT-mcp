@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed Crawler - LLMTEXT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #ffffff;
+            --fg: #000000;
+            --primary: #1a1a1a;
+            --primary-light: #404040;
+            --border: #000000;
+            --secondary: #666666;
+            --hover-bg: #f0f0f0;
+            --table-border: #cccccc;
+            --success: #2d5a2d;
+            --error: #8b0000;
+        }
+
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* Header */
+        .header {
+            border-bottom: 2px solid var(--border);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .logo-box {
+            background: var(--fg);
+            color: var(--bg);
+            padding: 0.25rem 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            border: 2px solid var(--fg);
+            display: flex;
+            align-items: baseline;
+            gap: 0.1rem;
+        }
+
+        .logo-main {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .powered-by {
+            font-size: 0.55rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .powered-by a {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            background: var(--bg);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border: 2px solid var(--border);
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--hover-bg);
+            border: none;
+            border-right: 2px solid var(--border);
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab:hover {
+            background: var(--bg);
+        }
+
+        .tab.active {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            border: 2px solid var(--border);
+            padding: 2rem;
+            background: var(--bg);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--fg);
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: inset 0 0 0 1px var(--primary);
+        }
+
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: var(--secondary);
+        }
+
+        .btn-primary {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: var(--bg);
+            border: 2px solid var(--border);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-light);
+        }
+
+        .btn-primary:disabled {
+            background: var(--secondary);
+            cursor: not-allowed;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            color: var(--fg);
+            border: 2px solid var(--border);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            text-transform: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Results */
+        .results-panel {
+            margin-top: 2rem;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            display: none;
+        }
+
+        .results-panel.visible {
+            display: block;
+        }
+
+        .results-header {
+            padding: 1rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-header h3 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .results-body {
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .results-body pre {
+            font-family: inherit;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Status messages */
+        .status {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 2px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        .status.loading {
+            background: var(--hover-bg);
+        }
+
+        .status.success {
+            background: #e8f5e8;
+            border-color: var(--success);
+        }
+
+        .status.error {
+            background: #ffeaea;
+            border-color: var(--error);
+        }
+
+        /* Post list */
+        .post-list {
+            list-style: none;
+        }
+
+        .post-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--table-border);
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .post-title a {
+            color: var(--fg);
+            text-decoration: none;
+        }
+
+        .post-title a:hover {
+            text-decoration: underline;
+        }
+
+        .post-meta {
+            font-size: 0.75rem;
+            color: var(--secondary);
+        }
+
+        .post-keywords {
+            font-size: 0.7rem;
+            color: var(--secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            border: 2px solid var(--border);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--secondary);
+        }
+
+        /* Info Box */
+        .info-box {
+            margin-top: 1.5rem;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            background: var(--hover-bg);
+            font-size: 0.8rem;
+        }
+
+        .info-box p {
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Two column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+
+            .tab:last-child {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo-box">
+                <span class="logo-main">FEED CRAWLER</span>
+            </div>
+            <span class="powered-by">Part of <a href="https://llmtext.com">LLMTEXT.com</a></span>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>RSS/Atom Feed Crawler</h1>
+        <p class="subtitle">Discover and extract content from RSS/Atom feeds</p>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="crawl">Crawl Feed</button>
+            <button class="tab" data-tab="index">Index Smallweb</button>
+            <button class="tab" data-tab="search">Search</button>
+            <button class="tab" data-tab="browse">Browse</button>
+        </div>
+
+        <!-- Crawl Feed Tab -->
+        <div class="tab-content active" id="tab-crawl">
+            <form id="crawlForm">
+                <div class="input-group">
+                    <label for="hostname">Hostname</label>
+                    <input type="text" id="hostname" name="hostname" placeholder="example.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="apiKey">Parallel API Key</label>
+                    <input type="password" id="apiKey" name="apiKey" placeholder="Your Parallel API key" required>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberKey" checked>
+                    <label for="rememberKey">Remember API key in browser</label>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">CRAWL FEED</button>
+            </form>
+
+            <div class="info-box">
+                <p><strong>How it works:</strong></p>
+                <p>1. Discovers RSS/Atom feeds from the hostname</p>
+                <p>2. Extracts markdown content using Parallel AI</p>
+                <p>3. Only re-extracts updated posts on subsequent runs</p>
+            </div>
+
+            <div class="results-panel" id="crawlResults">
+                <div class="results-header">
+                    <h3>Crawl Results</h3>
+                    <button class="btn-secondary" onclick="hideResults('crawlResults')">Close</button>
+                </div>
+                <div class="results-body">
+                    <pre id="crawlResultsContent"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Index Smallweb Tab -->
+        <div class="tab-content" id="tab-index">
+            <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">
+                Index RSS feeds from the <a href="https://github.com/kagisearch/smallweb" target="_blank">Kagi Smallweb</a>
+                list. This will enable periodic feed fetching for each domain.
+            </p>
+
+            <form id="indexForm">
+                <div class="input-group">
+                    <label for="indexApiKey">Parallel API Key (optional)</label>
+                    <input type="password" id="indexApiKey" name="apiKey" placeholder="Provide to enable automatic hourly extraction">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="indexRememberKey" checked>
+                    <label for="indexRememberKey">Remember API key in browser</label>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">CREATE INDEX FROM SMALLWEB.TXT</button>
+            </form>
+
+            <div class="info-box">
+                <p><strong>What this does:</strong></p>
+                <p>1. Fetches the smallweb.txt file from GitHub</p>
+                <p>2. Stores feed metadata for each domain</p>
+                <p>3. Enables hourly feed refresh for each domain</p>
+                <p>4. <strong>With API key:</strong> Automatically extracts new/updated posts each hour</p>
+                <p>5. <strong>Without API key:</strong> Only discovers items; manual extraction required</p>
+            </div>
+
+            <div class="results-panel" id="indexResults">
+                <div class="results-header">
+                    <h3>Index Results</h3>
+                    <button class="btn-secondary" onclick="hideResults('indexResults')">Close</button>
+                </div>
+                <div class="results-body">
+                    <pre id="indexResultsContent"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Tab -->
+        <div class="tab-content" id="tab-search">
+            <form id="searchForm">
+                <div class="input-group">
+                    <label for="searchQuery">Search Keywords</label>
+                    <input type="text" id="searchQuery" name="query" placeholder="Enter keywords to search..." required>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">SEARCH</button>
+            </form>
+
+            <div class="results-panel" id="searchResults">
+                <div class="results-header">
+                    <h3>Search Results</h3>
+                    <button class="btn-secondary" onclick="hideResults('searchResults')">Close</button>
+                </div>
+                <div class="results-body">
+                    <div id="searchResultsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Browse Tab -->
+        <div class="tab-content" id="tab-browse">
+            <form id="browseForm">
+                <div class="input-group">
+                    <label for="browseHostname">Hostname</label>
+                    <input type="text" id="browseHostname" name="hostname" placeholder="example.com" required>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">BROWSE POSTS</button>
+            </form>
+
+            <div class="results-panel" id="browseResults">
+                <div class="results-header">
+                    <h3>Posts</h3>
+                    <button class="btn-secondary" onclick="hideResults('browseResults')">Close</button>
+                </div>
+                <div class="results-body">
+                    <div id="browseResultsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'feedcrawler_api_key';
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Load saved API key on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem(STORAGE_KEY);
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+                document.getElementById('indexApiKey').value = savedKey;
+            }
+        });
+
+        function showResults(panelId, content) {
+            const panel = document.getElementById(panelId);
+            panel.classList.add('visible');
+        }
+
+        function hideResults(panelId) {
+            document.getElementById(panelId).classList.remove('visible');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Unknown date';
+            try {
+                return new Date(dateStr).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch {
+                return dateStr;
+            }
+        }
+
+        // Crawl form
+        document.getElementById('crawlForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const hostname = document.getElementById('hostname').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const rememberKey = document.getElementById('rememberKey').checked;
+
+            if (!hostname || !apiKey) return;
+
+            if (rememberKey) {
+                localStorage.setItem(STORAGE_KEY, apiKey);
+            } else {
+                localStorage.removeItem(STORAGE_KEY);
+            }
+
+            const resultsContent = document.getElementById('crawlResultsContent');
+            resultsContent.textContent = 'Crawling... This may take a while.';
+            showResults('crawlResults');
+
+            try {
+                const resp = await fetch(`/${hostname}?apiKey=${encodeURIComponent(apiKey)}`);
+                const data = await resp.json();
+                resultsContent.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                resultsContent.textContent = 'Error: ' + err.message;
+            }
+        });
+
+        // Create index form
+        document.getElementById('indexForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const apiKey = document.getElementById('indexApiKey').value.trim();
+            const rememberKey = document.getElementById('indexRememberKey').checked;
+
+            if (apiKey && rememberKey) {
+                localStorage.setItem(STORAGE_KEY, apiKey);
+                // Also update the crawl form's API key field
+                document.getElementById('apiKey').value = apiKey;
+            }
+
+            const resultsContent = document.getElementById('indexResultsContent');
+            resultsContent.textContent = 'Creating index... This may take a while.';
+            showResults('indexResults');
+
+            try {
+                let url = '/create-index';
+                if (apiKey) {
+                    url += `?apiKey=${encodeURIComponent(apiKey)}`;
+                }
+                const resp = await fetch(url);
+                const data = await resp.json();
+                resultsContent.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                resultsContent.textContent = 'Error: ' + err.message;
+            }
+        });
+
+        // Search form
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = document.getElementById('searchQuery').value.trim();
+
+            if (!query) return;
+
+            const resultsList = document.getElementById('searchResultsList');
+            resultsList.innerHTML = '<p>Searching...</p>';
+            showResults('searchResults');
+
+            try {
+                const resp = await fetch(`/search/${encodeURIComponent(query)}`);
+                const data = await resp.json();
+
+                if (data.results && data.results.length > 0) {
+                    resultsList.innerHTML = `
+                        <p style="margin-bottom: 1rem; font-size: 0.85rem;">
+                            Found <strong>${data.results.length}</strong> posts matching "<strong>${data.query}</strong>"
+                        </p>
+                        <ul class="post-list">
+                            ${data.results.map(post => `
+                                <li class="post-item">
+                                    <div class="post-title"><a href="${post.url}" target="_blank">${post.title || 'Untitled'}</a></div>
+                                    <div class="post-meta">${post.hostname} &middot; ${formatDate(post.updated)}</div>
+                                    ${post.keywords ? `<div class="post-keywords">Keywords: ${post.keywords}</div>` : ''}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                } else {
+                    resultsList.innerHTML = '<p>No results found.</p>';
+                }
+            } catch (err) {
+                resultsList.innerHTML = '<p>Error: ' + err.message + '</p>';
+            }
+        });
+
+        // Browse form
+        document.getElementById('browseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const hostname = document.getElementById('browseHostname').value.trim();
+
+            if (!hostname) return;
+
+            const resultsList = document.getElementById('browseResultsList');
+            resultsList.innerHTML = '<p>Loading posts...</p>';
+            showResults('browseResults');
+
+            try {
+                const resp = await fetch(`/${hostname}`);
+                const data = await resp.json();
+
+                if (data.posts && data.posts.length > 0) {
+                    resultsList.innerHTML = `
+                        <p style="margin-bottom: 1rem; font-size: 0.85rem;">
+                            Found <strong>${data.posts.length}</strong> posts from <strong>${data.hostname}</strong>
+                        </p>
+                        <ul class="post-list">
+                            ${data.posts.map(post => `
+                                <li class="post-item">
+                                    <div class="post-title"><a href="${post.url}" target="_blank">${post.title || 'Untitled'}</a></div>
+                                    <div class="post-meta">${formatDate(post.updated)}</div>
+                                    ${post.keywords ? `<div class="post-keywords">Keywords: ${post.keywords}</div>` : ''}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                } else {
+                    resultsList.innerHTML = `<p>No posts found for ${hostname}. Try crawling this feed first.</p>`;
+                }
+            } catch (err) {
+                resultsList.innerHTML = '<p>Error: ' + err.message + '</p>';
+            }
+        });
+    </script>
+</body>
+
+</html>
