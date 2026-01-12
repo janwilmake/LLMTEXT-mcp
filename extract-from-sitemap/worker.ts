@@ -11,7 +11,7 @@ export default {
     if (!apiKey) {
       return new Response(
         JSON.stringify({ error: "Authorization header not configured" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
+        { status: 401, headers: { "Content-Type": "application/json" } },
       );
     }
 
@@ -26,7 +26,7 @@ export default {
         JSON.stringify({
           error: "Missing 'origin' or 'hostname' query parameter",
         }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
@@ -40,7 +40,7 @@ export default {
         JSON.stringify({
           error: error instanceof Error ? error.message : "Unknown error",
         }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        { status: 500, headers: { "Content-Type": "application/json" } },
       );
     }
   },

@@ -6,6 +6,10 @@
   "type": "object",
   "properties": {
     "$schema": { "type": "string" },
+    "origin": {
+      "type": "string",
+      "description": "origin for every llms.txt link"
+    },
     "description": {
       "type": "string",
       "description": "Description of the documentation collection (appears after > in llms.txt)",

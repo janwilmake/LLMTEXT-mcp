@@ -640,6 +640,7 @@ export async function processLLMTextConfig(config, apiKey) {
     config.title,
     config.description,
     config.details,
+    config.origin,
     allSources,
   );
 
@@ -662,11 +663,18 @@ export async function processLLMTextConfig(config, apiKey) {
  * Generate combined llms.txt from all sources
  * @param {string} title - Top-level title
  * @param {string} description - Top-level description
- * @param {string} [details] - Optional top-level details
+ * @param {string} details - top-level details
+ * @param {string} origin - origin for all links
  * @param {ProcessedSource[]} allSources - All processed sources
  * @returns {string} Combined llms.txt content
  */
-function generateCombinedLlmsTxt(title, description, details, allSources) {
+function generateCombinedLlmsTxt(
+  title,
+  description,
+  details,
+  origin,
+  allSources,
+) {
   let combinedTxt = `# ${title}\n\n> ${description}\n\n`;
 
   if (details) {
@@ -693,7 +701,12 @@ function generateCombinedLlmsTxt(title, description, details, allSources) {
         if (source.keepOriginalUrls) {
           link = file.originalUrl;
         } else {
-          link = source.pathPrefix + (path.startsWith("/") ? path : "/" + path);
+          link = [origin, source.pathPrefix, path]
+            .filter((x) => !!x)
+            .map((chunk) => (chunk.startsWith("/") ? chunk.slice(1) : chunk))
+            .map((chunk) => (chunk.endsWith("/") ? chunk.slice(-1) : chunk))
+            .filter((x) => !!x)
+            .join("/");
         }
 
         combinedTxt += `- [${title}](${link})${description}\n`;
