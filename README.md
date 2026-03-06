@@ -16,21 +16,25 @@
 - [extract-from-sitemap](extract-from-sitemap): Generate llms.txt from a sitemap
 - [llms-txt-fetch](llms-txt-fetch): fetch all contents of a `llms.txt`
 - [llms-txt-generate](llms-txt-generate): Use this in combination with [getassetmanifest](getassetmanifest) if you want to deploy static assets already present in your fs as a `llms.txt`.
-- [llms-txt-mcp](llms-txt-mcp): converts a llms.txt into a dedicated MCP server
 - [llms-txt-parse](llms-txt-parse): parse llms.txt according to [the standard](https://llmstxt.org)
 - [llms-txt-validate](llms-txt-validate): Check llms.txt validity
-- [shared-crawler](shared-crawler): Crawls a website and stores results in DOs so anyone can access them cheaply. Available via https://crawl.llmtext.com. Is used
 
-### Other
+### Services
 
-- [llmtext](llmtext): the website. Also exposes https://llmtext.com/%s where %s can be any url to get markdown for it. Depends on [shared-crawler](shared-crawler) for that.
-- [llmtext.login](llmtext.login): X OAuth flow for the MCP
-- [llmtext.reader](llmtext.reader): converts HTML into simplified "browser-reader HTML", drastically improving token density
+| Repo                                 | Website                              | Description                                                                                                                                            |
+| ------------------------------------ | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [explore-sitemaps](explore-sitemaps) | https://map.llmtext.com              | crawls a website for rss, llms.txt, and sitemaps to find pages.                                                                                        |
+| [llms-txt-mcp](llms-txt-mcp)         | https://mcp.llmtext.com/{domain}/mcp | converts a llms.txt into a dedicated MCP server.                                                                                                       |
+| [shared-crawler](shared-crawler)     | https://crawl.llmtext.com            | Crawls a website and stores results in DOs so anyone can access them cheaply.                                                                          |
+| [llmtext](llmtext)                   |                                      | the website. Also exposes https://llmtext.com/%s where %s can be any url to get markdown for it. Depends on [shared-crawler](shared-crawler) for that. |
+| [llmtext.login](llmtext.login)       |                                      | X OAuth flow for the MCP                                                                                                                               |
+| [llmtext.reader](llmtext.reader)     |                                      | Converts HTML into simplified "browser-reader HTML", drastically improving token density                                                               |
 
 ### Other interesting repos
 
 - [markdown-renderer](https://github.com/janwilmake/markdown-renderer): Chrome/Safari Extension that renders markdown responses
 - [markdownbrowser](https://github.com/janwilmake/markdownbrowser)
+- [openwebgate](https://github.com/janwilmake/openwebgate) - shadow site principle
 
 ## Sponsors
 
@@ -48,8 +52,6 @@ I had a repo to scrape the entire website of simonw
 
 Notable private projects - https://github.com/janwilmake/xybrowse
 
-https://github.com/janwilmake/markdownbrowser
-https://github.com/janwilmake/openwebgate - THIS IS THE SHADOW SITE PRINCIPLE
 
 https://github.com/janwilmake/llmtext.browser
 https://github.com/janwilmake/llmtext.crawler
@@ -60,6 +62,8 @@ https://github.com/janwilmake/web-reader
 
 shadowsites
 
-https://github.com/janwilmake/arxivmd.org
-https://github.com/janwilmake/googllm https://github.com/janwilmake/googllm-parallel https://github.com/janwilmake/googllm-raw
+- https://github.com/janwilmake/arxivmd.org
+- https://github.com/janwilmake/googllm
+- https://github.com/janwilmake/googllm-parallel
+- https://github.com/janwilmake/googllm-raw
 -->

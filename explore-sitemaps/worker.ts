@@ -1,3 +1,6 @@
+/// <reference types="@cloudflare/workers-types" />
+/// <reference lib="esnext" />
+
 /**
  * Cloudflare Worker for crawling and parsing site indexes
  * Parses robots.txt, sitemaps, RSS feeds, and llms.txt files
@@ -128,7 +131,7 @@ const COMMON_RSS_PATHS = [
   "/index.xml",
   "/blog/feed",
   "/blog/rss",
-  "/news/feed",
+  "/news/feed"
 ];
 
 // Common llms.txt paths
@@ -141,7 +144,7 @@ function parseRobotsTxt(content: string): ParsedRobotsTxt {
   const lines = content.split("\n").map((l) => l.trim());
   const result: ParsedRobotsTxt = {
     rules: [],
-    sitemaps: [],
+    sitemaps: []
   };
 
   let currentRule: RobotsRule | null = null;
@@ -165,7 +168,7 @@ function parseRobotsTxt(content: string): ParsedRobotsTxt {
           userAgent: value,
           allow: [],
           disallow: [],
-          sitemaps: [],
+          sitemaps: []
         };
         break;
 
@@ -215,18 +218,18 @@ function parseRobotsTxt(content: string): ParsedRobotsTxt {
  */
 function checkAllowed(
   robots: ParsedRobotsTxt | null,
-  userAgent: string,
+  userAgent: string
 ): AllowedResult {
   if (!robots) {
     return {
       allowed: true,
-      reason: "No robots.txt found, assuming allowed",
+      reason: "No robots.txt found, assuming allowed"
     };
   }
 
   // Find matching rule - first try exact match, then wildcard
   let matchingRule = robots.rules.find(
-    (r) => r.userAgent.toLowerCase() === userAgent.toLowerCase(),
+    (r) => r.userAgent.toLowerCase() === userAgent.toLowerCase()
   );
 
   if (!matchingRule) {
@@ -236,21 +239,21 @@ function checkAllowed(
   if (!matchingRule) {
     return {
       allowed: true,
-      reason: "No matching user-agent rule found, assuming allowed",
+      reason: "No matching user-agent rule found, assuming allowed"
     };
   }
 
   // Check for blanket disallow
   const hasDisallowAll = matchingRule.disallow.some((d) => d === "/");
   const hasAllowRoot = matchingRule.allow.some(
-    (a) => a === "/" || a === "/*" || a === "",
+    (a) => a === "/" || a === "/*" || a === ""
   );
 
   if (hasDisallowAll && !hasAllowRoot) {
     return {
       allowed: false,
       reason: `Disallow: / rule found for user-agent "${matchingRule.userAgent}"`,
-      matchedRule: `User-agent: ${matchingRule.userAgent}\nDisallow: /`,
+      matchedRule: `User-agent: ${matchingRule.userAgent}\nDisallow: /`
     };
   }
 
@@ -261,19 +264,19 @@ function checkAllowed(
     "CCBot",
     "anthropic",
     "Claude",
-    "Google-Extended",
+    "Google-Extended"
   ];
   const isAiAgent = aiBlockPatterns.some(
     (p) =>
       userAgent.toLowerCase().includes(p.toLowerCase()) ||
-      matchingRule!.userAgent.toLowerCase().includes(p.toLowerCase()),
+      matchingRule!.userAgent.toLowerCase().includes(p.toLowerCase())
   );
 
   if (isAiAgent && hasDisallowAll) {
     return {
       allowed: false,
       reason: `AI bot "${userAgent}" appears to be blocked`,
-      matchedRule: `User-agent: ${matchingRule.userAgent}\nDisallow: /`,
+      matchedRule: `User-agent: ${matchingRule.userAgent}\nDisallow: /`
     };
   }
 
@@ -282,7 +285,7 @@ function checkAllowed(
     reason: `Allowed based on rules for user-agent "${matchingRule.userAgent}"`,
     matchedRule: `User-agent: ${matchingRule.userAgent}\nAllow: ${
       matchingRule.allow.join(", ") || "(default)"
-    }\nDisallow: ${matchingRule.disallow.join(", ") || "(none)"}`,
+    }\nDisallow: ${matchingRule.disallow.join(", ") || "(none)"}`
   };
 }
 
@@ -303,7 +306,7 @@ function parseSitemap(content: string): ParsedSitemap {
       if (locMatch) {
         sitemaps.push({
           loc: locMatch[1].trim(),
-          lastmod: lastmodMatch ? lastmodMatch[1].trim() : undefined,
+          lastmod: lastmodMatch ? lastmodMatch[1].trim() : undefined
         });
       }
     }
@@ -321,14 +324,14 @@ function parseSitemap(content: string): ParsedSitemap {
 
     if (locMatch) {
       const entry: SitemapEntry = {
-        loc: locMatch[1].trim(),
+        loc: locMatch[1].trim()
       };
 
       const lastmodMatch = urlContent.match(/<lastmod>(.*?)<\/lastmod>/);
       if (lastmodMatch) entry.lastmod = lastmodMatch[1].trim();
 
       const changefreqMatch = urlContent.match(
-        /<changefreq>(.*?)<\/changefreq>/,
+        /<changefreq>(.*?)<\/changefreq>/
       );
       if (changefreqMatch) entry.changefreq = changefreqMatch[1].trim();
 
@@ -357,12 +360,12 @@ function parseRSS(content: string): ParsedRSS {
     if (linkMatch) result.link = linkMatch[1].trim();
 
     const descMatch = content.match(
-      /<channel>[\s\S]*?<description>(.*?)<\/description>/,
+      /<channel>[\s\S]*?<description>(.*?)<\/description>/
     );
     if (descMatch) result.description = decodeXMLEntities(descMatch[1]);
 
     const lastBuildMatch = content.match(
-      /<lastBuildDate>(.*?)<\/lastBuildDate>/,
+      /<lastBuildDate>(.*?)<\/lastBuildDate>/
     );
     if (lastBuildMatch) result.lastBuildDate = lastBuildMatch[1].trim();
 
@@ -418,7 +421,7 @@ function parseRSS(content: string): ParsedRSS {
       if (entrySummary) item.description = decodeXMLEntities(entrySummary[1]);
 
       const entryPublished = entryContent.match(
-        /<published>(.*?)<\/published>/,
+        /<published>(.*?)<\/published>/
       );
       if (entryPublished) item.pubDate = entryPublished[1].trim();
 
@@ -454,7 +457,7 @@ function parseLlmsTxtContent(markdown: string): LlmsTxtFile {
 
   const result: LlmsTxtFile = {
     title: "",
-    sections: [],
+    sections: []
   };
 
   let currentSection: Section | null = null;
@@ -491,7 +494,7 @@ function parseLlmsTxtContent(markdown: string): LlmsTxtFile {
         foundFirstH2 = true;
         currentSection = {
           name: line.substring(3).trim(),
-          files: [],
+          files: []
         };
         continue;
       } else if (line !== "") {
@@ -510,7 +513,7 @@ function parseLlmsTxtContent(markdown: string): LlmsTxtFile {
 
       currentSection = {
         name: line.substring(3).trim(),
-        files: [],
+        files: []
       };
       continue;
     }
@@ -530,13 +533,13 @@ function parseLlmsTxtContent(markdown: string): LlmsTxtFile {
         const name = linkMatch[1];
         const url = linkMatch[2];
         const afterLink = content.substring(
-          linkMatch.index! + linkMatch[0].length,
+          linkMatch.index! + linkMatch[0].length
         );
         const colonMatch = afterLink.match(/:\s*(.+)/);
 
         const fileEntry: FileEntry = {
           name: name.trim(),
-          url: url.trim(),
+          url: url.trim()
         };
 
         if (colonMatch) {
@@ -565,7 +568,7 @@ function parseLlmsTxtContent(markdown: string): LlmsTxtFile {
 function calculateRefreshRecommendation(
   robots: ParsedRobotsTxt | null,
   sitemaps: { parsed?: ParsedSitemap }[],
-  rssFeeds: { parsed?: ParsedRSS }[],
+  rssFeeds: { parsed?: ParsedRSS }[]
 ): RefreshRecommendation {
   const factors: string[] = [];
   let recommendedHours = 24; // Default to daily
@@ -573,7 +576,7 @@ function calculateRefreshRecommendation(
   // Check crawl delay
   if (robots) {
     const maxCrawlDelay = Math.max(
-      ...robots.rules.map((r) => r.crawlDelay || 0),
+      ...robots.rules.map((r) => r.crawlDelay || 0)
     );
     if (maxCrawlDelay > 0) {
       factors.push(`Crawl delay specified: ${maxCrawlDelay}s`);
@@ -617,7 +620,7 @@ function calculateRefreshRecommendation(
         if (avgGapHours > 0 && avgGapHours < recommendedHours) {
           recommendedHours = Math.ceil(avgGapHours);
           factors.push(
-            `RSS feed average update interval: ${avgGapHours.toFixed(1)}h`,
+            `RSS feed average update interval: ${avgGapHours.toFixed(1)}h`
           );
         }
       }
@@ -633,7 +636,7 @@ function calculateRefreshRecommendation(
       factors.length > 0
         ? "Based on site signals"
         : "Default recommendation (no signals found)",
-    factors,
+    factors
   };
 }
 
@@ -642,7 +645,7 @@ function calculateRefreshRecommendation(
  */
 async function safeFetch(
   url: string,
-  fetchCount: { count: number },
+  fetchCount: { count: number }
 ): Promise<{ content: string | null; error?: string }> {
   if (fetchCount.count >= MAX_FETCHES) {
     return { content: null, error: "Max fetch limit reached" };
@@ -657,8 +660,8 @@ async function safeFetch(
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        "User-Agent": "SiteCrawler/1.0 (Index Crawler)",
-      },
+        "User-Agent": "SiteCrawler/1.0 (Index Crawler)"
+      }
     });
 
     clearTimeout(timeout);
@@ -672,7 +675,7 @@ async function safeFetch(
   } catch (error) {
     return {
       content: null,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error.message : "Unknown error"
     };
   }
 }
@@ -682,7 +685,7 @@ async function safeFetch(
  */
 async function crawlDomain(
   domainName: string,
-  userAgent: string,
+  userAgent: string
 ): Promise<CrawlResult> {
   const fetchCount = { count: 0 };
   const baseUrl = domainName.startsWith("http")
@@ -701,10 +704,10 @@ async function crawlDomain(
     refreshRecommendation: {
       recommendedRefreshHours: 24,
       reason: "Default",
-      factors: [],
+      factors: []
     },
     fetchCount: 0,
-    maxFetches: MAX_FETCHES,
+    maxFetches: MAX_FETCHES
   };
 
   // 1. Fetch and parse robots.txt
@@ -719,7 +722,7 @@ async function crawlDomain(
     result.robotsTxt.error = robotsResult.error;
     result.allowedToScrape = {
       allowed: true,
-      reason: "No robots.txt found, assuming allowed",
+      reason: "No robots.txt found, assuming allowed"
     };
   }
 
@@ -761,7 +764,7 @@ async function crawlDomain(
       } catch (e) {
         result.sitemaps.push({
           url: sitemapUrl,
-          error: e instanceof Error ? e.message : "Parse error",
+          error: e instanceof Error ? e.message : "Parse error"
         });
       }
     } else if (sitemapResult.error && sitemapResult.error !== "HTTP 404") {
@@ -796,7 +799,7 @@ async function crawlDomain(
       } catch (e) {
         result.rssFeeds.push({
           url: rssUrl,
-          error: e instanceof Error ? e.message : "Parse error",
+          error: e instanceof Error ? e.message : "Parse error"
         });
       }
     }
@@ -818,7 +821,7 @@ async function crawlDomain(
       } catch (e) {
         result.llmsTxt.push({
           url: llmsUrl,
-          error: e instanceof Error ? e.message : "Parse error",
+          error: e instanceof Error ? e.message : "Parse error"
         });
       }
     }
@@ -828,7 +831,7 @@ async function crawlDomain(
   result.refreshRecommendation = calculateRefreshRecommendation(
     result.robotsTxt.parsed || null,
     result.sitemaps,
-    result.rssFeeds,
+    result.rssFeeds
   );
 
   result.fetchCount = fetchCount.count;
@@ -840,7 +843,7 @@ export default {
   async fetch(
     request: Request,
     env: Env,
-    ctx: ExecutionContext,
+    ctx: ExecutionContext
   ): Promise<Response> {
     const url = new URL(request.url);
 
@@ -850,8 +853,8 @@ export default {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
-        },
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
       });
     }
 
@@ -878,9 +881,9 @@ For more details on the response format, check /openapi.html or /openapi.json
         {
           status: 404,
           headers: {
-            "Content-Type": "text/plain",
-          },
-        },
+            "Content-Type": "text/plain"
+          }
+        }
       );
     }
     console.log({ domain, userAgent });
@@ -892,24 +895,24 @@ For more details on the response format, check /openapi.html or /openapi.json
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
-          "Cache-Control": "public, max-age=3600",
-        },
+          "Cache-Control": "public, max-age=3600"
+        }
       });
     } catch (error) {
       return new Response(
         JSON.stringify({
           error: "Crawl failed",
           message: error instanceof Error ? error.message : "Unknown error",
-          domain,
+          domain
         }),
         {
           status: 500,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        },
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
       );
     }
-  },
+  }
 };
