@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
   "name": "llmtext-www",
   "main": "main.ts",
-  "assets": { "directory": "./" },
+  "assets": { "directory": "./public" },
   "compatibility_date": "2025-10-14",
   "observability": { "logs": { "enabled": true } },
   "routes": [
